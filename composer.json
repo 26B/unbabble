@@ -1,0 +1,35 @@
+{
+  "name": "26b/unbabble",
+  "description": "A new and simple i18n system for WordPress",
+  "type": "wordpress-plugin",
+  "keywords": [
+    "wordpress",
+    "plugin"
+  ],
+  "homepage": "https://github.com/26B/unbabble",
+  "license": "GPL-2.0+",
+  "require": {
+    "composer/installers": "^1.11",
+    "dg/composer-cleaner": "^2.2",
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.5.7",
+    "10up/wp_mock": "@dev"
+  },
+  "authors": [],
+  "autoload": {
+    "psr-4": {
+      "TwentySixB\\WP\\Plugin\\Unbabble\\": "lib/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "TwentySixB\\WP\\Plugin\\Unbabble\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "config": {
+    "sort-packages": true
+  }
+}

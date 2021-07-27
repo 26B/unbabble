@@ -1,23 +1,66 @@
-# ignore everything in the root except the "wp-content" directory.
-!wp-content/
-
-# ignore everything in the "wp-content" directory, except:
-# "mu-plugins", "plugins", "themes" directory
-wp-content/*
-!wp-content/mu-plugins/
-!wp-content/plugins/
-!wp-content/themes/
-
-# ignore these plugins
-wp-content/plugins/hello.php
-
-# ignore specific themes
-wp-content/themes/twenty*/
-
-# ignore node dependency directories
+# Dependencies #
+################
+vendor/
 node_modules/
 
-# ignore log files and databases
+# Build directories #
+#####################
+.sass-cache
+
+# IDEs #
+########
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+.idea/
+.idea_modules/
+*.ipr
+*.iws
+*.iml
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+*.sublime-workspace
+*.code-workspace
+.vscode
+
+# VCS #
+#######
+.svn
+.cvs
+
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.bz2
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.tgz
+
+# Logs and databases #
+######################
+/logs
 *.log
 *.sql
-*.sqlite
+
+# OS generated files #
+######################
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+._*
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+*.bak
+*.swp
+*.orig
