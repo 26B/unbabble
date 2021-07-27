@@ -56,7 +56,6 @@ class Plugin {
 	public function run() {
 		$this->set_locale();
 		$this->define_admin_hooks();
-		$this->define_frontend_hooks();
 	}
 
 	/**
@@ -106,24 +105,6 @@ class Plugin {
 
 		$components = [
 			'admin' => new Admin( $this ),
-		];
-
-		foreach ( $components as $component ) {
-			$component->register();
-		}
-	}
-
-	/**
-	 * Register all of the hooks related to the public-facing functionality
-	 * of the plugin.
-	 *
-	 * @since  0.0.0
-	 * @access private
-	 */
-	private function define_frontend_hooks() {
-
-		$components = [
-			'frontend' => new Frontend( $this ),
 		];
 
 		foreach ( $components as $component ) {
