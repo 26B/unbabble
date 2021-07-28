@@ -104,7 +104,8 @@ class Plugin {
 	private function define_admin_hooks() {
 
 		$components = [
-			'admin' => new Admin( $this ),
+			'admin'        => new Admin( $this ),
+			'options_page' => new OptionsPage( $this ),
 		];
 
 		foreach ( $components as $component ) {
