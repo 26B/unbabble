@@ -104,7 +104,8 @@ class Plugin {
 	private function define_admin_hooks() {
 
 		$components = [
-			'admin' => new Admin( $this ),
+			'admin'            => new Admin( $this ),
+			'language_metabox' => new LanguageMetaBox( $this ),
 		];
 
 		foreach ( $components as $component ) {
