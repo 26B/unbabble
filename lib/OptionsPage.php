@@ -25,7 +25,7 @@ class OptionsPage {
 	}
 
 	public function add_options_to_page() {
-		\register_setting( 'unbabble_options', 'unbabble_options', [ $this, 'test_validate' ] ); //TODO: args
+		\register_setting( 'unbabble_options', 'unbabble_options', [ $this, 'validate_options' ] );
 		\add_settings_section( 'languages', 'Languages', '', 'unbabble' );
 
 		\add_settings_field( 'allowed_languages', 'Allowed Languages', [ $this, 'field_allowed_languages' ], 'unbabble', 'languages', [] );
@@ -87,7 +87,7 @@ class OptionsPage {
 		);
 	}
 
-	public function test_validate( $input ) {
+	public function validate_options( $input ) {
 		if ( empty( $input['allowed_languages'] ) ) {
 			$input['default_language'] = '';
 
