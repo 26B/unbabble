@@ -15,6 +15,7 @@ class LanguageMetaBox {
 	 * @since 0.0.0
 	 */
 	public function register() {
+
 		// Post meta box.
 		\add_action( 'add_meta_boxes', [ $this, 'language_metabox' ] );
 		\add_action( 'save_post', [ $this, 'save_language_meta' ] );
@@ -75,7 +76,7 @@ class LanguageMetaBox {
 			$meta = $options['default_language'];
 		}
 
-		$this->print_language_metabox( $meta, $options );
+		$this->print_language_select( $meta, $options );
 		// TODO: Add translate or duplicate into other language fields options
 	}
 
@@ -99,7 +100,17 @@ class LanguageMetaBox {
 
 	public function new_term_language_metabox() {
 		$options = \get_option( 'unbabble_options' );
-		$this->print_language_metabox( $options['default_language'], $options );
+
+		printf(
+			'<div class="form-field term-language-wrap">
+				<label for="tag-language">%1$s</label>
+				%2$s
+				<p>%3$s</p>
+			</div>',
+			esc_html__( 'Language', 'unbabble' ),
+			$this->print_language_select( $options['default_language'], $options, false ),
+			esc_html__( 'The term only appears on the site for this language.', 'unbabble' )
+		);
 	}
 
 	public function edit_term_language_metabox( $term ) {
@@ -108,7 +119,19 @@ class LanguageMetaBox {
 		if ( empty( $meta ) ) {
 			$meta = $options['default_language'];
 		}
-		$this->print_language_metabox( $meta, $options );
+
+		printf(
+			'<tr class="form-field term-language-wrap">
+				<th scope="row"><label for="language">%1$s</label></th>
+				<td>
+					%2$s
+					<p class="description">%3$s</p>
+				</td>
+			</tr>',
+			esc_html__( 'Language', 'unbabble' ),
+			$this->print_language_select( $meta, $options, false ),
+			esc_html__( 'The term only appears on the site for this language.', 'unbabble' )
+		);
 	}
 
 	public function save_term_language_meta( $term_id ) {
@@ -129,7 +152,7 @@ class LanguageMetaBox {
 		}
 	}
 
-	private function print_language_metabox( $selected, $options ) : void {
+	private function print_language_select( $selected, $options, $echo = true ) {
 		$langs = array_map(
 			function ( $lang ) use ( $selected ) {
 				return sprintf(
@@ -143,14 +166,14 @@ class LanguageMetaBox {
 
 		\wp_nonce_field( 'ubb_language_metabox', 'ubb_language_metabox_nonce' );
 
-		printf(
-			'<label for="term-meta-text">%s</label>
-			<select id="ubb_lang" name="ubb_lang">
+		$output = sprintf(
+			'<select id="ubb_lang" name="ubb_lang">
 				%s
 			</select>',
-			__( 'Language', 'unbabble' ),
 			implode( '', $langs )
 		);
+
+		return ! $echo ? $output : printf( $output );
 	}
 
 	private function verify_nonce() : bool {
