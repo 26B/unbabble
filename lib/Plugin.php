@@ -106,6 +106,7 @@ class Plugin {
 		$components = [
 			'admin'            => new Admin( $this ),
 			'language_metabox' => new LanguageMetaBox( $this ),
+			'options_page'     => new OptionsPage( $this ),
 		];
 
 		foreach ( $components as $component ) {

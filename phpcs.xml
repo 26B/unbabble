@@ -21,5 +21,10 @@
     <severity>0</severity>
   </rule>
 
+  <!-- Ignore Short Array Syntax -->
+  <rule ref="Generic.Arrays.DisallowShortArraySyntax">
+    <severity>0</severity>
+  </rule>
+
   <rule ref="WordPress-Extra" />
 </ruleset>
