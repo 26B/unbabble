@@ -15,6 +15,9 @@ class LanguageMetaBox {
 	 * @since 0.0.0
 	 */
 	public function register() {
+		if ( Options::only_one_language_allowed() ) {
+			return;
+		}
 
 		// Post meta box.
 		\add_action( 'add_meta_boxes', [ $this, 'language_metabox' ] );
@@ -71,7 +74,7 @@ class LanguageMetaBox {
 
 	public function ubb_lang_callback( \WP_Post $post ) {
 		$meta    = \get_post_meta( $post->ID, 'ubb_lang', true );
-		$options = \get_option( 'unbabble_options' );
+		$options = Options::get();
 		if ( empty( $meta ) ) {
 			$meta = $options['default_language'];
 		}
@@ -99,7 +102,7 @@ class LanguageMetaBox {
 	}
 
 	public function new_term_language_metabox() {
-		$options = \get_option( 'unbabble_options' );
+		$options = Options::get();
 
 		printf(
 			'<div class="form-field term-language-wrap">
@@ -115,7 +118,7 @@ class LanguageMetaBox {
 
 	public function edit_term_language_metabox( $term ) {
 		$meta    = \get_term_meta( $term->term_id, 'ubb_lang', true );
-		$options = \get_option( 'unbabble_options' );
+		$options = Options::get();
 		if ( empty( $meta ) ) {
 			$meta = $options['default_language'];
 		}
@@ -143,7 +146,7 @@ class LanguageMetaBox {
 		$new_lang = \sanitize_text_field( $_POST['ubb_lang'] );
 
 		if ( $new_lang === '' ) {
-			$options  = \get_option( 'unbabble_options' );
+			$options  = Options::get();
 			$new_lang = $options['default_language'];
 		}
 
@@ -161,6 +164,7 @@ class LanguageMetaBox {
 					\selected( $lang, $selected, false )
 				);
 			},
+			// TODO: This shouldn't happen. Should always be array.
 			is_array( $options['allowed_languages'] ) ? $options['allowed_languages'] : []
 		);
 
