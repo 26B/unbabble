@@ -4,6 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 
 class OptionsPage {
 
+	// TODO: replace with full list.
 	private $available_langs = [
 		'pt_PT',
 		'en',
