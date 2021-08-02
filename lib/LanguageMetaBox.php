@@ -20,41 +20,21 @@ class LanguageMetaBox {
 		}
 
 		// Post meta box.
-		\add_action( 'add_meta_boxes', [ $this, 'language_metabox' ] );
+		\add_action( 'add_meta_boxes', [ $this, 'post_language_selector' ] );
 		\add_action( 'save_post', [ $this, 'save_language_meta' ] );
 
 		// Term meta box.
 		\add_action( 'init', [ $this, 'register_term_meta' ] );
-		$taxonomies = \get_taxonomies(
-			[
-				'public'  => true,
-				'show_ui' => true,
-			]
-		);
-		foreach ( $taxonomies as $taxonomy ) {
-			\add_action( "{$taxonomy}_add_form_fields", [ $this, 'new_term_language_metabox' ] );
-			\add_action( "{$taxonomy}_edit_form_fields", [ $this, 'edit_term_language_metabox' ] );
-			\add_action( "edit_{$taxonomy}", [ $this, 'save_term_language_meta' ] );
-			\add_action( "create_{$taxonomy}", [ $this, 'save_term_language_meta' ] );
-		}
+		\add_action( 'init', [ $this, 'term_language_selector' ] );
 	}
 
-	public function language_metabox() {
-		$post_types = \get_post_types(
-			[
-				'public'  => true,
-				'show_ui' => true,
-			]
-		);
-		$post_types = array_filter(
-			$post_types,
-			fn ( $post_type ) => ! in_array( $post_type, [ 'revision', 'attachment' ], true )
-		);
+	public function post_language_selector() {
+
+		// Filter for allowed post types.
+		$post_types = array_intersect( \get_post_types(), Options::get_allowed_post_types() );
 
 		/**
 		 * Allow for the post types that are translatable to be filtered.
-		 *
-		 * TODO: we need to add the post types as a configuration for non dev users.
 		 */
 		$post_types = \apply_filters( 'ubb_translatable_post_types', $post_types );
 
@@ -99,6 +79,24 @@ class LanguageMetaBox {
 
 	public function register_term_meta() {
 		\register_meta( 'term', 'ubb_lang', [] );
+	}
+
+	public function term_language_selector() {
+
+		// Filter for allowed taxonomies.
+		$taxonomies = array_intersect( \get_taxonomies(), Options::get_allowed_taxonomies() );
+
+		/**
+		 * Allow for the taxonomies that are translatable to be filtered.
+		 */
+		$taxonomies = \apply_filters( 'ubb_translatable_taxonomies', $taxonomies );
+
+		foreach ( $taxonomies as $taxonomy ) {
+			\add_action( "{$taxonomy}_add_form_fields", [ $this, 'new_term_language_metabox' ] );
+			\add_action( "{$taxonomy}_edit_form_fields", [ $this, 'edit_term_language_metabox' ] );
+			\add_action( "edit_{$taxonomy}", [ $this, 'save_term_language_meta' ] );
+			\add_action( "create_{$taxonomy}", [ $this, 'save_term_language_meta' ] );
+		}
 	}
 
 	public function new_term_language_metabox() {
