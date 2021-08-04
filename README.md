@@ -1,39 +1,32 @@
-# WP-Plugin
+# unbabble
 
-All you need to start creating a plugin for WordPress.
+A simpler way to translate content in WordPress.
 
-We aim to deliver a focus on the API features of WordPress and it's eventual use as a headless CMS, but feel free to use this base for any kind of plugin. It provides several features that will enable you to develop and test your code.
+This plugin aims to be simpler and, above all, aligned with WordPress in providing translations for entities (posts and terms). We don't use any custom tables columns, or taxonomies. Just a few meta fields and a lot of hooking.
 
-## Getting started
+## Developing
 
-### Find and Replace
+We use a standard WordPress plugin approach with OOP style and composer to manage dependencies. This is where we don't align so well with WordPress' core. There are also some screens that are made with JavaScript, using ReactJS, and we try to match all the minimum requirements from WordPress.
 
-This project is a skeleton, so it has a bunch of keys that need to be replaced with values specific to your project.
+## Architecture
 
-For these changes, you should use the "Find and Replace" feature of your editor. Later there will be more options to this. Below you can find the table with the keys and their respective description, along with an example for the possible value.
+A lot of decisions went into this. We try to provide information on all of them to allow for new contributions to be easy and, also, for those seeking to contributo to have a place to fallback when understanding everything. (It's not just for newcommers we all use it 😉)
 
-| Key                      | Description                                                         | Example value                         |
-| ------------------------ | ------------------------------------------------------------------- | ------------------------------------- |
-| `26b`          | Your username or company name: no spaces                            | `26B`                                 |
-| `unbabble`          | See ["Planning Your Plugin – Pick a good name"][1] ([more info][2]) | `Foo Bar`                             |
-| `A new and simple i18n system for WordPress`   | Description for the plugin ([more info][2])                         | `A WordPress plugin starter.`         |
-| `https://github.com/26B/unbabble`           | Plugin URL ([more info][2])                                         | `https://github.com/26B/wp-plugin`    |
-| `0.0.0`      | Version to start the plugin with ([more info][2])                   | `1.0.0`                               |
-| `26B`          | Author name ([more info][2])                                        | `Pedro Duarte`                        |
-| `https://26b.io/`           | Author URL ([more info][2])                                         | `https://github.com/xipasduarte`      |
-| `unbabble`          | Text domain ([more info][2])                                        | `foo-bar`                             |
-| `26b`      | Your username, company or project name: lowercase and no spaces     | `26b`                                 |
-| `unbabble`        | Plugin identifier: usually the `unbabble` in dash-case          | `foo-bar`                             |
-| `TwentySixB\WP\Plugin\Unbabble`            | Desired PHP namespace                                               | `26B\WP\Plugin\FooBar`                |
-| `TwentySixB\\WP\\Plugin\\Unbabble\\`       | [PSR-4 autoload][3] for `TwentySixB\WP\Plugin\Unbabble`                               | `26B\\WP\\Plugin\\FooBar\\`           |
-| `TwentySixB\\WP\\Plugin\\Unbabble\\Tests\\` | [PSR-4 autoload][3] for `[namespace_tests]`                         | `26B\\WP\\Plugin\\FooBar\\Tests\\`    |
+### SOL System
 
-[1]: https://developer.wordpress.org/plugins/wordpress-org/planning-your-plugin/#2-pick-a-good-name
-[2]: https://developer.wordpress.org/plugins/the-basics/header-requirements/
-[3]: https://getcomposer.org/doc/04-schema.md#psr-4
+This is the hearth and sol (pun intended 😄) of the plugin's copy and data resolution. This, along with the copy-on-write approach, allows us to save on meta fields and provide some interesting features without much effort.
 
-For further information on writing WordPress plugins refer to the [official documentation](https://developer.wordpress.org/plugins/).
+SOL stands for:
+- **S** Synchronize
+- **O** Original
+- **L** Language
 
-### Run composer
+Each represents a branching point in the data fetching flow for any entity's content (data and metadata).
 
-After all of the changes don't forget to run `composer install` to have the dependencies load and the autoload built. (Without this your plugin will break.)
+When fetching any of the entity's content the systems follows these steps:
+1. *(Synchronize)* Fetch the `ubb_sync[_lang]`. Use the result, if any, as the current `lang`.
+2. *(Language)* Check if this is a Language scenario where we need to copy from a specific language. Use the result, if any, as the current `lang`. (Too similar to sync? yes, but doesn't live in the database. It's more like a temporary sync.)
+2. Fetch the content for the current `lang`. If it's not empty return it.
+3. *(Original)* If it's empty, fetch the original content and return it.
+
+(`[_lang]` is the language being requested)
