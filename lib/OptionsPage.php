@@ -9,6 +9,7 @@ class OptionsPage {
 		'pt_PT',
 		'en',
 		'es_ES',
+		'en_US',
 	];
 
 	/**
@@ -26,7 +27,7 @@ class OptionsPage {
 	}
 
 	public function add_options_to_page() {
-		\register_setting( 'unbabble_options', 'unbabble_options', [ $this, 'validate_options' ] );
+		\register_setting( 'ubb_options', 'ubb_options', [ $this, 'validate_options' ] );
 		\add_settings_section( 'languages', 'Languages', '', 'unbabble' );
 		\add_settings_section( 'post_types', 'Post Types', '', 'unbabble' );
 		\add_settings_section( 'taxonomies', 'Taxonomies', '', 'unbabble' );
@@ -43,7 +44,7 @@ class OptionsPage {
 		<h2>Unbabble Settings</h2>
 		<form action="options.php" method="post">
 			<?php
-			\settings_fields( 'unbabble_options' );
+			\settings_fields( 'ubb_options' );
 			\do_settings_sections( 'unbabble' );
 			?>
 			<input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
@@ -52,7 +53,7 @@ class OptionsPage {
 	}
 
 	public function field_allowed_languages() {
-		$options = \get_option( 'unbabble_options' );
+		$options = Options::get();
 		$langs   = array_map(
 			function ( $lang ) use ( $options ) {
 				return sprintf(
@@ -65,7 +66,7 @@ class OptionsPage {
 		);
 
 		printf(
-			'<select multiple id="allowed_languages" name="unbabble_options[allowed_languages][]">
+			'<select multiple id="allowed_languages" name="ubb_options[allowed_languages][]">
 				%s
 			</select>',
 			implode( '', $langs )
@@ -73,7 +74,7 @@ class OptionsPage {
 	}
 
 	public function field_default_language() {
-		$options = \get_option( 'unbabble_options' );
+		$options = Options::get();
 		$langs   = array_map(
 			function ( $lang ) use ( $options ) {
 				return sprintf(
@@ -86,7 +87,7 @@ class OptionsPage {
 		);
 
 		printf(
-			'<select id="default_language" name="unbabble_options[default_language]">
+			'<select id="default_language" name="ubb_options[default_language]">
 				%s
 			</select>',
 			implode( '', $langs )
@@ -118,7 +119,7 @@ class OptionsPage {
 		}
 
 		printf(
-			'<select multiple id="post_types" name="unbabble_options[post_types][]" size="%1$s">
+			'<select multiple id="post_types" name="ubb_options[post_types][]" size="%1$s">
 			%2$s
 			</select>',
 			count( $post_types ),
@@ -140,7 +141,7 @@ class OptionsPage {
 		}
 
 		printf(
-			'<select multiple id="taxonomies" name="unbabble_options[taxonomies][]" size="%1$s">
+			'<select multiple id="taxonomies" name="ubb_options[taxonomies][]" size="%1$s">
 			%2$s
 			</select>',
 			count( $taxonomies ),

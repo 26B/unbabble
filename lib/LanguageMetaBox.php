@@ -53,6 +53,7 @@ class LanguageMetaBox {
 	}
 
 	public function ubb_lang_callback( \WP_Post $post ) {
+		// TODO: This should come from the cookie/query_var
 		$meta    = \get_post_meta( $post->ID, 'ubb_lang', true );
 		$options = Options::get();
 		if ( empty( $meta ) ) {
