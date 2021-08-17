@@ -26,6 +26,8 @@ class LanguageMetaBox {
 		// Term meta box.
 		\add_action( 'init', [ $this, 'register_term_meta' ] );
 		\add_action( 'init', [ $this, 'term_language_selector' ] );
+
+		// TODO: Metaboxes should be somewhat disabled during translation create.
 	}
 
 	public function post_language_selector() {
@@ -53,19 +55,77 @@ class LanguageMetaBox {
 	}
 
 	public function ubb_lang_callback( \WP_Post $post ) {
-		// TODO: This should come from the cookie/query_var
-		$meta    = \get_post_meta( $post->ID, 'ubb_lang', true );
 		$options = Options::get();
-		if ( empty( $meta ) ) {
-			$meta = $options['default_language'];
+		$lang    = $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];
+		if ( empty( $lang ) ) {
+			$lang = $options['default_language'];
 		}
 
-		$this->print_language_select( $meta, $options );
-		// TODO: Add translate or duplicate into other language fields options
+		$this->print_language_select( 'ubb_lang', $lang, $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox' );
+
+		$translations                  = \get_post_meta( $post->ID, 'ubb_lang' );
+		$available_languages           = array_flip( $options['allowed_languages'] );
+		$allowed_translation_languages = [];
+
+		$query_args = $_GET;
+		unset( $query_args['lang'] );
+
+		// Display existing translations.
+		$translation_to_show = [];
+		foreach ( $translations as $translation_lang ) {
+			if ( ! in_array( $translation_lang, $options['allowed_languages'], true ) ) {
+				continue;
+			}
+			unset( $available_languages[ $translation_lang ] );
+			$allowed_translation_languages[] = $translation_lang;
+			if ( $translation_lang === $lang ) {
+				continue;
+			}
+			$translation_to_show[] = sprintf(
+				'<tr><td>%1$s</td><td><a href="%2$s" >View</a></td></tr>',
+				$translation_lang,
+				\add_query_arg( array_merge( $query_args, [ 'ubb_switch_lang' => $translation_lang ] ), $_SERVER['PHP_SELF'] )
+			);
+		}
+
+		if ( $translation_to_show ) {
+			printf(
+				'<p><b>Translations:</b></p>
+				<table>
+				<tr>
+					<th>Language</th>
+					<th>Actions</th>
+				</tr>
+				%s
+				</table>',
+				implode( '', $translation_to_show )
+			);
+		} else {
+			printf( '<p><b>No Translations</b></p>' );
+		}
+
+		unset( $available_languages[ $lang ] );
+
+		// Can't create more translations currently.
+		if ( empty( $available_languages ) ) {
+			return;
+		}
+
+		$available_languages = array_keys( $available_languages );
+
+		// Display language selector and button to create new translation.
+		printf(
+			'<p><b>Create Translation</b></p>
+			<div>To: %1$s <br>Copy from: %2$s</div><br>
+			<button type="button" id="ubb-translate-action">Save and Create</button>',
+			$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
+			$this->print_language_select( 'ubb_copy', '', array_merge( [ 'No Copy' => '' ], $allowed_translation_languages ), '', '', false ),
+		);
 	}
 
 	public function save_language_meta( $post_id ) {
-		if ( ! $this->verify_nonce() ) {
+
+		if ( ! $this->verify_nonce( 'ubb_language_metabox', 'ubb_language_metabox_nonce' ) ) {
 			return;
 		}
 
@@ -74,8 +134,16 @@ class LanguageMetaBox {
 		// Sanitize the user input.
 		$lang = \sanitize_text_field( $_POST['ubb_lang'] );
 
-		// Update the meta field.
-		\update_post_meta( $post_id, 'ubb_lang', $lang );
+		// Check langs for post.
+		$post_languages = \get_post_meta( $post_id, 'ubb_lang' );
+
+		// If lang already exists for this post, then don't add it.
+		if ( in_array( $lang, $post_languages, true ) ) {
+			return;
+		}
+
+		// Add the meta field.
+		\add_post_meta( $post_id, 'ubb_lang', $lang );
 	}
 
 	public function register_term_meta() {
@@ -110,7 +178,7 @@ class LanguageMetaBox {
 				<p>%3$s</p>
 			</div>',
 			esc_html__( 'Language', 'unbabble' ),
-			$this->print_language_select( $options['default_language'], $options, false ),
+			$this->print_language_select( 'ubb_lang', $options['default_language'], $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' )
 		);
 	}
@@ -131,17 +199,17 @@ class LanguageMetaBox {
 				</td>
 			</tr>',
 			esc_html__( 'Language', 'unbabble' ),
-			$this->print_language_select( $meta, $options, false ),
+			$this->print_language_select( 'ubb_lang', $meta, $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' )
 		);
 	}
 
 	public function save_term_language_meta( $term_id ) {
-		if ( ! $this->verify_nonce() ) {
+		if ( ! $this->verify_nonce( 'ubb_language_metabox_nonce', 'ubb_language_metabox' ) ) {
 			return;
 		}
 
-		$old_lang = \get_term_meta( $term_id, 'ubb_lang', true );
+		$old_lang = \get_term_meta( $term_id, 'ubb_lang', true ); // TODO: should not be single=true.
 		$new_lang = \sanitize_text_field( $_POST['ubb_lang'] );
 
 		if ( $new_lang === '' ) {
@@ -150,46 +218,54 @@ class LanguageMetaBox {
 		}
 
 		if ( $old_lang !== $new_lang ) {
+			// TODO: should be add if it doesnt exist already.
 			\update_term_meta( $term_id, 'ubb_lang', $new_lang );
 		}
 	}
 
-	private function print_language_select( $selected, $options, $echo = true ) {
+	private function print_language_select( string $name, $selected, $options, string $nonce_action, string $nonce_name, $echo = true ) {
 		$langs = array_map(
-			function ( $lang ) use ( $selected ) {
+			function ( $text, $lang ) use ( $selected ) {
+				if ( is_int( $text ) ) {
+					$text = $lang;
+				}
 				return sprintf(
-					'<option value="%1$s" %2$s>%1$s</option>',
+					'<option value="%1$s" %2$s>%3$s</option>',
 					$lang,
-					\selected( $lang, $selected, false )
+					\selected( $lang, $selected, false ),
+					$text
 				);
 			},
-			// TODO: This shouldn't happen. Should always be array.
-			is_array( $options['allowed_languages'] ) ? $options['allowed_languages'] : []
+			array_keys( $options ),
+			$options
 		);
 
-		\wp_nonce_field( 'ubb_language_metabox', 'ubb_language_metabox_nonce' );
+		if ( ! empty( $nonce_action ) && ! empty( $nonce_name ) ) {
+			\wp_nonce_field( $nonce_action, $nonce_name );
+		}
 
 		$output = sprintf(
-			'<select id="ubb_lang" name="ubb_lang">
-				%s
+			'<select id="%1$s" name="%1$s">
+				%2$s
 			</select>',
+			$name,
 			implode( '', $langs )
 		);
 
 		return ! $echo ? $output : printf( $output );
 	}
 
-	private function verify_nonce() : bool {
+	private function verify_nonce( $name, $action ) : bool {
 
 		// Check if our nonce is set.
-		if ( ! isset( $_POST['ubb_language_metabox_nonce'] ) ) {
+		if ( ! isset( $_POST[ $name ] ) ) {
 			return false;
 		}
 
-		$nonce = $_POST['ubb_language_metabox_nonce'];
+		$nonce = $_POST[ $name ];
 
 		// Verify that the nonce is valid.
-		if ( ! \wp_verify_nonce( $nonce, 'ubb_language_metabox' ) ) {
+		if ( ! \wp_verify_nonce( $nonce, $action ) ) {
 			return false;
 		}
 

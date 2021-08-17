@@ -42,6 +42,7 @@ class Admin {
 
 		\add_action( 'admin_init', [ $this, 'action_callback' ] );
 		\add_action( 'admin_init', [ $this, 'update_lang_cookie' ] );
+		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts'] );
 		\add_action( 'set_auth_cookie', [ $this, 'set_lang_cookie_on_login' ], PHP_INT_MAX, 3 );
 		\add_action( 'wp_logout', [ $this, 'unset_lang_cookie_on_logout' ] );
 		\add_action( 'update_option_ubb_options', [ $this, 'set_lang_cookie_on_options_save' ], 10, 0 );
@@ -55,6 +56,10 @@ class Admin {
 	 */
 	public function action_callback() {}
 
+	public function enqueue_scripts() : void {
+		wp_enqueue_script( 'ubb-admin', plugin_dir_url( dirname( __FILE__, 1 ) ) . 'src/scripts/ubb-admin.js', [], '0.0.0', true );
+	}
+
 	public function handle_language_switch_redirect( string $new_lang ) : void {
 		$options = Options::get();
 
@@ -67,7 +72,7 @@ class Admin {
 
 		// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
 		$expiration = $this->get_lang_expire_cookie( time() + 14 * DAY_IN_SECONDS );
-		setcookie( 'ubb_lang', $new_lang, $expiration, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
+		setcookie( 'ubb_lang', $new_lang, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 
 		// Change `ubb_switch_lang` in query in url to `lang` if not default language.
 		$path    = str_replace(
@@ -114,7 +119,7 @@ class Admin {
 			// Temporary expiration time. User Session default.
 			$expiration   = time() + 14 * DAY_IN_SECONDS;
 			$cookie_value = empty( $lang_url ) ? $options['default_language'] : $lang_url;
-			setcookie( 'ubb_lang', $cookie_value, $expiration, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
+			setcookie( 'ubb_lang', $cookie_value, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 
 			// TODO: Need to be careful with redirect when this hook is called from admin-ajax/heartbeat.
 			if ( $redirect ) {
@@ -134,21 +139,21 @@ class Admin {
 
 			// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
 			$expiration = $this->get_lang_expire_cookie( time() + 14 * DAY_IN_SECONDS );
-			setcookie( 'ubb_lang', $options['default_language'], $expiration, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
+			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
 	}
 
 	public function set_lang_cookie_on_login( string $auth_cookie, int $expire, int $expiration ) : void {
 		$options = Options::get();
-		setcookie( 'ubb_lang', $options['default_language'], $expiration, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
-		setcookie( 'ubb_lang_expire', $expiration, $expiration, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
+		setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
+		setcookie( 'ubb_lang_expire', $expiration, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 	}
 
 	public function unset_lang_cookie_on_logout() : void {
 		unset( $_COOKIE['ubb_lang'], $_COOKIE['ubb_lang_expire'] );
-		setcookie( 'ubb_lang', '', 1, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
-		setcookie( 'ubb_lang_expire', '', 1, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
+		setcookie( 'ubb_lang', '', 1, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
+		setcookie( 'ubb_lang_expire', '', 1, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 	}
 
 	/**
@@ -166,7 +171,7 @@ class Admin {
 
 			// Temporary expiration time. User Session default.
 			$expiration = time() + 14 * DAY_IN_SECONDS;
-			setcookie( 'ubb_lang', $options['default_language'], $expiration, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
+			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
 
@@ -176,7 +181,7 @@ class Admin {
 
 			// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
 			$expiration = $this->get_lang_expire_cookie( time() + 14 * DAY_IN_SECONDS );
-			setcookie( 'ubb_lang', $options['default_language'], $expiration, ADMIN_COOKIE_PATH, $_SERVER['HTTP_HOST'], is_ssl(), true );
+			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
 	}
