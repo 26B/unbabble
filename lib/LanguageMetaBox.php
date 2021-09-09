@@ -81,10 +81,12 @@ class LanguageMetaBox {
 			if ( $translation_lang === $lang ) {
 				continue;
 			}
+			$args = $query_args;
+			unset( $args['ubb_create'], $args['ubb_copy'] );
 			$translation_to_show[] = sprintf(
 				'<tr><td>%1$s</td><td><a href="%2$s" >View</a></td></tr>',
 				$translation_lang,
-				\add_query_arg( array_merge( $query_args, [ 'ubb_switch_lang' => $translation_lang ] ), $_SERVER['PHP_SELF'] )
+				\add_query_arg( array_merge( $args, [ 'ubb_switch_lang' => $translation_lang ] ), $_SERVER['PHP_SELF'] )
 			);
 		}
 
