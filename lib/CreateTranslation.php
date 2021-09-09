@@ -77,7 +77,7 @@ class CreateTranslation {
 		$post_id       = $prepared_post->ID;
 		$options       = Options::get();
 		$lang          = $_COOKIE['ubb_lang'] ?? $options['default_language'];                //TODO: how to get from request.
-		$original_post = get_post( $post_id );
+		$original_post = \get_post( $post_id );
 		$previous_post = $this->apply_post_translation( $original_post, $lang, true );
 		$post_langs    = \get_post_meta( $post_id, 'ubb_lang' );                              //TODO: find out if this lang is the original.
 		$is_original   = empty( $post_langs ) ? true : current( $post_langs ) === $lang;
@@ -92,12 +92,14 @@ class CreateTranslation {
 			if ( in_array( $property, [ 'ID', 'post_type', 'page_template' ], true ) ) {
 				continue;
 			}
+
+			// If not original, then we need to unset the property so it doesn't overwrite the original's.
 			if ( ! $is_original ) {
 
 				// Delete unnecessary meta since value is the same as original.
 				if ( $value === $original_post->$property ) {
 					$meta_data_to_delete[] = "{$property}_ubb_{$lang}";
-					unset( $prepared_post->$property ); //TODO: why do we unset properties.
+					unset( $prepared_post->$property );
 					continue;
 				}
 
@@ -247,12 +249,15 @@ class CreateTranslation {
 			OBJECT_K
 		);
 
+		// Don't want to alter received object.
+		$new_post = clone $post;
+
 		foreach ( $translation_data as $meta_key => $meta_data ) {
-			$property        = $post_data_fields[ $meta_key ];
-			$post->$property = $meta_data->meta_value;
+			$property            = $post_data_fields[ $meta_key ];
+			$new_post->$property = $meta_data->meta_value;
 		}
 
-		return $post;
+		return $new_post;
 	}
 
 	public function apply_post_empty_content( \WP_Post $post ) : \WP_Post {
@@ -281,10 +286,13 @@ class CreateTranslation {
 			// 'comment_count'         => '',
 		];
 
+		// Don't want to alter received object.
+		$new_post = clone $post;
+
 		foreach ( $post_data_fields as $field => $value ) {
-			$post->$field = $value;
+			$new_post->$field = $value;
 		}
 
-		return $post;
+		return $new_post;
 	}
 }
