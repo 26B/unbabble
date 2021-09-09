@@ -77,26 +77,70 @@ class CreateTranslation {
 		$post_id       = $prepared_post->ID;
 		$options       = Options::get();
 		$lang          = $_COOKIE['ubb_lang'] ?? $options['default_language'];                //TODO: how to get from request.
-		$previous_post = $this->apply_post_translation( get_post( $post_id ), $lang, true );
+		$original_post = get_post( $post_id );
+		$previous_post = $this->apply_post_translation( $original_post, $lang, true );
 		$post_langs    = \get_post_meta( $post_id, 'ubb_lang' );                              //TODO: find out if this lang is the original.
 		$is_original   = empty( $post_langs ) ? true : current( $post_langs ) === $lang;
+		array_shift( $post_langs ); // Keep the rest of the languages.
 
 		// TODO: Add ubb_lang meta when create is on url and redirect to link without create/copy args.
-		$meta_data_to_save = [];
+		//       Right now being added on save via the metabox.
+		$meta_data_to_save   = [];
+		$meta_data_to_delete = [];
 
 		foreach ( get_object_vars( $prepared_post ) as $property => $value ) {
 			if ( in_array( $property, [ 'ID', 'post_type', 'page_template' ], true ) ) {
 				continue;
 			}
 			if ( ! $is_original ) {
+
+				// Delete unnecessary meta since value is the same as original.
+				if ( $value === $original_post->$property ) {
+					$meta_data_to_delete[] = "{$property}_ubb_{$lang}";
+					unset( $prepared_post->$property ); //TODO: why do we unset properties.
+					continue;
+				}
+
 				// TODO: what if property is not set.
 				if ( $previous_post->$property === $value ) {
 					unset( $prepared_post->$property );
 					continue;
 				}
+
 				if ( $previous_post->$property !== $value ) {
 					$meta_data_to_save[ "{$property}_ubb_{$lang}" ] = $value;
 					unset( $prepared_post->$property );
+					continue;
+				}
+			}
+
+			if ( $is_original ) {
+				if ( $previous_post->$property === $value ) {
+					continue;
+				}
+				if ( ! isset( $all_meta ) ) {
+					$all_meta = \get_post_meta( $post_id );
+				}
+				/**
+				 * When original changes, we need to add ubb metas for translations with the previous
+				 * value, if they don't already have a value for that property.
+				 */
+				foreach ( $post_langs as $other_lang ) {
+					if ( ! isset( $all_meta[ "{$property}_ubb_{$other_lang}" ] ) ) {
+						$meta_data_to_save[ "{$property}_ubb_{$other_lang}" ] = $previous_post->$property;
+					}
+				}
+				/**
+				 * Similarly, we need to remove ubb metas for translations if their value is the
+				 * same as the new value.
+				 */
+				foreach ( $post_langs as $other_lang ) {
+					if (
+						isset( $all_meta[ "{$property}_ubb_{$other_lang}" ] )
+						&& current( $all_meta[ "{$property}_ubb_{$other_lang}" ] ) === $value
+					) {
+						$meta_data_to_delete[] = "{$property}_ubb_{$other_lang}";
+					}
 				}
 			}
 		}
@@ -105,6 +149,11 @@ class CreateTranslation {
 		// Save meta data.
 		foreach ( $meta_data_to_save as $meta_key => $meta_value ) {
 			\update_metadata( 'post', $post_id, $meta_key, $meta_value );
+		}
+
+		// Delete meta data.
+		foreach ( $meta_data_to_delete as $meta_key ) {
+			\delete_post_meta( $post_id, $meta_key );
 		}
 
 		// Need to handle the refetch/response that happens when you save, to maintain the same translated content.
