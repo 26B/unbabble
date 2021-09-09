@@ -57,7 +57,7 @@ class Admin {
 	public function action_callback() {}
 
 	public function enqueue_scripts() : void {
-		wp_enqueue_script( 'ubb-admin', plugin_dir_url( dirname( __FILE__, 1 ) ) . 'src/scripts/ubb-admin.js', [], '0.0.0', true );
+		\wp_enqueue_script( 'ubb-admin', plugin_dir_url( dirname( __FILE__, 1 ) ) . 'src/scripts/ubb-admin.js', [], '0.0.0', true );
 	}
 
 	public function handle_language_switch_redirect( string $new_lang ) : void {
@@ -71,7 +71,7 @@ class Admin {
 		// Update cookie with new lang.
 
 		// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
-		$expiration = $this->get_lang_expire_cookie( time() + 14 * DAY_IN_SECONDS );
+		$expiration = $this->get_lang_expire_cookie();
 		setcookie( 'ubb_lang', $new_lang, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 
 		// Change `ubb_switch_lang` in query in url to `lang` if not default language.
@@ -83,7 +83,9 @@ class Admin {
 		$new_url = home_url( $path );
 
 		// Redirect.
+		nocache_headers();
 		wp_safe_redirect( $new_url, 302, 'WordPress - Unbabble' );
+		exit;
 	}
 
 	public function update_lang_cookie() : void {
@@ -117,7 +119,7 @@ class Admin {
 			}
 
 			// Temporary expiration time. User Session default.
-			$expiration   = time() + 14 * DAY_IN_SECONDS;
+			$expiration   = $this->get_lang_expire_cookie();
 			$cookie_value = empty( $lang_url ) ? $options['default_language'] : $lang_url;
 			setcookie( 'ubb_lang', $cookie_value, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 
@@ -125,7 +127,9 @@ class Admin {
 			if ( $redirect ) {
 				$path    = str_replace( "lang={$_GET['lang']}", "lang={$cookie_value}", $_SERVER['REQUEST_URI'] );
 				$new_url = home_url( $path );
+				nocache_headers();
 				wp_safe_redirect( $new_url, 302, 'WordPress - Unbabble' );
+				exit;
 			}
 			return;
 		}
@@ -138,7 +142,7 @@ class Admin {
 		if ( ! in_array( $lang_cookie, $options['allowed_languages'], true ) ) {
 
 			// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
-			$expiration = $this->get_lang_expire_cookie( time() + 14 * DAY_IN_SECONDS );
+			$expiration = $this->get_lang_expire_cookie();
 			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
@@ -180,13 +184,13 @@ class Admin {
 		if ( ! in_array( $lang_cookie, $options['allowed_languages'], true ) ) {
 
 			// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
-			$expiration = $this->get_lang_expire_cookie( time() + 14 * DAY_IN_SECONDS );
+			$expiration = $this->get_lang_expire_cookie();
 			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
 	}
 
-	private function get_lang_expire_cookie( $default_expiration ) : int {
+	private function get_lang_expire_cookie() : int {
 		if (
 			isset( $_COOKIE['ubb_lang_expire'] )
 			// Verify if its a Unix Timestamp.
@@ -197,6 +201,6 @@ class Admin {
 			return $_COOKIE['ubb_lang_expire'];
 		}
 
-		return $default_expiration;
+		return \apply_filters( 'ubb_lang_cookie_expire_time', time() + 14 * DAY_IN_SECONDS );
 	}
 }
