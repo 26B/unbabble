@@ -83,7 +83,9 @@ class Admin {
 		$new_url = home_url( $path );
 
 		// Redirect.
+		nocache_headers();
 		wp_safe_redirect( $new_url, 302, 'WordPress - Unbabble' );
+		exit;
 	}
 
 	public function update_lang_cookie() : void {
@@ -117,7 +119,7 @@ class Admin {
 			}
 
 			// Temporary expiration time. User Session default.
-			$expiration   = time() + 14 * DAY_IN_SECONDS;
+			$expiration   = $this->get_lang_expire_cookie();
 			$cookie_value = empty( $lang_url ) ? $options['default_language'] : $lang_url;
 			setcookie( 'ubb_lang', $cookie_value, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 
@@ -125,7 +127,9 @@ class Admin {
 			if ( $redirect ) {
 				$path    = str_replace( "lang={$_GET['lang']}", "lang={$cookie_value}", $_SERVER['REQUEST_URI'] );
 				$new_url = home_url( $path );
+				nocache_headers();
 				wp_safe_redirect( $new_url, 302, 'WordPress - Unbabble' );
+				exit;
 			}
 			return;
 		}
