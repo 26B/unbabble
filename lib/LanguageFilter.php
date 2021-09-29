@@ -22,15 +22,36 @@ class LanguageFilter {
 		\add_filter( 'pre_get_posts', [ $this, 'filter_posts_by_language' ] );
 	}
 
-	public function filter_posts_by_language( WP_Query $wp_query ) : WP_Query {
+	public function filter_posts_by_language( WP_Query $wp_query, string $language = '' ) : WP_Query {
+
+		/**
+		 * TODO: Docs
+		 */
+		if ( ! \apply_filters( 'ubb_filter_pre_get_posts', true ) ) {
+			return $wp_query;
+		}
+
 		$meta_query = $wp_query->get( 'meta_query', [] );
 		if ( ! is_array( $meta_query ) ) {
 			$meta_query = [];
 		}
 
+		if ( empty( $language ) ) {
+			if ( is_admin() ) {
+				//TODO: function to get ubb_lang cookie
+				$language = $_COOKIE['ubb_lang'];
+			} else {
+				// TODO: getting language in frontend.
+			}
+
+			if ( empty( $language ) ) {
+				return $wp_query;
+			}
+		}
+
 		$language_query = [
 			'key'     => 'ubb_lang',
-			'value'   => $_COOKIE['ubb_lang'],   //TODO: function to get ubb_lang cookie
+			'value'   => esc_sql( $language ), // TODO: might not be needed.
 			'compare' => '=',
 		];
 
@@ -45,6 +66,10 @@ class LanguageFilter {
 				]
 			);
 			return $wp_query;
+		}
+
+		if ( empty( $meta_query ) || ! isset( $meta_query['relation'] ) ) {
+			$meta_query['relation'] = 'AND';
 		}
 
 		$meta_query[] = $language_query;
