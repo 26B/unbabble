@@ -39,7 +39,7 @@ class LanguageFilter {
 		if ( empty( $language ) ) {
 			if ( is_admin() ) {
 				//TODO: function to get ubb_lang cookie
-				$language = $_COOKIE['ubb_lang'];
+				$language = $_COOKIE['ubb_lang'] ?? '';
 			} else {
 				// TODO: getting language in frontend.
 			}
