@@ -3,14 +3,14 @@
 namespace TwentySixB\WP\Plugin\Unbabble;
 
 /**
- * Handler for the `unbabble_options` option.
+ * Handler for the `ubb_options` option.
  *
  * @since 0.0.0
  */
 class Options {
 
 	public static function get() : array {
-		$options = \get_option( 'unbabble_options' );
+		$options = \get_option( 'ubb_options' );
 		if ( $options ) {
 			return $options;
 		}
