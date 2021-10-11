@@ -82,11 +82,22 @@ class PostMetaTranslation {
 			return $check;
 		}
 
+		/**
+		 * TODO: Docs.
+		 */
+		if ( ! apply_filters( 'ubb_get_post_metadata', true, $post_id, $meta_key, $lang ) ) {
+			return $check;
+		}
+
+		// Check if post has meta key with lang. If not then let WordPress get base value.
+		if ( ! metadata_exists( 'post', $post_id, "{$meta_key}_ubb_{$lang}" ) ) {
+			return $check;
+		}
+
 		error_log( print_r( 'get ' . $post_id . ' ' . $meta_key, true ) );
 		return get_post_meta( $post_id, "{$meta_key}_ubb_{$lang}", $single );
 	}
 
-	// TODO: What happens if this is the first save?
 	public function update_post_metadata( $check, $post_id, $meta_key, $meta_value, $prev_value ) : ?bool {
 		if ( $check !== null ) {
 			return $check;
@@ -105,8 +116,20 @@ class PostMetaTranslation {
 			return $check;
 		}
 
-		// TODO: Space saving, remove post_meta instead if it will have the same value as the default meta.
-		error_log( print_r( 'update' . $post_id . ' ' . $meta_key . ' ' . $meta_value, true ) );
+		// Saving space, remove post_meta instead if it will have the same value as the default meta.
+		// TODO: Test with multiple entries per meta_key.
+		// TODO: If we update the default meta and other languages have the same value, we need to
+		//      create meta for the others with the old value before updating.
+		$fn = fn() => false;
+		add_filter( 'ubb_get_post_metadata', $fn );
+		$base_value = get_post_meta( $post_id, $meta_key, true );
+		remove_filter( 'ubb_get_post_metadata', $fn );
+		if ( $base_value === (string) $meta_value ) {
+			delete_post_meta( $post_id, "{$meta_key}_ubb_{$lang}", $prev_value );
+			return true;
+		}
+
+		error_log( print_r( 'update ' . $post_id . ' ' . $meta_key . ' ' . $meta_value, true ) );
 		update_post_meta( $post_id, "{$meta_key}_ubb_{$lang}", $meta_value, $prev_value );
 		return true;
 	}
