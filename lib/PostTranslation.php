@@ -2,10 +2,12 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
+use WP_Post;
+
 /**
  * @since 0.0.0
  */
-class CreateTranslation {
+class PostTranslation {
 
 	/**
 	 * Register hooks.
@@ -13,6 +15,7 @@ class CreateTranslation {
 	 * @since 0.0.0
 	 */
 	public function register() {
+		// Gutenberg.
 		\add_action( 'current_screen', [ $this, 'handle_post_edit' ] );
 
 		foreach ( Options::get_allowed_post_types() as $post_type ) {
@@ -20,8 +23,40 @@ class CreateTranslation {
 			\add_filter( "rest_pre_insert_{$post_type}", [ $this, 'rest_pre_insert' ], 10, 2 );
 		}
 
-		// Redirect on create save
+		// Redirect on create save.
 		\add_action( 'save_post', [ $this, 'redirect_on_create' ], PHP_INT_MAX, 3 );
+
+		// Apply translation to post.
+		\add_action( 'the_post', [ $this, 'apply_translation' ] );
+		\add_action( 'posts_selection', [ $this, 'apply_global_translation' ] );
+	}
+
+	// Classic Editor.
+	public function apply_global_translation() : void {
+		global $post;
+		if ( ! $post instanceof \WP_Post || property_exists( $post, 'ubb_lang' ) ) {
+			return;
+		}
+		$this->apply_translation( $post );
+	}
+
+	// General translation.
+	public function apply_translation( \WP_Post &$post_object ) {
+		if ( property_exists( $post_object, 'ubb_lang' ) ) {
+			return;
+		}
+		$options = Options::get();
+		if ( ! in_array( $post_object->post_type, $options['post_types'], true ) ) {
+			return;
+		}
+
+		// TODO: function to get lang.
+		$lang = $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];
+
+		// TODO: Check if post's default language is lang. If so then exit.
+
+		// modify post object here
+		$this->apply_post_translation( $post_object, $lang, false, true );
 	}
 
 	public function redirect_on_create( $post_id, $post, bool $update ) : void {
@@ -73,7 +108,6 @@ class CreateTranslation {
 	}
 
 	public function rest_pre_insert( object $prepared_post, \WP_REST_Request $request ) : object {
-		//TODO: Handle metas on insert.
 		$post_id       = $prepared_post->ID;
 		$options       = Options::get();
 		$lang          = $_COOKIE['ubb_lang'] ?? $options['default_language'];                //TODO: how to get from request.
@@ -200,7 +234,7 @@ class CreateTranslation {
 		return ( new \WP_REST_Posts_Controller( $post->post_type ) )->prepare_item_for_response( $post, $request );
 	}
 
-	public function apply_post_translation( \WP_Post $post, string $lang, $skip_verify_meta = false ) : \WP_Post {
+	public function apply_post_translation( \WP_Post $post, string $lang, $skip_verify_meta = false, bool $apply_in_place = false ) : \WP_Post {
 		global $wpdb;
 
 		// Verify if lang is allowed.
@@ -249,13 +283,19 @@ class CreateTranslation {
 			OBJECT_K
 		);
 
-		// Don't want to alter received object.
-		$new_post = clone $post;
+		$new_post = $post;
+		if ( ! $apply_in_place ) {
+			// Don't want to alter received object.
+			$new_post = clone $post;
+		}
 
 		foreach ( $translation_data as $meta_key => $meta_data ) {
 			$property            = $post_data_fields[ $meta_key ];
 			$new_post->$property = $meta_data->meta_value;
 		}
+
+		// Add ubb_lang property to know if post is already translated.
+		$new_post->ubb_lang = $lang;
 
 		return $new_post;
 	}
