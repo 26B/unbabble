@@ -131,6 +131,10 @@ class LanguageMetaBox {
 			return;
 		}
 
+		if ( get_post_type( $post_id ) === 'revision' ) {
+			return;
+		}
+
 		// TODO: Check the user's permissions.
 
 		// Sanitize the user input.

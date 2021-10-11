@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
+
 use WP_Query;
 
 /**
@@ -22,12 +23,17 @@ class LanguageFilter {
 		\add_filter( 'pre_get_posts', [ $this, 'filter_posts_by_language' ] );
 	}
 
+
 	public function filter_posts_by_language( WP_Query $wp_query, string $language = '' ) : WP_Query {
+
+		if ( isset( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'] === 'attachment' ) {
+			return $wp_query;
+		}
 
 		/**
 		 * TODO: Docs
 		 */
-		if ( ! \apply_filters( 'ubb_filter_pre_get_posts', true ) ) {
+		if ( ! \apply_filters( 'ubb_filter_pre_get_posts', true, $wp_query ) ) {
 			return $wp_query;
 		}
 
