@@ -105,6 +105,7 @@ class Plugin {
 
 		$components = [
 			'admin'                 => new Admin( $this ),
+			'create_translation'    => new CreateTranslation( $this ),
 			'language_metabox'      => new LanguageMetaBox( $this ),
 			'language_switcher'     => new LanguageSwitcher( $this ),
 			'language_filter'       => new LanguageFilter( $this ),
