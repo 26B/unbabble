@@ -107,6 +107,7 @@ class Plugin {
 			'admin'              => new Admin( $this ),
 			'language_metabox'   => new LanguageMetaBox( $this ),
 			'language_switcher'  => new LanguageSwitcher( $this ),
+			'language_filter'    => new LanguageFilter( $this ),
 			'options_page'       => new OptionsPage( $this ),
 			'create_translation' => new CreateTranslation( $this ),
 		];
