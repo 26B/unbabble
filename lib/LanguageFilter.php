@@ -31,7 +31,11 @@ class LanguageFilter {
 		}
 
 		/**
-		 * TODO: Docs
+		 * Allow disabling transalation system on current query.
+		 *
+		 * @param bool      True if translation filtering should occur, false
+		 *                  otherwise.
+		 * @param \WP_Query Current query object.
 		 */
 		if ( ! \apply_filters( 'ubb_filter_pre_get_posts', true, $wp_query ) ) {
 			return $wp_query;
