@@ -10,6 +10,7 @@ use WP_Query;
  * @since 0.0.0
  */
 class LanguageFilter {
+
 	/**
 	 * Register hooks.
 	 *
@@ -30,6 +31,20 @@ class LanguageFilter {
 			return $wp_query;
 		}
 
+		// Don't do anything if there is no language defined.
+		if ( empty( $language ) ) {
+
+			// Reset language cookie.
+			if ( is_admin() ) {
+				//TODO: function to get ubb_lang cookie
+				$language = $_COOKIE['ubb_lang'] ?? '';
+			} else {
+				// TODO: getting language in frontend.
+			}
+
+			return $wp_query;
+		}
+
 		/**
 		 * Allow disabling transalation system on current query.
 		 *
@@ -44,19 +59,6 @@ class LanguageFilter {
 		$meta_query = $wp_query->get( 'meta_query', [] );
 		if ( ! is_array( $meta_query ) ) {
 			$meta_query = [];
-		}
-
-		if ( empty( $language ) ) {
-			if ( is_admin() ) {
-				//TODO: function to get ubb_lang cookie
-				$language = $_COOKIE['ubb_lang'] ?? '';
-			} else {
-				// TODO: getting language in frontend.
-			}
-
-			if ( empty( $language ) ) {
-				return $wp_query;
-			}
 		}
 
 		$language_query = [
