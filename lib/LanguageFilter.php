@@ -2,7 +2,6 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
-
 use WP_Query;
 
 /**
