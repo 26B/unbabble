@@ -104,12 +104,14 @@ class Plugin {
 	private function define_admin_hooks() {
 
 		$components = [
-			'admin'              => new Admin( $this ),
-			'language_metabox'   => new LanguageMetaBox( $this ),
-			'language_switcher'  => new LanguageSwitcher( $this ),
-			'language_filter'    => new LanguageFilter( $this ),
-			'options_page'       => new OptionsPage( $this ),
-			'create_translation' => new CreateTranslation( $this ),
+			'admin'                 => new Admin( $this ),
+			'create_translation'    => new CreateTranslation( $this ),
+			'language_metabox'      => new LanguageMetaBox( $this ),
+			'language_switcher'     => new LanguageSwitcher( $this ),
+			'language_filter'       => new LanguageFilter( $this ),
+			'options_page'          => new OptionsPage( $this ),
+			'post_translation'      => new PostTranslation( $this ),
+			'post_meta_translation' => new PostMetaTranslation( $this ),
 		];
 
 		foreach ( $components as $component ) {
