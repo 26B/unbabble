@@ -61,31 +61,20 @@ class LanguageFilter {
 			$meta_query = [];
 		}
 
-		$language_query = [
-			'key'     => 'ubb_lang',
-			'value'   => esc_sql( $language ), // TODO: might not be needed.
-			'compare' => '=',
-		];
-
-		// If there is an OR condition, it needs to become a lower condition.
-		if ( isset( $meta_query['relation'] ) && $meta_query['relation'] === 'OR' ) {
-			$wp_query->set(
-				'meta_query',
+		// Envelop meta query in our own meta condition.
+		$wp_query->set(
+			'meta_query',
+			[
+				'relation' => 'AND',
 				[
-					'relation' => 'AND',
-					$meta_query,
-					$language_query,
-				]
-			);
-			return $wp_query;
-		}
+					'key'     => 'ubb_lang',
+					'value'   => $language,
+					'compare' => '=',
+				],
+				$meta_query,
+			]
+		);
 
-		if ( empty( $meta_query ) || ! isset( $meta_query['relation'] ) ) {
-			$meta_query['relation'] = 'AND';
-		}
-
-		$meta_query[] = $language_query;
-		$wp_query->set( 'meta_query', $meta_query );
 		return $wp_query;
 	}
 }
