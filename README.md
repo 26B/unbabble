@@ -10,7 +10,7 @@ We use a standard WordPress plugin approach with OOP style and composer to manag
 
 ## Architecture
 
-A lot of decisions went into this. We try to provide information on all of them to allow for new contributions to be easy and, also, for those seeking to contributo to have a place to fallback when understanding everything. (It's not just for newcommers we all use it 😉)
+A lot of decisions went into this. We try to provide information on all of them to allow for new contributions to be easy and, also, for those seeking to contribute to have a place to fallback when understanding everything. (It's not just for newcommers we all use it 😉)
 
 ### SOL System
 
