@@ -2,6 +2,8 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
+use TwentySixB\WP\Plugin\Unbabble\Refactor;
+
 /**
  * The core plugin class.
  *
@@ -56,6 +58,7 @@ class Plugin {
 	public function run() {
 		$this->set_locale();
 		$this->define_admin_hooks();
+		$this->include_function_files();
 	}
 
 	/**
@@ -104,18 +107,28 @@ class Plugin {
 	private function define_admin_hooks() {
 
 		$components = [
-			'admin'                 => new Admin( $this ),
-			'create_translation'    => new CreateTranslation( $this ),
-			'language_metabox'      => new LanguageMetaBox( $this ),
-			'language_switcher'     => new LanguageSwitcher( $this ),
-			'language_filter'       => new LanguageFilter( $this ),
-			'options_page'          => new OptionsPage( $this ),
-			'post_translation'      => new PostTranslation( $this ),
-			'post_meta_translation' => new PostMetaTranslation( $this ),
+			'admin'              => new Admin( $this ),
+			'options_page'       => new OptionsPage( $this ),
+			'language_switcher'  => new LanguageSwitcher( $this ),
+			'language_metabox'   => new Refactor\LangMetaBox( $this ),
+			'create_translation' => new Refactor\CreateTranslation( $this ),
+			'redirector'         => new Refactor\Redirector( $this ),
+			'language_filter'    => new Refactor\LangFilter( $this ),
+
+			// 'language_metabox'      => new LanguageMetaBox( $this ),
+			// 'language_filter'       => new LanguageFilter( $this ),
+			// 'post_translation'      => new PostTranslation( $this ),
+			// 'post_meta_translation' => new PostMetaTranslation( $this ),
+
+			// 'create_translation'    => new CreateTranslation( $this ),
 		];
 
 		foreach ( $components as $component ) {
 			$component->register();
 		}
+	}
+
+	private function include_function_files() {
+		include __DIR__ . '/utilities.php';
 	}
 }

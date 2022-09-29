@@ -2,6 +2,8 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
+use TwentySixB\WP\Plugin\Unbabble\DB;
+
 /**
  * Fired during plugin activation
  *
@@ -47,5 +49,8 @@ class Activator {
 	 *                           false if WPMU is disabled or plugin is activated on an
 	 *                           individual blog.
 	 */
-	public static function single_activate( $network_wide ) {}
+	public static function single_activate( $network_wide ) {
+		(new DB\PostTable() )->create_table();
+		(new DB\TermTable() )->create_table();
+	}
 }
