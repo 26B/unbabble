@@ -58,7 +58,6 @@ class Plugin {
 	public function run() {
 		$this->set_locale();
 		$this->define_admin_hooks();
-		$this->include_function_files();
 	}
 
 	/**
@@ -107,28 +106,24 @@ class Plugin {
 	private function define_admin_hooks() {
 
 		$components = [
-			'admin'              => new Admin( $this ),
-			'options_page'       => new OptionsPage( $this ),
-			'language_switcher'  => new LanguageSwitcher( $this ),
-			'language_metabox'   => new Refactor\LangMetaBox( $this ),
-			'create_translation' => new Refactor\CreateTranslation( $this ),
-			'redirector'         => new Refactor\Redirector( $this ),
-			'language_filter'    => new Refactor\LangFilter( $this ),
+			'admin'                    => new Admin\Admin( $this ),
+			'options_page'             => new Admin\OptionsPage( $this ),
+			'language_switcher'        => new Admin\LanguageSwitcher( $this ),
+			'redirector'               => new Admin\Redirector( $this ),
+			'posts_create_translation' => new Posts\CreateTranslation( $this ),
+			'posts_language_filter'    => new Posts\LangFilter( $this ),
+			'posts_change_language'    => new Posts\ChangeLanguage( $this ),
+			'posts_language_metabox'   => new Posts\LangMetaBox( $this ),
 
+			// TODO: Terms
+			// TODO: Disconnect from translations.
+
+			// TODO: Get old term metabox from here.
 			// 'language_metabox'      => new LanguageMetaBox( $this ),
-			// 'language_filter'       => new LanguageFilter( $this ),
-			// 'post_translation'      => new PostTranslation( $this ),
-			// 'post_meta_translation' => new PostMetaTranslation( $this ),
-
-			// 'create_translation'    => new CreateTranslation( $this ),
 		];
 
 		foreach ( $components as $component ) {
 			$component->register();
 		}
-	}
-
-	private function include_function_files() {
-		include __DIR__ . '/utilities.php';
 	}
 }

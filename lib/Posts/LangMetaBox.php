@@ -1,7 +1,8 @@
 <?php
 
-namespace TwentySixB\WP\Plugin\Unbabble\Refactor;
+namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -102,7 +103,7 @@ class LangMetaBox {
 			$args = $query_args;
 			unset( $args['ubb_create'], $args['ubb_copy'] );
 			$translation_to_show[] = sprintf(
-				'<tr><td>%1$s</td><td><a href="%2$s" >View</a></td></tr>',
+				'<tr><td>%1$s</td><td><a href="%2$s" >Edit</a></td></tr>',
 				$translation_lang,
 				add_query_arg( 'lang', $translation_lang, get_edit_post_link( $translation_id ) )
 			);
@@ -137,9 +138,10 @@ class LangMetaBox {
 		// TODO: Use the `ubb_save_create` to create new post translation in the backend and redirect.
 		printf(
 			'<p><b>Create Translation</b></p>
-			<div>To: %1$s</div><br>
-			<button id="save-post" name="ubb_save_create" value="true">Save and Create</button>',
+			<div>To: %1$s</div>
+			<input type="submit" %2$s name="ubb_save_create" value="Save and Create" class="button"/>',
 			$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
+			$post->post_status === 'draft' ? 'id="save-post"' : ''
 		);
 	}
 

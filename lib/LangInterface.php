@@ -1,6 +1,6 @@
 <?php
 
-namespace TwentySixB\WP\Plugin\Unbabble\Refactor;
+namespace TwentySixB\WP\Plugin\Unbabble;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\Options;
@@ -106,5 +106,60 @@ class LangInterface {
 	public static function get_current_language() : string {
 		$options = Options::get();
 		return $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];
+	}
+
+	public static function change_post_language( int $post_id, string $lang ) : bool {
+		global $wpdb;
+
+		if (
+			empty( $lang )
+			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
+			|| $lang === self::get_post_language( $post_id )
+		) {
+			return false;
+		}
+
+		$translations = self::get_translation_list( $post_id );
+		if ( in_array( $lang, $translations, true ) ) {
+			return false;
+		}
+
+		$rows_updated = $wpdb->update(
+			( new PostTable() )->get_table_name(),
+			[ 'locale' => $lang ],
+			[ 'post_id' => $post_id ],
+		);
+
+		if ( $rows_updated === false ) {
+			return false;
+		}
+
+		// TODO: Update terms
+		return true;
+	}
+
+	// TODO: Test me!
+	public function get_post_translation( int $post_id, string $lang ) : ?int {
+		global $wpdb;
+		$source_id = self::get_source( $post_id );
+		if ( $source_id === null ) {
+			return null;
+		}
+
+		$post_lang_table = ( new PostTable() )->get_table_name();
+		$post_id         = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT post_id
+				FROM {$wpdb->postmeta}
+				WHERE meta_key = 'ubb_source'
+				AND meta_value = %s
+				AND post_id IN ( SELECT post_id FROM {$post_lang_table} WHERE lang = %s )
+				LIMIT 1",
+				$source_id,
+				$lang
+			)
+		);
+
+		return $post_id;
 	}
 }

@@ -1,6 +1,9 @@
 <?php
 
-namespace TwentySixB\WP\Plugin\Unbabble;
+namespace TwentySixB\WP\Plugin\Unbabble\Admin;
+
+use TwentySixB\WP\Plugin\Unbabble\Options;
+use TwentySixB\WP\Plugin\Unbabble\Plugin;
 
 /**
  * The dashboard-specific functionality of the plugin

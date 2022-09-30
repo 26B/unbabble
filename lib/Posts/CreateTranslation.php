@@ -1,7 +1,8 @@
 <?php
 
-namespace TwentySixB\WP\Plugin\Unbabble\Refactor;
+namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use WP_Embed;
 use WP_Error;
 use TwentySixB\WP\Plugin\Unbabble\Options;

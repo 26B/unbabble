@@ -1,7 +1,8 @@
 <?php
 
-namespace TwentySixB\WP\Plugin\Unbabble\Refactor;
+namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -14,7 +15,7 @@ class Redirector {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
-		\add_action( 'init', [ $this, 'redirect_if_needed' ], PHP_INT_MAX );
+		\add_action( 'admin_init', [ $this, 'redirect_if_needed' ], PHP_INT_MAX );
 	}
 
 	/**
@@ -34,7 +35,7 @@ class Redirector {
 		}
 
 		$post_lang = LangInterface::get_post_language( $_REQUEST['post'] );
-		if ( $post_lang === $current_lang ) {
+		if ( $post_lang === null || $post_lang === $current_lang ) {
 			return;
 		}
 
