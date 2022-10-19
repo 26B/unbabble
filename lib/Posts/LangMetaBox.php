@@ -6,7 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
- * Handle Language Meta Box for Posts and Terms.
+ * Handle Language Meta Box for Posts.
  *
  * @since 0.0.0
  */
@@ -84,7 +84,7 @@ class LangMetaBox {
 			return;
 		}
 
-		$translations                  = LangInterface::get_translation_list( $post->ID );
+		$translations                  = LangInterface::get_post_translations( $post->ID );
 		$available_languages           = array_flip( $options['allowed_languages'] );
 		$allowed_translation_languages = [];
 
@@ -135,7 +135,6 @@ class LangMetaBox {
 		$available_languages = array_keys( $available_languages );
 
 		// Display language selector and button to create new translation.
-		// TODO: Use the `ubb_save_create` to create new post translation in the backend and redirect.
 		printf(
 			'<p><b>Create Translation</b></p>
 			<div>To: %1$s</div>

@@ -35,8 +35,14 @@ class LanguageSwitcher {
 
 		$langs = [];
 		foreach ( $allowed_languages as $allowed_lang ) {
-			if ( ! isset( $_REQUEST['post'] ) || ! is_numeric( $_REQUEST['post'] ) ) {
+			// TODO: Better way of handling this.
+			if (
+				( ! isset( $_REQUEST['post'] ) || ! is_numeric( $_REQUEST['post'] ) )
+				&& ( ! isset( $_REQUEST['tag_ID'] ) || ! is_numeric( $_REQUEST['tag_ID'] ) )
+			) {
 				$url = $this->make_switch_url( $allowed_lang );
+			} else if ( isset( $_REQUEST['tag_ID'] ) && is_numeric( $_REQUEST['tag_ID'] ) ) {
+				$url = $this->make_switch_term_url( $_REQUEST['tag_ID'], $allowed_lang );
 			} else {
 				$url = $this->make_switch_post_url( $_REQUEST['post'], $allowed_lang );
 			}
@@ -93,7 +99,7 @@ class LanguageSwitcher {
 	 * @return string
 	 */
 	private function make_switch_post_url( int $post_id, string $lang ) : string {
-		$translations   = LangInterface::get_translation_list( $post_id );
+		$translations   = LangInterface::get_post_translations( $post_id );
 		$translation_id = array_search( $lang, $translations, true );
 		if ( ! $translation_id ) {
 			$post_type = get_post_type( $post_id );
@@ -111,6 +117,40 @@ class LanguageSwitcher {
 		$params = $_GET;
 		unset( $params['lang'], $params['ubb_switch_lang'] );
 		$params['post']            = $translation_id;
+		$params['ubb_switch_lang'] = $lang;
+		$query                     = http_build_query( $params );
+		if ( empty( $query ) ) {
+			return $_SERVER['PHP_SELF'];
+		}
+		return $_SERVER['PHP_SELF'] . '?' . $query;
+	}
+
+	/**
+	 * Make the term language switch url.
+	 *
+	 * @param  int    $term_id
+	 * @param  string $lang
+	 * @return string
+	 */
+	private function make_switch_term_url( int $term_id, string $lang ) : string {
+		$translations   = LangInterface::get_term_translations( $term_id );
+		$translation_id = array_search( $lang, $translations, true );
+		if ( ! $translation_id ) {
+			$taxonomy = get_term( $term_id )->taxonomy;
+			// TODO: better way to get this
+			return get_site_url(
+				null,
+				sprintf(
+					"/wp-admin/edit-tags.php?%slang=%s",
+					$taxonomy === 'term' ? '' : "taxonomy={$taxonomy}&",
+					$lang
+				)
+			);
+		}
+
+		$params = $_GET;
+		unset( $params['lang'], $params['ubb_switch_lang'] );
+		$params['tag_ID']          = $translation_id;
 		$params['ubb_switch_lang'] = $lang;
 		$query                     = http_build_query( $params );
 		if ( empty( $query ) ) {

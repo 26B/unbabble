@@ -22,7 +22,8 @@ class CreateTranslation {
 	}
 
 	public function create_and_redirect( int $post_id ) : void {
-		if ( get_post_type( $post_id ) === 'revision' ) {
+		$post_type = get_post_type( $post_id );
+		if ( $post_type === 'revision' || ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
 			return;
 		}
 		if ( ! ( $_POST['ubb_save_create'] ?? false ) ) {
@@ -69,20 +70,20 @@ class CreateTranslation {
 			return;
 		}
 
-		$source_id = LangInterface::get_source( $post_id );
+		$source_id = LangInterface::get_post_source( $post_id );
 		error_log( print_r( 'Source -' . $source_id, true ) );
 
 		// If first translations. set source on the original post.
 		if ( ! $source_id ) {
 			$source_id = $post_id;
-			if ( ! LangInterface::set_source( $post_id, $post_id ) ) {
+			if ( ! LangInterface::set_post_source( $post_id, $post_id ) ) {
 				error_log( print_r( 'CreateTranslation - set source original failed', true ) );
 				// TODO: What to do when this happens.
 				return;
 			}
 		}
 
-		if ( ! LangInterface::set_source( $new_post_id, $source_id ) ) {
+		if ( ! LangInterface::set_post_source( $new_post_id, $source_id ) ) {
 			error_log( print_r( 'CreateTranslation - set source on translation failed', true ) );
 			// TODO: What to do when this happens.
 			return;
