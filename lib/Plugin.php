@@ -106,14 +106,20 @@ class Plugin {
 	private function define_admin_hooks() {
 
 		$components = [
-			'admin'                    => new Admin\Admin( $this ),
-			'options_page'             => new Admin\OptionsPage( $this ),
-			'language_switcher'        => new Admin\LanguageSwitcher( $this ),
-			'redirector'               => new Admin\Redirector( $this ),
+			'admin'             => new Admin\Admin( $this ),
+			'options_page'      => new Admin\OptionsPage( $this ),
+			'language_switcher' => new Admin\LanguageSwitcher( $this ),
+			'redirector'        => new Admin\Redirector( $this ),
+
 			'posts_create_translation' => new Posts\CreateTranslation( $this ),
 			'posts_language_filter'    => new Posts\LangFilter( $this ),
 			'posts_change_language'    => new Posts\ChangeLanguage( $this ),
 			'posts_language_metabox'   => new Posts\LangMetaBox( $this ),
+
+			'terms_language_metabox'   => new Terms\LangMetaBox( $this ),
+			'terms_create_translation' => new Terms\CreateTranslation( $this ),
+			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
+			'terms_language_filter'    => new Terms\LangFilter( $this ),
 
 			// TODO: Terms
 			// TODO: Disconnect from translations.
