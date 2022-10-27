@@ -121,11 +121,10 @@ class Plugin {
 			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
 			'terms_language_filter'    => new Terms\LangFilter( $this ),
 
+			'router_query_var' => new Router\QueryVar( $this ),
+
 			// TODO: Terms
 			// TODO: Disconnect from translations.
-
-			// TODO: Get old term metabox from here.
-			// 'language_metabox'      => new LanguageMetaBox( $this ),
 		];
 
 		foreach ( $components as $component ) {

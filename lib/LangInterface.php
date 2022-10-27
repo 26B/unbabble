@@ -15,7 +15,14 @@ class LangInterface {
 
 	public static function get_current_language() : string {
 		$options = Options::get();
-		return $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];
+		$lang    = get_query_var( 'lang', null );
+		if ( ! isset( $lang ) && is_admin() ) {
+			$lang = $_COOKIE['ubb_lang'];
+		}
+		if ( ! isset( $lang )  ) {
+			$lang = $options['default_language'];
+		}
+		return $lang;
 	}
 
 	/**

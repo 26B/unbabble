@@ -43,6 +43,12 @@ class Admin {
 			$this->handle_language_switch_redirect( $_GET['ubb_switch_lang'] );
 		}
 
+		// Whitelist 'lang' as a query_var.
+		add_filter( 'query_vars', function( $query_vars ) {
+			$query_vars[] = 'lang';
+			return $query_vars;
+		} );
+
 		\add_action( 'admin_init', [ $this, 'action_callback' ] );
 		\add_action( 'admin_init', [ $this, 'update_lang_cookie' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts'] );
