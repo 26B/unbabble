@@ -5,27 +5,25 @@ namespace TwentySixB\WP\Plugin\Unbabble\Router;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
+use WP_Query;
 
 /**
  * For hooks related to wordpress routing via the query_var lang.
  */
-class QueryVar {
+class Directory {
 	public function register() {
-		if ( Options::only_one_language_allowed() || Options::get_router() !== 'query_var' ) {
+		if ( Options::only_one_language_allowed() || Options::get_router() !== 'directory' ) {
 			return;
 		}
 
 		if ( ! is_admin() ) {
-			add_filter( 'query_vars', function( $query_vars ) {
-				if ( ! in_array( 'lang', $query_vars, true ) ) {
-					$query_vars[] = 'lang';
-				}
-				return $query_vars;
-			} );
+			// FIXME: HACKY METHOD TO GET ROUTING TO WORK CORRECTLY.
+			\add_filter( 'init', [ $this, 'init' ], PHP_INT_MIN );
 
-			// TODO: We might need this sooner.
 			\add_filter( 'pre_get_posts', [ $this, 'homepage_default_lang_redirect' ], 1 );
 		}
+
+		\add_filter( 'ubb_current_lang', [ $this, 'current_lang_from_url' ] );
 
 		// Post Permalinks:
 		// Post permalink.
@@ -42,14 +40,50 @@ class QueryVar {
 		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
 	}
 
+	public function init() : void {
+		$lang = $this->current_lang_from_url( Options::get()['default_language'] );
+		if ( $lang === Options::get()['default_language'] ) {
+			return;
+		}
+
+		if (
+			str_starts_with( $_SERVER['REQUEST_URI'], "/{$lang}/" )
+			&& str_starts_with( $_SERVER['PHP_SELF'], "/{$lang}/" )
+		) {
+			$_SERVER['REQUEST_URI'] = substr( $_SERVER['REQUEST_URI'], strlen( "/{$lang}" ) );
+			$_SERVER['PHP_SELF']    = substr( $_SERVER['PHP_SELF'], strlen( "/{$lang}" ) );
+			$_SERVER['UBB_LANG']    = $lang;
+		}
+	}
+
+	public function current_lang_from_url( string $curr_lang ) : string {
+		if (
+			! empty( $_SERVER['UBB_LANG'] ?? '' )
+			&& in_array( $_SERVER['UBB_LANG'], Options::get()['allowed_languages'], true )
+		) {
+			return $_SERVER['UBB_LANG'];
+		}
+
+		$languages        = Options::get()['allowed_languages'];
+		$default_language = Options::get()['default_language'];
+		foreach ( $languages as $lang ) {
+			if ( $lang === $default_language ) {
+				continue;
+			}
+			if ( str_starts_with( $_SERVER['REQUEST_URI'], "/{$lang}/" ) ) {
+				return $lang;
+			}
+		}
+		return $curr_lang;
+	}
+
 	public function apply_lang_to_post_url( string $post_link, WP_Post $post ) : string {
-		// throw new Exception();
-		error_log( print_r( 'APPLY LANG', true ) );
 		$post_lang = LangInterface::get_post_language( $post->ID );
 		if ( $post_lang ===  Options::get()['default_language'] ) {
 			return $post_link;
 		}
-		return add_query_arg( 'lang', $post_lang, $post_link );
+		$site_url = site_url();
+		return str_replace( $site_url, trailingslashit( $site_url ) . $post_lang, $post_link );
 	}
 
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
@@ -58,7 +92,7 @@ class QueryVar {
 		}
 
 		// If there is a language set, that takes precedence.
-		$lang = get_query_var( 'lang' );
+		$lang = $this->current_lang_from_url( '' );
 		if ( ! empty( $lang ) ) {
 			return;
 		}
@@ -129,6 +163,10 @@ class QueryVar {
 			if ( ! $post_id ) {
 				return false;
 			}
+
+			error_log( print_r( $post_id, true ) );
+			error_log( print_r( LangInterface::get_post_language( $post_id ), true ) );
+			error_log( print_r( LangInterface::get_current_language(), true ) );
 
 			// If the post language is not the same as the current language, then don't redirect.
 			if ( LangInterface::get_post_language( $post_id ) !== LangInterface::get_current_language() ) {

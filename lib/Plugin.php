@@ -122,6 +122,7 @@ class Plugin {
 			'terms_language_filter'    => new Terms\LangFilter( $this ),
 
 			'router_query_var' => new Router\QueryVar( $this ),
+			'router_directory' => new Router\Directory( $this ),
 
 			// TODO: Terms
 			// TODO: Disconnect from translations.

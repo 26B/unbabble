@@ -22,7 +22,7 @@ class LangInterface {
 		if ( ! isset( $lang )  ) {
 			$lang = $options['default_language'];
 		}
-		return $lang;
+		return apply_filters( 'ubb_current_lang', $lang );
 	}
 
 	/**

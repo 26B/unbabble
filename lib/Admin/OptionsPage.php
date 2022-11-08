@@ -33,12 +33,15 @@ class OptionsPage {
 		\add_settings_section( 'languages', 'Languages', '', 'unbabble' );
 		\add_settings_section( 'post_types', 'Post Types', '', 'unbabble' );
 		\add_settings_section( 'taxonomies', 'Taxonomies', '', 'unbabble' );
+		\add_settings_section( 'router', 'Router', '', 'unbabble' );
 
 		\add_settings_field( 'allowed_languages', 'Allowed Languages', [ $this, 'field_allowed_languages' ], 'unbabble', 'languages', [] );
 		\add_settings_field( 'default_language', 'Default Language', [ $this, 'field_default_language' ], 'unbabble', 'languages', [] );
 
 		\add_settings_field( 'post_types', 'Select translatable post types', [ $this, 'field_post_types' ], 'unbabble', 'post_types', [] );
 		\add_settings_field( 'taxonomies', 'Select translatable taxonomies', [ $this, 'field_taxonomies' ], 'unbabble', 'taxonomies', [] );
+
+		\add_settings_field( 'router', 'Select routing type', [ $this, 'field_router' ], 'unbabble', 'router', [] );
 	}
 
 	public function page_output() {
@@ -148,6 +151,26 @@ class OptionsPage {
 			</select>',
 			count( $taxonomies ),
 			$taxonomies_options
+		);
+	}
+
+	public function field_router() {
+		$router_types    = Options::get_router_types();
+		$selected_router = Options::get_router();
+		$router_options  = '';
+		foreach ( $router_types as $type ) {
+			$router_options .= sprintf(
+				'<option value="%1$s" %2$s>%1$s</option>',
+				$type,
+				\selected( $type === $selected_router, true, false ),
+			);
+		}
+
+		printf(
+			'<select id="router" name="ubb_options[router]">
+			%1$s
+			</select>',
+			$router_options
 		);
 	}
 }

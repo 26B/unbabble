@@ -21,6 +21,7 @@ class Options {
 			'default_language'  => $wp_locale,
 			'post_types'        => self::build_default_post_types(),
 			'taxonomies'        => self::build_default_taxonomies(),
+			'router'            => 'query_var',
 		];
 	}
 
@@ -38,6 +39,18 @@ class Options {
 		$options            = self::get();
 		$allowed_taxonomies = $options['taxonomies'] ?? self::build_default_taxonomies();
 		return is_array( $allowed_taxonomies ) ? $allowed_taxonomies : [];
+	}
+
+	public static function get_router() : string {
+		$router_type = self::get()['router'] ?? '';
+		return empty( $router_type ) ? 'query_var' : $router_type;
+	}
+
+	public static function get_router_types() : array {
+		return [
+			'query_var',
+			'directory',
+		];
 	}
 
 	private static function build_default_post_types() : array {
