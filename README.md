@@ -45,3 +45,12 @@ We add two new tables with the following schemas that contains all the translati
 | ------------ | ---------- |
 | `post_id`    | Integer    |
 | `locale`     | VARCHAR(5) |
+
+### Translations Links
+
+To know which entities are translations of any other entity, we add a meta to all entities that contains the original ID `ubb_source`. The original is the first post that was created, and can be in any langues. Although the site might have a given default language that is not required to be the language of all original posts/terms.
+
+### Enforced restrictions
+
+* Only one translation for a given `ubb_source` with the same locale (avoids multiple options for the same entity)
+
