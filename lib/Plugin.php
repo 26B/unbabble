@@ -112,6 +112,8 @@ class Plugin {
 
 			'api_query_vars' => new API\QueryVar( $this ),
 
+			'attachments_set_language' => new Attachments\SetLanguage( $this ),
+
 			'posts_create_translation' => new Posts\CreateTranslation( $this ),
 			'posts_language_filter'    => new Posts\LangFilter( $this ),
 			'posts_change_language'    => new Posts\ChangeLanguage( $this ),

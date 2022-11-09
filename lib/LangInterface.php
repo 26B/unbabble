@@ -16,6 +16,7 @@ class LangInterface {
 	public static function get_current_language() : string {
 		$options = Options::get();
 		$lang    = get_query_var( 'lang', null );
+		// TODO: check for lang in the Allowed languages.
 		if ( ! isset( $lang ) && is_admin() ) {
 			$lang = $_COOKIE['ubb_lang'];
 		}
