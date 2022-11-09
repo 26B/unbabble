@@ -83,7 +83,10 @@ class LangMetaBox {
 			 * duplicate for the user to handle.
 			 */
 			$duplicate_language = false;
-			if ( isset( $seen_languages[ $translation_lang ] ) ) {
+			if (
+				isset( $seen_languages[ $translation_lang ] )
+				|| $translation_lang === $lang
+			) {
 				$duplicate_language = true;
 			}
 

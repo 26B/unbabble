@@ -73,6 +73,7 @@ class LangMetaBox {
 	 */
 	public function post_language_selector_callback( \WP_Post $post ) : void {
 		$options = Options::get();
+		// TODO: use LangInterface for language.
 		$lang    = $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];
 		if ( empty( $lang ) ) {
 			$lang = $options['default_language'];
@@ -104,7 +105,10 @@ class LangMetaBox {
 			 * duplicate for the user to handle.
 			 */
 			$duplicate_language = false;
-			if ( isset( $seen_languages[ $translation_lang ] ) ) {
+			if (
+				isset( $seen_languages[ $translation_lang ] )
+				|| $translation_lang === $lang
+			) {
 				$duplicate_language = true;
 			}
 

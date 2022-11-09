@@ -118,11 +118,13 @@ class Plugin {
 			'posts_language_filter'    => new Posts\LangFilter( $this ),
 			'posts_change_language'    => new Posts\ChangeLanguage( $this ),
 			'posts_language_metabox'   => new Posts\LangMetaBox( $this ),
+			'posts_admin_notices'      => new Posts\AdminNotices( $this ),
 
 			'terms_language_metabox'   => new Terms\LangMetaBox( $this ),
 			'terms_create_translation' => new Terms\CreateTranslation( $this ),
 			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
 			'terms_language_filter'    => new Terms\LangFilter( $this ),
+			'terms_admin_notices'      => new Terms\AdminNotices( $this ),
 
 			'router_query_var' => new Router\QueryVar( $this ),
 			'router_directory' => new Router\Directory( $this ),
