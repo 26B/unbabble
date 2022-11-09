@@ -29,9 +29,18 @@ class LangFilter {
 	}
 
 	public function filter_terms_by_language( array $pieces, array $taxonomies, array $args ) : array {
+		if ( ! $this->allow_filter( $taxonomies ) ) {
+			return $pieces;
+		}
+
 		$current_lang     = esc_sql( LangInterface::get_current_language() );
 		$term_lang_table  = ( new TermTable() )->get_table_name();
 		$pieces['where'] .= " AND ( t.term_id IN ( SELECT term_id FROM {$term_lang_table} WHERE locale = '$current_lang' ))";
 		return $pieces;
+	}
+
+	public function allow_filter( array $taxonomies ) : bool {
+		return true;
+		// TODO: Multiple taxonomies, how to filter only for some of them?
 	}
 }

@@ -104,12 +104,13 @@ class Plugin {
 	 * @access private
 	 */
 	private function define_admin_hooks() {
-
 		$components = [
 			'admin'             => new Admin\Admin( $this ),
 			'options_page'      => new Admin\OptionsPage( $this ),
 			'language_switcher' => new Admin\LanguageSwitcher( $this ),
 			'redirector'        => new Admin\Redirector( $this ),
+
+			'api_query_vars' => new API\QueryVar( $this ),
 
 			'posts_create_translation' => new Posts\CreateTranslation( $this ),
 			'posts_language_filter'    => new Posts\LangFilter( $this ),

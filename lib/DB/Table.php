@@ -31,12 +31,6 @@ abstract class Table {
 			// See https://codex.wordpress.org/Creating_Tables_with_Plugins#Creating_or_Updating_the_Table
 			$sql = $this->get_table_mysql( $table_name, $charset_collate );
 
-			"CREATE TABLE {$table_name} (
-				post_id bigint(20) unsigned NOT NULL,
-				locale varchar(5) NOT NULL,
-				FOREIGN KEY (post_id) REFERENCES {$wpdb->posts} (ID) ON DELETE CASCADE
-			) $charset_collate;";
-
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 			dbDelta( $sql );
 

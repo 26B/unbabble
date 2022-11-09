@@ -28,14 +28,26 @@ class QueryVar {
 		}
 
 		// Post Permalinks:
-		// Post permalink.
-		\add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
-		// Page permalink.
-		\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
-		// Attachment permalink.
-		\add_filter( 'attachment_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+		$allowed_post_types = Options::get_allowed_post_types();
+
+		if ( in_array( 'post', $allowed_post_types, true ) ) {
+			// Post permalink.
+			\add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+		}
+
+		if ( in_array( 'page', $allowed_post_types, true ) ) {
+			// Page permalink.
+			\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+		}
+
+		if ( in_array( 'attachment', $allowed_post_types, true ) ) {
+			// Attachment permalink.
+			// TODO: Attachment is not being set a language when created.
+			// \add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
+		}
+
 		// Custom post types permalinks.
-		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
 
 		// TODO: post_type_archive_link
 
@@ -50,6 +62,19 @@ class QueryVar {
 			return $post_link;
 		}
 		return add_query_arg( 'lang', $post_lang, $post_link );
+	}
+
+	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
+		$post_type = $post->post_type;
+		if ( ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
+			return $post_link;
+		}
+		return $this->apply_lang_to_post_url( $post_link, $post );
+	}
+
+	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
+		$post = WP_Post::get_instance( $post_id );
+		return $this->apply_lang_to_post_url( $link, $post );
 	}
 
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {

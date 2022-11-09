@@ -28,7 +28,7 @@ class LangMetaBox {
 		\add_action( 'add_meta_boxes', [ $this, 'post_language_selector' ] );
 		\add_action( 'save_post', [ $this, 'save_post_language' ] );
 
-		// TODO: Term meta box.
+		// FIXME: Set post language when attachment is saved.
 
 		// TODO: Metaboxes should be somewhat disabled during translation create.
 	}

@@ -28,9 +28,24 @@ class LangFilter {
 
 	public function filter_posts_by_language( string $where, WP_Query $query ) : string {
 		global $wpdb;
+		if ( ! $this->allow_filter( $query ) ) {
+			return $where;
+		}
+
 		$current_lang    = esc_sql( LangInterface::get_current_language() );
 		$post_lang_table = ( new PostTable() )->get_table_name();
 		$where .= " AND ({$wpdb->posts}.ID IN ( SELECT post_id FROM {$post_lang_table} WHERE locale = '$current_lang' ))";
 		return $where;
+	}
+
+	public function allow_filter( WP_Query $query ) : bool {
+		if (
+			! empty( $query->get( 'post_type', null ) )
+			&& ! in_array( $query->get( 'post_type', null ), Options::get_allowed_post_types(), true )
+		) {
+			return false;
+		}
+
+		return true;
 	}
 }
