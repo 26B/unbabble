@@ -86,26 +86,38 @@ class LangMetaBox {
 
 		$translations                  = LangInterface::get_post_translations( $post->ID );
 		$available_languages           = array_flip( $options['allowed_languages'] );
-		$allowed_translation_languages = [];
 
 		$query_args = $_GET;
 		unset( $query_args['lang'] );
 
 		// Display existing translations.
 		$translation_to_show = [];
+		$seen_languages      = [];
 		foreach ( $translations as $translation_id => $translation_lang ) {
 			if ( ! in_array( $translation_lang, $options['allowed_languages'], true ) ) {
 				continue;
 			}
+			/**
+			 * It is possible that there might be more than one translation for the same language
+			 * due to some action outside of the plugin. We place a warning that one of them is a
+			 * duplicate for the user to handle.
+			 */
+			$duplicate_language = false;
+			error_log( print_r( 'qweqwe', true ) );
+			if ( isset( $seen_languages[ $translation_lang ] ) ) {
+				$duplicate_language = true;
+			}
+
 			unset( $available_languages[ $translation_lang ] );
-			$allowed_translation_languages[] = $translation_lang;
+			$seen_languages[ $translation_lang ] = true;
 
 			$args = $query_args;
 			unset( $args['ubb_create'], $args['ubb_copy'] );
 			$translation_to_show[] = sprintf(
-				'<tr><td>%1$s</td><td><a href="%2$s" >Edit</a></td></tr>',
+				'<tr><td>%1$s</td><td><a href="%2$s" >Edit</a>%3$s</td></tr>',
 				$translation_lang,
-				add_query_arg( 'lang', $translation_lang, get_edit_post_link( $translation_id ) )
+				add_query_arg( 'lang', $translation_lang, get_edit_post_link( $translation_id ) ),
+				! $duplicate_language ? '' : ' <b style="color:FireBrick">Duplicate</b>',
 			);
 		}
 
