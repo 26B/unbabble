@@ -97,13 +97,13 @@ class LangMetaBox {
 			if ( ! in_array( $translation_lang, $options['allowed_languages'], true ) ) {
 				continue;
 			}
+
 			/**
 			 * It is possible that there might be more than one translation for the same language
 			 * due to some action outside of the plugin. We place a warning that one of them is a
 			 * duplicate for the user to handle.
 			 */
 			$duplicate_language = false;
-			error_log( print_r( 'qweqwe', true ) );
 			if ( isset( $seen_languages[ $translation_lang ] ) ) {
 				$duplicate_language = true;
 			}
