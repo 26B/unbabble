@@ -83,6 +83,9 @@ class QueryVar {
 			return $termlink;
 		}
 		$term_lang = LangInterface::get_term_language( $term->term_id );
+		if ( $term_lang === Options::get()['default_language'] ) {
+			return $termlink;
+		}
 		return add_query_arg( 'lang', $term_lang, $termlink );
 	}
 

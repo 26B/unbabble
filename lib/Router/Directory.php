@@ -89,7 +89,7 @@ class Directory {
 
 	public function apply_lang_to_post_url( string $post_link, WP_Post $post ) : string {
 		$post_lang = LangInterface::get_post_language( $post->ID );
-		if ( $post_lang ===  Options::get()['default_language'] ) {
+		if ( $post_lang === Options::get()['default_language'] ) {
 			return $post_link;
 		}
 		$site_url = site_url();
@@ -120,6 +120,9 @@ class Directory {
 			return $termlink;
 		}
 		$term_lang = LangInterface::get_term_language( $term->term_id );
+		if ( $term_lang === Options::get()['default_language'] ) {
+			return $termlink;
+		}
 		$site_url = site_url();
 		return str_replace( $site_url, trailingslashit( $site_url ) . $term_lang, $termlink );
 	}
