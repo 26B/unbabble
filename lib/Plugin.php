@@ -129,6 +129,7 @@ class Plugin {
 
 			// TODO: Terms
 			// TODO: Disconnect from translations.
+			// TODO: Filter the query for attaching an attachment.
 		];
 
 		foreach ( $components as $component ) {

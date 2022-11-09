@@ -169,7 +169,6 @@ class LangMetaBox {
 		// Sanitize the user input.
 		$lang = \sanitize_text_field( $_POST['ubb_lang'] );
 
-		error_log( print_r( 'LANGINTERFACE SAVE', true ) );
 		LangInterface::set_post_language( $post_id, $lang );
 	}
 

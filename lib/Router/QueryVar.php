@@ -5,6 +5,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Router;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
+use WP_Term;
 
 /**
  * For hooks related to wordpress routing via the query_var lang.
@@ -42,12 +43,14 @@ class QueryVar {
 
 		if ( in_array( 'attachment', $allowed_post_types, true ) ) {
 			// Attachment permalink.
-			// TODO: Attachment is not being set a language when created.
-			// \add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
+			\add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
 		}
 
 		// Custom post types permalinks.
 		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
+
+		// Term archive permalinks.
+		\add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
 
 		// TODO: post_type_archive_link
 
@@ -55,8 +58,6 @@ class QueryVar {
 	}
 
 	public function apply_lang_to_post_url( string $post_link, WP_Post $post ) : string {
-		// throw new Exception();
-		error_log( print_r( 'APPLY LANG', true ) );
 		$post_lang = LangInterface::get_post_language( $post->ID );
 		if ( $post_lang ===  Options::get()['default_language'] ) {
 			return $post_link;
@@ -75,6 +76,14 @@ class QueryVar {
 	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
 		$post = WP_Post::get_instance( $post_id );
 		return $this->apply_lang_to_post_url( $link, $post );
+	}
+
+	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
+		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+			return $termlink;
+		}
+		$term_lang = LangInterface::get_term_language( $term->term_id );
+		return add_query_arg( 'lang', $term_lang, $termlink );
 	}
 
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {

@@ -6,6 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 use WP_Query;
+use WP_Term;
 
 /**
  * For hooks related to wordpress routing via the query_var lang.
@@ -38,12 +39,14 @@ class Directory {
 
 		if ( in_array( 'attachment', $allowed_post_types, true ) ) {
 			// Attachment permalink.
-			// TODO: Attachment is not being set a language when created.
-			// \add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
+			\add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
 		}
 
 		// Custom post types permalinks.
 		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
+
+		// Term archive permalinks.
+		\add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
 
 		// TODO: post_type_archive_link
 
@@ -51,7 +54,7 @@ class Directory {
 	}
 
 	public function init() : void {
-		$lang = $this->current_lang_from_url( Options::get()['default_language'] );
+		$lang = $this->current_lang_from_uri( Options::get()['default_language'], $_SERVER['REQUEST_URI'] );
 		if ( $lang === Options::get()['default_language'] ) {
 			return;
 		}
@@ -70,14 +73,14 @@ class Directory {
 		}
 	}
 
-	public function current_lang_from_url( string $curr_lang ) : string {
+	public function current_lang_from_uri( string $curr_lang, string $uri ) : string {
 		$languages        = Options::get()['allowed_languages'];
 		$default_language = Options::get()['default_language'];
 		foreach ( $languages as $lang ) {
 			if ( $lang === $default_language ) {
 				continue;
 			}
-			if ( str_starts_with( $_SERVER['REQUEST_URI'], "/{$lang}/" ) ) {
+			if ( str_starts_with( $uri, "/{$lang}/" ) ) {
 				return $lang;
 			}
 		}
@@ -102,8 +105,23 @@ class Directory {
 	}
 
 	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
+		// When attachments are attached to a post, their url already has the lang from the post permalink.
+		$lang = $this->current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
+		if ( ! empty( $lang ) ) {
+			return $link;
+		}
+
 		$post = WP_Post::get_instance( $post_id );
 		return $this->apply_lang_to_post_url( $link, $post );
+	}
+
+	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
+		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+			return $termlink;
+		}
+		$term_lang = LangInterface::get_term_language( $term->term_id );
+		$site_url = site_url();
+		return str_replace( $site_url, trailingslashit( $site_url ) . $term_lang, $termlink );
 	}
 
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
@@ -112,7 +130,7 @@ class Directory {
 		}
 
 		// If there is a language set, that takes precedence.
-		$lang = $this->current_lang_from_url( '' );
+		$lang = $this->current_lang_from_uri( '', $_SERVER['REQUEST_URI'] );
 		if ( ! empty( $lang ) ) {
 			return;
 		}
