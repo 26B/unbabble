@@ -110,6 +110,7 @@ class Plugin {
 			'language_switcher' => new Admin\LanguageSwitcher( $this ),
 			'redirector'        => new Admin\Redirector( $this ),
 
+			'api_header'     => new API\Header( $this ),
 			'api_query_vars' => new API\QueryVar( $this ),
 
 			'attachments_set_language' => new Attachments\SetLanguage( $this ),
