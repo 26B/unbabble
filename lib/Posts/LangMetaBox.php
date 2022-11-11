@@ -169,6 +169,11 @@ class LangMetaBox {
 	 * @return void
 	 */
 	public function save_post_language( int $post_id ) : void {
+		if ( 'auto-draft' === get_post( $post_id )->post_status) {
+			LangInterface::set_post_language( $post_id, LangInterface::get_current_language() );
+			return;
+		}
+
 		if ( ! $this->verify_nonce( 'ubb_language_metabox', 'ubb_language_metabox_nonce' ) ) {
 			return;
 		}

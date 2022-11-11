@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
@@ -12,6 +13,7 @@ class AdminNotices {
 			return;
 		}
 		\add_action( 'admin_notices', [ $this, 'duplicate_language' ], PHP_INT_MAX );
+		\add_action( 'admin_notices', [ $this, 'posts_missing_language' ], PHP_INT_MAX );
 	}
 
 	/**
@@ -40,5 +42,55 @@ class AdminNotices {
 
 		$message = __( 'There is a translation with the same language as this post.', 'unbabble' );
 		printf( '<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>', esc_html( $message ) );
+	}
+
+	public function posts_missing_language() : void {
+		global $wpdb;
+		$screen = get_current_screen();
+		if (
+			! is_admin()
+			|| $screen->parent_base !== 'edit'
+			|| $screen->base !== 'edit'
+			|| ! current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		$post_type = $_GET['post_type'] ?? 'post';
+
+		if ( ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
+			return;
+		}
+
+		$allowed_languages  = implode( "','", Options::get()['allowed_languages'] );
+		$translations_table = ( new PostTable() )->get_table_name();
+		$bad_posts          = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID
+				FROM {$wpdb->posts} as P
+				WHERE ID NOT IN (
+					SELECT post_id
+					FROM {$translations_table} as PT
+					WHERE PT.locale IN ('{$allowed_languages}')
+				) AND post_type = %s AND post_status != 'auto-draft'",
+				esc_sql( $post_type )
+			)
+		);
+
+		if ( count( $bad_posts ) === 0 ) {
+			return;
+		}
+
+		// TODO: link to actions.
+		$message = _n(
+			'There is %1$s post without language or with an unknown language. Go to (link) to see possible actions.',
+			'There are %1$s posts without language or with an unknown language. Go to (link) to see possible actions.',
+			count( $bad_posts ),
+			'unbabble'
+		);
+		printf(
+			'<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>',
+			esc_html( sprintf( $message, count( $bad_posts ) ) )
+		);
 	}
 }

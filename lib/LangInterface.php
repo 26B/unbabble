@@ -48,12 +48,12 @@ class LangInterface {
 			}
 		}
 
-		$inserted = $wpdb->insert(
+		$inserted = $wpdb->replace(
 			$table_name,
 			[
 				'post_id' => $post_id,
 				'locale'  => $language,
-			]
+			],
 		);
 		return is_int( $inserted );
 	}
@@ -206,7 +206,7 @@ class LangInterface {
 			}
 		}
 
-		$inserted = $wpdb->insert(
+		$inserted = $wpdb->replace(
 			$table_name,
 			[
 				'term_id' => $term_id,

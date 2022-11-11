@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
+use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Term;
@@ -12,6 +13,7 @@ class AdminNotices {
 			return;
 		}
 		\add_action( 'admin_notices', [ $this, 'duplicate_language' ], PHP_INT_MAX );
+		\add_action( 'admin_notices', [ $this, 'terms_missing_language' ], PHP_INT_MAX );
 	}
 
 	/**
@@ -46,5 +48,57 @@ class AdminNotices {
 
 		$message = __( 'There is a translation with the same language as this term.', 'unbabble' );
 		printf( '<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>', esc_html( $message ) );
+	}
+
+	public function terms_missing_language() : void {
+		global $wpdb;
+		$screen = get_current_screen();
+		if (
+			! is_admin()
+			|| $screen->parent_base !== 'edit'
+			|| $screen->base !== 'edit-tags'
+			|| ! current_user_can( 'manage_options' )
+			|| ! isset( $_GET['taxonomy'] )
+		) {
+			return;
+		}
+
+		$taxonomy = $_GET['taxonomy'];
+
+		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+			return;
+		}
+
+		$allowed_languages  = implode( "','", Options::get()['allowed_languages'] );
+		$translations_table = ( new TermTable() )->get_table_name();
+		$bad_terms          = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT T.term_id
+				FROM {$wpdb->terms} as T
+				INNER JOIN {$wpdb->term_taxonomy} as TT ON (T.term_id = TT.term_id)
+				WHERE T.term_id NOT IN (
+					SELECT term_id
+					FROM {$translations_table} as TR
+					WHERE TR.locale IN ('{$allowed_languages}')
+				) AND TT.taxonomy = %s",
+				esc_sql( $taxonomy )
+			)
+		);
+
+		if ( count( $bad_terms ) === 0 ) {
+			return;
+		}
+
+		// TODO: link to actions.
+		$message = _n(
+			'There is %1$s term without language or with an unknown language. Go to (link) to see possible actions.',
+			'There are %1$s terms without language or with an unknown language. Go to (link) to see possible actions.',
+			count( $bad_terms ),
+			'unbabble'
+		);
+		printf(
+			'<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>',
+			esc_html( sprintf( $message, count( $bad_terms ) ) )
+		);
 	}
 }

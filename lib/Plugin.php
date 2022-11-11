@@ -58,6 +58,7 @@ class Plugin {
 	public function run() {
 		$this->set_locale();
 		$this->define_admin_hooks();
+		$this->define_api_routes();
 	}
 
 	/**
@@ -138,5 +139,12 @@ class Plugin {
 		foreach ( $components as $component ) {
 			$component->register();
 		}
+	}
+
+	private function define_api_routes() : void {
+		add_action( 'rest_api_init', function () {
+			$namespace = 'unbabble/v1';
+			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
+		} );
 	}
 }
