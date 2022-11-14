@@ -159,6 +159,7 @@ class LangMetaBox {
 		$available_languages = array_keys( $available_languages );
 
 		// Display language selector and button to create new translation.
+		// TODO: Only show `ubb_copy_new` input if duplicate-post is active. Add filter and move the input to an integration class.
 		printf(
 			'<p><b>Create Translation</b></p>
 			<div>To: %1$s</div>
@@ -189,7 +190,7 @@ class LangMetaBox {
 
 		if (
 			get_post_type( $post_id ) === 'revision'
-			|| isset( $_POST['ubb_save_create'] ) // Don't set post language when creating a translation.
+			|| isset( $_POST['ubb_copy_new'] ) // Don't set post language when copying to a translation.
 		) {
 			return;
 		}

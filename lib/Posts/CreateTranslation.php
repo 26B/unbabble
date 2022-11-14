@@ -3,10 +3,8 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use WP_Embed;
 use WP_Error;
 use TwentySixB\WP\Plugin\Unbabble\Options;
-
 
 /**
  * For hooks related to creating a translations from an existing post.
@@ -18,13 +16,20 @@ class CreateTranslation {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
-		// Redirect to create new post page to create a translation.
-		// FIXME: Saving an auto-draft (no title) does not call save_post and so source is not set.
-		\add_action( 'save_post', [ $this, 'redirect_to_new' ], PHP_INT_MAX );
-		\add_action( 'save_post', [ $this, 'set_source' ], PHP_INT_MAX );
 
-		// TODO: Use Yoast's duplicate-post plugin to duplicate post before redirect.
-		// \add_action( 'save_post', [ $this, 'create_and_redirect' ], PHP_INT_MAX );
+		\add_action( 'admin_init', function() {
+			// Redirect to create new post page to create a translation.
+			// FIXME: Saving an auto-draft (no title) does not call save_post and so source is not set.
+			\add_action( 'save_post', [ $this, 'redirect_to_new' ], PHP_INT_MAX );
+			\add_action( 'save_post', [ $this, 'set_new_source' ], PHP_INT_MAX );
+
+			// TODO: Move to separate class for integration.
+			// Use Yoast's duplicate-post plugin to duplicate post before redirect.
+			if ( \is_plugin_active( 'duplicate-post/duplicate-post.php' ) ) {
+				\add_action( 'save_post', [ $this, 'copy_and_redirect' ], PHP_INT_MAX );
+			}
+		} );
+
 	}
 
 	public function redirect_to_new( int $post_id ) : void {
@@ -62,7 +67,7 @@ class CreateTranslation {
 		exit;
 	}
 
-	public function set_source( int $post_id ) : void {
+	public function set_new_source( int $post_id ) : void {
 		$post_type          = get_post_type( $post_id );
 		$allowed_post_types = Options::get_allowed_post_types();
 		if (
@@ -91,16 +96,15 @@ class CreateTranslation {
 		LangInterface::set_post_source( $post_id, $original_source );
 	}
 
-	// TODO: Refactor to use duplicate-post for copying and redirecting.
-	public function create_and_redirect( int $post_id ) : void {
+	public function copy_and_redirect( int $post_id ) : void {
 		$post_type = get_post_type( $post_id );
 		if ( $post_type === 'revision' || ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
 			return;
 		}
-		if ( ! ( $_POST['ubb_save_create'] ?? false ) ) {
+		if ( ! ( $_POST['ubb_copy_new'] ?? false ) ) {
 			return;
 		}
-		$_POST['ubb_save_create'] = false; // Used to stop recursion and stop saving in the LangMetaBox.php.
+		$_POST['ubb_copy_new'] = false; // Used to stop recursion and stop saving in the LangMetaBox.php.
 
 		// Language to set to the new post.
 		$lang_create = $_POST['ubb_create'] ?? '';
@@ -114,25 +118,16 @@ class CreateTranslation {
 			return;
 		}
 
-		add_filter( 'wp_insert_post_empty_content', '__return_false' );
-
-		// TODO: slug needs to be different.
-		$new_post_id = wp_insert_post( [
-			'post_title'   => "({$lang_create})-" . get_post( $post_id )->post_title,
-			'post_content' => '',
-			'post_status'  => 'draft',
-			'post_type'    => get_post_type( $post_id ),
-			'post_name'    => get_post( $post_id )->post_title . "-{$lang_create}",
-		], true );
-
-		// TODO: check if its being removed correctly.
-		remove_filter( 'wp_insert_post_empty_content', '__return_false' );
+		$post_duplicator = new \Yoast\WP\Duplicate_Post\Post_Duplicator();
+		$new_post_id     = $post_duplicator->create_duplicate( get_post( $post_id ), [] );
 
 		if ( $new_post_id instanceof WP_Error ) {
 			error_log( print_r( 'CreateTranslation - New post error', true ) );
 			// TODO: How to show error.
 			return;
 		}
+
+		\delete_post_meta( $new_post_id, '_dp_original' );
 
 		// Set language in the custom post lang table.
 		if ( ! LangInterface::set_post_language( $new_post_id, $lang_create ) ) {
