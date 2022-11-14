@@ -57,6 +57,13 @@ class LangMetaBox {
 			$this->print_language_select( 'ubb_lang', LangInterface::get_current_language(), $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' )
 		);
+
+		if ( is_numeric( $_GET['ubb_source'] ?? '' ) ) {
+			printf(
+				'<input type="hidden" id="ubb_source" name="ubb_source" value="%s">',
+				esc_sql( $_GET['ubb_source'] )
+			);
+		}
 	}
 
 	public function edit_term_language_metabox( $term ) {
@@ -147,7 +154,8 @@ class LangMetaBox {
 					<th scope="row"><label for="language">%1$s</label></th>
 					<td>
 					%2$s
-					<input type="submit" name="ubb_save_create" value="Save and Create" class="button"/>
+					<input type="submit" name="ubb_redirect_new" value="Save and Create" class="button"/>
+					<input type="submit" name="ubb_copy_new" value="Save and Copy" class="button"/>
 					</td>
 				</tr>',
 				esc_html__( 'Create Translation', 'unbabble' ),
@@ -161,7 +169,7 @@ class LangMetaBox {
 			return;
 		}
 
-		if ( isset( $_POST['ubb_save_create'] ) ) { // Don't set post language when creating a translation.
+		if ( isset( $_POST['ubb_copy_new'] ) ) { // Don't set post language when creating a translation.
 			return;
 		}
 
@@ -177,15 +185,18 @@ class LangMetaBox {
 
 	// TODO: Duplicated in Posts/LangMetaBox
 	private function print_language_select( string $name, $selected, $options, string $nonce_action, string $nonce_name, $echo = true ) {
-		$langs = array_map(
-			function ( $text, $lang ) use ( $selected ) {
+		$create_mode = is_numeric( $_GET['ubb_source'] ?? '' );
+		$langs       = array_map(
+			function ( $text, $lang ) use ( $selected, $create_mode ) {
 				if ( is_int( $text ) ) {
 					$text = $lang;
 				}
+				$selected_str = \selected( $lang, $selected, false );
 				return sprintf(
-					'<option value="%1$s" %2$s>%3$s</option>',
+					'<option value="%1$s" %2$s %3$s>%4$s</option>',
 					$lang,
-					\selected( $lang, $selected, false ),
+					$selected_str,
+					$create_mode && empty( $selected_str ) ? 'disabled' : '',
 					$text
 				);
 			},

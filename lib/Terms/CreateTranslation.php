@@ -17,9 +17,78 @@ class CreateTranslation {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
-		\add_action( 'saved_term', [ $this, 'create_and_redirect' ], PHP_INT_MAX, 4 );
+		// Redirect to create new translation.
+		\add_action( 'saved_term', [ $this, 'redirect_to_new' ], PHP_INT_MAX, 4 );
+		\add_action( 'saved_term', [ $this, 'set_new_source' ], PHP_INT_MAX, 4 );
+
+		// TODO: Refactor for copy.
+		// \add_action( 'saved_term', [ $this, 'create_and_redirect' ], PHP_INT_MAX, 4 );
 	}
 
+	public function redirect_to_new( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
+		if (
+			! $update
+			|| ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true )
+			|| ! ( $_POST['ubb_redirect_new'] ?? false )
+		) {
+			return;
+		}
+
+		// Language to set to the new term.
+		$lang_create = $_POST['ubb_create'] ?? '';
+		if (
+			empty( $lang_create )
+			|| ! in_array( $lang_create, Options::get()['allowed_languages'] )
+			// TODO: check if term_id has this language already
+		) {
+			// TODO: What else to do when this happens.
+			error_log( print_r( 'CreateTranslation - lang create failed', true ) );
+			return;
+		}
+
+		// TODO: Add something in the page to show that a translation is being saved. Use existence of ubb_source.
+		wp_safe_redirect(
+			add_query_arg(
+				[
+					'taxonomy'   => $taxonomy,
+					'lang'       => $lang_create,
+					'ubb_source' => $term_id,
+				],
+				admin_url( 'edit-tags.php' )
+			),
+			302,
+			'Unbabble'
+		);
+		exit;
+	}
+
+	public function set_new_source( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
+		$allowed_taxonomies = Options::get_allowed_taxonomies();
+		if (
+			$update
+			|| ! in_array( $taxonomy, $allowed_taxonomies, true )
+			|| ! isset( $_POST['ubb_source'] )
+			|| ! is_numeric( $_POST['ubb_source'] )
+		) {
+			return;
+		}
+
+		$src_term = get_term( \sanitize_text_field( $_POST['ubb_source'] ), $taxonomy );
+		if ( $src_term === null || ! in_array( $src_term->taxonomy, $allowed_taxonomies, true ) ) {
+			return;
+		}
+
+		$original_source = LangInterface::get_term_source( $src_term->term_id );
+		if ( $original_source === null ) {
+			$original_source = $src_term->term_id;
+			LangInterface::set_term_source( $src_term->term_id, $src_term->term_id );
+		}
+
+		LangInterface::set_term_source( $term_id, $original_source );
+	}
+
+
+	// TODO: Refactor for copy.
 	public function create_and_redirect( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		if ( ! $update ) {
 			return;
