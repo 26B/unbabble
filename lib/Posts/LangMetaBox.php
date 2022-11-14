@@ -80,6 +80,14 @@ class LangMetaBox {
 		}
 
 		$this->print_language_select( 'ubb_lang', $lang, $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox' );
+
+		if ( is_numeric( $_GET['ubb_source'] ?? '' ) ) {
+			printf(
+				'<input type="hidden" id="ubb_source" name="ubb_source" value="%s">',
+				esc_sql( $_GET['ubb_source'] )
+			);
+		}
+
 		$current_screen = get_current_screen();
 		if ( $current_screen->base == "post" && $current_screen->action == "add" ) {
 			return;
@@ -154,9 +162,10 @@ class LangMetaBox {
 		printf(
 			'<p><b>Create Translation</b></p>
 			<div>To: %1$s</div>
-			<input type="submit" %2$s name="ubb_save_create" value="Save and Create" class="button"/>',
+			<input type="submit" %2$s name="ubb_redirect_new" value="Save and Create" class="button"/>
+			<input type="submit" %2$s name="ubb_copy_new" value="Save and Copy" class="button"/>',
 			$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
-			$post->post_status === 'draft' ? 'id="save-post"' : ''
+			$post->post_status === 'draft' ? 'id="save-post"' : '',
 		);
 	}
 
@@ -169,7 +178,7 @@ class LangMetaBox {
 	 * @return void
 	 */
 	public function save_post_language( int $post_id ) : void {
-		if ( 'auto-draft' === get_post( $post_id )->post_status) {
+		if ( 'auto-draft' === get_post( $post_id )->post_status ) {
 			LangInterface::set_post_language( $post_id, LangInterface::get_current_language() );
 			return;
 		}
@@ -205,15 +214,18 @@ class LangMetaBox {
 	 * @return string
 	 */
 	private function print_language_select( string $name, $selected, $options, string $nonce_action, string $nonce_name, $echo = true ) : string {
-		$langs = array_map(
-			function ( $text, $lang ) use ( $selected ) {
+		$create_mode = is_numeric( $_GET['ubb_source'] ?? '' );
+		$langs       = array_map(
+			function ( $text, $lang ) use ( $selected, $create_mode ) {
 				if ( is_int( $text ) ) {
 					$text = $lang;
 				}
+				$selected_str = \selected( $lang, $selected, false );
 				return sprintf(
-					'<option value="%1$s" %2$s>%3$s</option>',
+					'<option value="%1$s" %2$s %3$s>%4$s</option>',
 					$lang,
-					\selected( $lang, $selected, false ),
+					$selected_str,
+					$create_mode && empty( $selected_str ) ? 'disabled' : '',
 					$text
 				);
 			},
@@ -230,7 +242,7 @@ class LangMetaBox {
 				%2$s
 			</select>',
 			$name,
-			implode( '', $langs )
+			implode( '', $langs ),
 		);
 
 		return ! $echo ? $output : printf( $output );

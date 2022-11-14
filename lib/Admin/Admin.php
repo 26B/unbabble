@@ -46,6 +46,7 @@ class Admin {
 		// Whitelist 'lang' as a query_var.
 		add_filter( 'query_vars', function( $query_vars ) {
 			$query_vars[] = 'lang';
+			$query_vars[] = 'ubb_source';
 			return $query_vars;
 		} );
 

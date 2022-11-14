@@ -213,10 +213,6 @@ class Directory {
 				return false;
 			}
 
-			error_log( print_r( $post_id, true ) );
-			error_log( print_r( LangInterface::get_post_language( $post_id ), true ) );
-			error_log( print_r( LangInterface::get_current_language(), true ) );
-
 			// If the post language is not the same as the current language, then don't redirect.
 			if ( LangInterface::get_post_language( $post_id ) !== LangInterface::get_current_language() ) {
 				return false;

@@ -16,14 +16,27 @@ class LangInterface {
 	public static function get_current_language() : string {
 		$options = Options::get();
 		$lang    = get_query_var( 'lang', null );
-		// TODO: check for lang in the Allowed languages.
+
+		// TODO: Auto-draft saving does not put the query var.
+		if ( ! isset( $lang ) && isset( $_GET['lang'] ) ) {
+			$lang = $_GET['lang'];
+		}
+
 		if ( ! isset( $lang ) && is_admin() ) {
 			$lang = $_COOKIE['ubb_lang'];
 		}
+
 		if ( ! isset( $lang )  ) {
 			$lang = $options['default_language'];
 		}
-		return apply_filters( 'ubb_current_lang', $lang );
+
+		$options = Options::get();
+		if ( ! in_array( $lang, $options['allowed_languages'] ) ) {
+			$lang = $options['default_language'];
+		}
+
+		// TODO: which sanitize to use.
+		return apply_filters( 'ubb_current_lang', \sanitize_text_field( $lang ) );
 	}
 
 	/**
@@ -170,19 +183,14 @@ class LangInterface {
 			return false;
 		}
 
-		// TODO: Update terms
+		// TODO: Update terms.
 		$allowed_taxonomies = Options::get_allowed_taxonomies();
-		error_log( print_r( $terms, true ) );
-		error_log( print_r( $allowed_taxonomies, true ) );
 		foreach ( $terms as $term ) {
 			if ( ! in_array( $term->taxonomy, $allowed_taxonomies, true ) ) {
 				continue;
 			}
-			error_log( print_r( $term->term_id, true ) );
-			error_log( print_r( $term->taxonomy, true ) );
 			$term_translation = LangInterface::get_term_translation( $term->term_id, $lang );
 
-			error_log( print_r( $term_translation, true ) );
 			wp_remove_object_terms( $post_id, $term->term_id, $term->taxonomy );
 
 			if ( $term_translation != null ) {

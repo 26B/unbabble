@@ -22,7 +22,7 @@ class ChangeLanguage {
 		// TODO: Finish this.
 		return;
 
-		$ubb_lang = $_POST['ubb_lang'] ?? '';
+		$ubb_lang = \sanitize_text_field( $_POST['ubb_lang'] ?? '' );
 
 		$status = LangInterface::change_term_language( $term_id, $ubb_lang );
 
