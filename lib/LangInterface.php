@@ -158,10 +158,11 @@ class LangInterface {
 	public static function change_post_language( int $post_id, string $lang ) : bool {
 		global $wpdb;
 
+		$old_lang = self::get_post_language( $post_id );
 		if (
 			empty( $lang )
 			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
-			|| $lang === self::get_post_language( $post_id )
+			|| $lang === $old_lang
 		) {
 			return false;
 		}
@@ -183,7 +184,10 @@ class LangInterface {
 			return false;
 		}
 
-		// TODO: Update terms.
+		// Update Terms.
+
+		// Filter needed since system still thinks its in the previous language.
+		add_filter( 'ubb_use_term_lang_filter', '__return_false' );
 		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		foreach ( $terms as $term ) {
 			if ( ! in_array( $term->taxonomy, $allowed_taxonomies, true ) ) {
@@ -193,9 +197,26 @@ class LangInterface {
 
 			wp_remove_object_terms( $post_id, $term->term_id, $term->taxonomy );
 
-			if ( $term_translation != null ) {
-				wp_add_object_terms( $post_id, $term_translation, $term->taxonomy );
+			if ( $term_translation !== null ) {
+				$status = wp_add_object_terms( $post_id, $term_translation, $term->taxonomy );
+				if ( empty( $status ) || is_wp_error( $status )	) {
+					error_log( print_r( "ChangeLanguage - term update failed for term {$term_translation}.", true ) );
+					// TODO: What else to do here?
+				}
 			}
+		}
+		remove_filter( 'ubb_use_term_lang_filter', '__return_false' );
+
+		// Update Meta.
+		$default_meta = [];
+		if ( in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
+			$default_meta['_thumbnail_id'] = 'post';
+		}
+		// TODO: Filter docs.
+		$meta_keys_to_translate = apply_filters( 'ubb_change_language_post_meta_translate_keys', $default_meta, $post_id, $lang, $old_lang );
+		if ( ! self::translate_post_meta( $post_id, $lang, $meta_keys_to_translate ) ) {
+			// TODO: Failure state
+			return false;
 		}
 
 		return true;
@@ -328,6 +349,11 @@ class LangInterface {
 		}
 
 		// TODO: Update posts?
+		return true;
+	}
+
+	private static function translate_post_meta( $post_id, $ubb_lang, $meta_keys_to_translate ) : bool {
+		// TODO:
 		return true;
 	}
 }

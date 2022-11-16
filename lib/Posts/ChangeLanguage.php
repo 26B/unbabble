@@ -22,7 +22,6 @@ class ChangeLanguage {
 		$ubb_lang = $_POST['ubb_lang'] ?? '';
 
 		$status = LangInterface::change_post_language( $post_id, $ubb_lang );
-
 		// TODO: show admin notice about translation with that language already existing and needing to disconnect a previous one.
 		if ( $status === false ) {
 			// TODO:
