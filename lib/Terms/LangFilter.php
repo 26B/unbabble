@@ -30,6 +30,11 @@ class LangFilter {
 
 	public function filter_terms_by_language( array $pieces, array $taxonomies, array $args ) : array {
 
+		// TODO: filter docs.
+		if ( ! \apply_filters( 'ubb_use_term_lang_filter', true ) ) {
+			return $pieces;
+		}
+
 		// Divide $taxonomies into taxonomies with and without language.
 		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		$taxonomies_w_lang  = [];

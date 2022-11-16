@@ -2,7 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
-use TwentySixB\WP\Plugin\Unbabble\Refactor;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 
 /**
  * The core plugin class.
@@ -59,6 +59,7 @@ class Plugin {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_api_routes();
+		$this->define_integrations();
 	}
 
 	/**
@@ -145,6 +146,19 @@ class Plugin {
 		add_action( 'rest_api_init', function () {
 			$namespace = 'unbabble/v1';
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
+		} );
+	}
+
+	private function define_integrations() : void {
+		$integrations = [
+			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+		];
+		\add_action( 'admin_init', function() use ( $integrations ) {
+			foreach ( $integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
 		} );
 	}
 }

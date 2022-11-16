@@ -18,7 +18,6 @@ class LanguageSwitcher {
 	 * @since 0.0.0
 	 */
 	public function register() {
-		// TODO: Frontend
 
 		// Backoffice.
 		if ( is_admin() ) {
@@ -108,7 +107,7 @@ class LanguageSwitcher {
 				null,
 				sprintf(
 					"/wp-admin/edit.php?%slang=%s",
-					$post_type === 'post' ? '' : "post_type={$post_type}",
+					$post_type === 'post' ? '' : "post_type={$post_type}&",
 					$lang
 				)
 			);
