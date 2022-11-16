@@ -23,7 +23,7 @@ class LangInterface {
 		}
 
 		if ( ! isset( $lang ) && is_admin() ) {
-			$lang = $_COOKIE['ubb_lang'];
+			$lang = $_COOKIE['ubb_lang'] ?? null;
 		}
 
 		if ( ! isset( $lang )  ) {

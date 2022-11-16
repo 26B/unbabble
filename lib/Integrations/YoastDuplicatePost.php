@@ -6,6 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Error;
 use WP_Post;
+use WP_Term;
 
 class YoastDuplicatePost {
 	public function register() {
@@ -56,9 +57,12 @@ class YoastDuplicatePost {
 			$post_duplicator->get_default_options(),
 			[ 'meta_excludelist' => [ 'ubb_source' ] ]
 		);
-		// TODO: filter to get meta values for changing stuff.
+
+		// Set filters to translate meta values before they're saved if needed.
 		$this->set_filters_for_meta( $post_id, $lang_create );
+		$this->filter_post_meta = true;
 		$post_duplicator->copy_post_meta_info( $new_post_id, get_post( $post_id ), $options );
+		$this->filter_post_meta = false;
 
 		// Set language in the custom post lang table.
 		if ( ! LangInterface::set_post_language( $new_post_id, $lang_create ) ) {
@@ -104,15 +108,20 @@ class YoastDuplicatePost {
 		$default_meta = [];
 		if ( in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
 			$default_meta['_thumbnail_id'] = 'post';
-			$default_meta['acf_image']     = 'post';
 		}
-		// TODO: Handle wildcards.
+
+		// TODO: Handle wildcards/regex.
 		$meta_to_translate = \apply_filters( 'ubb_yoast_duplicate_post_meta_translate_keys', $default_meta, $post_id, $new_lang );
 
 		$self = $this;
 		\add_filter( 'add_post_metadata',
 			function( $check, $new_post_id, $meta_key, $meta_value, $unique ) use ( $self, $meta_to_translate, $post_id, $new_lang ) {
 				if ( ! isset( $meta_to_translate[ $meta_key ] ) ) {
+					return $check;
+				}
+
+				// Prevent filter from messing with other post meta saves.
+				if ( ! $self->filter_post_meta ) {
 					return $check;
 				}
 
@@ -141,8 +150,7 @@ class YoastDuplicatePost {
 		}
 
 		if ( $meta_to_translate[ $meta_key ] === 'term' ) {
-			// TODO:
-			return $check;
+			return $this->translate_term_meta( $check, $new_post_id, $meta_key, $meta_value, $new_lang );
 		}
 
 		return $check;
@@ -154,7 +162,7 @@ class YoastDuplicatePost {
 		if ( is_array( $meta_value ) ) {
 
 			// Verify all numeric.
-			if ( count( array_filter( $meta_value, 'is_numeric' ) ) === count( $meta_value ) ) {
+			if ( count( array_filter( $meta_value, 'is_numeric' ) ) !== count( $meta_value ) ) {
 				return $check;
 			}
 
@@ -195,6 +203,53 @@ class YoastDuplicatePost {
 		return $new_meta_value;
 	}
 
+	// Copy of translate_post_meta
+	private function translate_term_meta( $check, $new_post_id, $meta_key, $meta_value, $new_lang ) {
+		$new_meta_value = null;
+
+		if ( is_array( $meta_value ) ) {
+
+			// Verify all numeric.
+			if ( count( array_filter( $meta_value, 'is_numeric' ) ) !== count( $meta_value ) ) {
+				return $check;
+			}
+
+			$new_meta_value = [];
+			foreach ( $meta_value as $meta_term_id ) {
+				$term = get_term( $meta_term_id );
+				if ( ! $term instanceof WP_Term || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+					continue;
+				}
+				$meta_term_translation = LangInterface::get_term_translation( $meta_term_id, $new_lang );
+				if ( $meta_term_translation === null ) {
+					continue;
+				}
+				$new_meta_value[] = $meta_term_translation;
+			}
+		}
+
+		if ( is_numeric( $meta_value ) ) {
+			$term = get_term( $meta_value );
+			if ( ! $term instanceof WP_Post || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+				return $check;
+			}
+			$new_meta_value = LangInterface::get_term_translation( $meta_value, $new_lang );
+			if ( $new_meta_value === null ) {
+				return ''; // Save nothing to meta_value.
+			}
+		}
+
+		if ( $new_meta_value === null ) {
+			return $check;
+		}
+
+		$result = $this->insert_meta( $new_post_id, $meta_key, $new_meta_value );
+		if ( $result === false ) {
+			// TODO: Failure state.
+			return $check;
+		}
+		return $new_meta_value;
+	}
 
 	private function insert_meta( $post_id, $meta_key, $meta_value ) {
 		global $wpdb;
@@ -203,7 +258,7 @@ class YoastDuplicatePost {
 			[
 				'post_id'    => $post_id,
 				'meta_key'   => $meta_key,
-				'meta_value' => $meta_value,
+				'meta_value' => \maybe_serialize( $meta_value ),
 			]
 		);
 	}
