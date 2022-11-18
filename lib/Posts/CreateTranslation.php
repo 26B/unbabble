@@ -17,12 +17,18 @@ class CreateTranslation {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
-		// TODO: Attachment pages are not working.
+
+		// TODO: Attachment copy not done yet.
 
 		// Redirect to create new post page to create a translation.
 		// FIXME: Saving an auto-draft (no title) does not call save_post and so source is not set.
 		\add_action( 'save_post', [ $this, 'redirect_to_new' ], PHP_INT_MAX );
 		\add_action( 'save_post', [ $this, 'set_new_source' ], PHP_INT_MAX );
+
+		// Attachment translations.
+		\add_action( 'edit_attachment', [ $this, 'redirect_to_new' ], PHP_INT_MAX );
+		\add_filter( 'plupload_init', [ $this, 'add_params_to_upload' ], PHP_INT_MAX );
+		\add_action( 'add_attachment', [ $this, 'set_new_source_attachment' ], PHP_INT_MAX );
 	}
 
 	public function redirect_to_new( int $post_id ) : void {
@@ -48,11 +54,16 @@ class CreateTranslation {
 
 		wp_safe_redirect(
 			add_query_arg(
-				[
-					'lang'       => $lang_create,
-					'ubb_source' => $post_id,
-				],
-				admin_url( 'post-new.php' )
+				array_merge(
+					[
+						'lang'       => $lang_create,
+						'ubb_source' => $post_id,
+					],
+					$post_type === 'post' ? [] : [
+						'post_type' => $post_type
+					],
+				),
+				$post_type === 'attachment' ? admin_url( 'media-new.php' ) : admin_url( 'post-new.php' )
 			),
 			302,
 			'Unbabble'
@@ -67,11 +78,8 @@ class CreateTranslation {
 			$post_type === 'revision'
 			|| ! in_array( $post_type, $allowed_post_types, true )
 			|| ! isset( $_POST['ubb_source'] )
+			|| ! is_numeric( $_POST['ubb_source'] )
 		) {
-			return;
-		}
-
-		if ( ! is_numeric( $_POST['ubb_source'] ) ) {
 			return;
 		}
 
@@ -80,10 +88,44 @@ class CreateTranslation {
 			return;
 		}
 
-		$original_source = LangInterface::get_post_source( $src_post->ID );
+		$this->set_post_source( $post_id, $src_post->ID );
+	}
+
+	public function set_new_source_attachment( int $post_id ) : void {
+		$post_type          = get_post_type( $post_id );
+		$allowed_post_types = Options::get_allowed_post_types();
+		if (
+			$post_type !== 'attachment'
+			|| ! in_array( $post_type, $allowed_post_types, true )
+			|| ! isset( $_GET['ubb_source'] )
+			|| ! is_numeric( $_GET['ubb_source'] )
+		) {
+			return;
+		}
+
+		$src_post = get_post( \sanitize_text_field( $_GET['ubb_source'] ) );
+		if ( $src_post === null || ! in_array( $src_post->post_type, $allowed_post_types, true ) ) {
+			return;
+		}
+
+		$this->set_post_source( $post_id, $src_post->ID );
+	}
+
+	public function add_params_to_upload( $plupload_init ) : array {
+		$url = $plupload_init['url'];
+		$url = add_query_arg( 'lang', LangInterface::get_current_language(), $url );
+		if ( isset( $_GET['ubb_source'] ) && is_numeric( $_GET['ubb_source'] ) ) {
+			$url = add_query_arg( 'ubb_source', $_GET['ubb_source'], $url );
+		}
+		$plupload_init['url'] = $url;
+		return $plupload_init;
+	}
+
+	private function set_post_source( $post_id, $src_post_id ) {
+		$original_source = LangInterface::get_post_source( $src_post_id );
 		if ( $original_source === null ) {
-			$original_source = $src_post->ID;
-			LangInterface::set_post_source( $src_post->ID, $src_post->ID );
+			$original_source = $src_post_id;
+			LangInterface::set_post_source( $src_post_id, $src_post_id );
 		}
 
 		LangInterface::set_post_source( $post_id, $original_source );
