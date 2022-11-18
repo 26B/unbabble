@@ -17,6 +17,7 @@ class CreateTranslation {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
+		// TODO: Attachment pages are not working.
 
 		// Redirect to create new post page to create a translation.
 		// FIXME: Saving an auto-draft (no title) does not call save_post and so source is not set.

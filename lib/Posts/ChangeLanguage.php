@@ -15,11 +15,17 @@ class ChangeLanguage {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
-		\add_action( 'save_post', [ $this, 'change_language' ], PHP_INT_MAX );
+
+		// Priority needs to be before the set post language when post is first saved.
+		\add_action( 'save_post', [ $this, 'change_language' ], PHP_INT_MAX - 10 );
 	}
 
 	public function change_language( int $post_id ) : void {
 		$ubb_lang = $_POST['ubb_lang'] ?? '';
+
+		if ( empty( LangInterface::get_post_language( $post_id ) ) ) {
+			return;
+		}
 
 		$status = LangInterface::change_post_language( $post_id, $ubb_lang );
 		// TODO: show admin notice about translation with that language already existing and needing to disconnect a previous one.

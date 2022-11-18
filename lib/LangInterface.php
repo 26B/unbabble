@@ -5,6 +5,8 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use WP_Post;
+use WP_Term;
 
 /**
  * Handle Language Meta Box for Posts and Terms.
@@ -212,7 +214,7 @@ class LangInterface {
 		if ( in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
 			$default_meta['_thumbnail_id'] = 'post';
 		}
-		// TODO: Filter docs.
+		// TODO: Filter docs. Use same filter as the one is YoastDuplicatePost.
 		$meta_keys_to_translate = apply_filters( 'ubb_change_language_post_meta_translate_keys', $default_meta, $post_id, $lang, $old_lang );
 		if ( ! self::translate_post_meta( $post_id, $lang, $meta_keys_to_translate ) ) {
 			// TODO: Failure state
@@ -352,8 +354,117 @@ class LangInterface {
 		return true;
 	}
 
-	private static function translate_post_meta( $post_id, $ubb_lang, $meta_keys_to_translate ) : bool {
-		// TODO:
+	private static function translate_post_meta( $post_id, $new_lang, $meta_keys_to_translate ) : bool {
+		global $wpdb;
+		$meta_keys_str = implode(
+			"','",
+			array_map(
+				fn ( $meta_key ) => esc_sql( $meta_key ),
+				array_keys( $meta_keys_to_translate )
+			)
+		);
+		$meta = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->postmeta} WHERE meta_key IN ('{$meta_keys_str}') AND post_id = %s",
+				$post_id
+			),
+			ARRAY_A
+		);
+
+		// Code similar to one in YoastDuplicatePost.
+		foreach ( $meta as $meta_data ) {
+			$meta_key       = $meta_data['meta_key'];
+			$meta_value     = maybe_unserialize( $meta_data['meta_value'] );
+			$new_meta_value = \apply_filters( 'ubb_change_language_post_meta_translate_value', null, $meta_value, $meta_key, $post_id, $new_lang, $meta_data['meta_id'] );
+			if ( $new_meta_value !== null ) {
+				$status = update_metadata_by_mid( 'post', $meta_data['meta_id'], $new_meta_value, $meta_key );
+				if ( $status ) {
+					continue;
+				}
+			}
+
+			self::translate_post_meta_type_ids( $meta_keys_to_translate[ $meta_key ], $meta_data['meta_id'], $meta_key, $meta_value, $new_lang );
+		}
+
 		return true;
+	}
+
+	private static function translate_post_meta_type_ids( $meta_type, $meta_id, $meta_key, $meta_value, $new_lang ) : void {
+		if ( $meta_type !== 'post' && $meta_type !== 'term' ) {
+			return;
+		}
+
+		$new_meta_value = null;
+		if ( is_array( $meta_value ) ) {
+
+			// Verify all numeric.
+			if ( count( array_filter( $meta_value, 'is_numeric' ) ) !== count( $meta_value ) ) {
+				return;
+			}
+
+			$new_meta_value = [];
+			foreach ( $meta_value as $object_id ) {
+				if ( $meta_type === 'post' ) {
+					$post = get_post( $object_id );
+					if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, Options::get_allowed_post_types(), true )  ) {
+						continue;
+					}
+					$meta_post_translation = LangInterface::get_post_translation( $object_id, $new_lang );
+					if ( $meta_post_translation === null ) {
+						continue;
+					}
+					$new_meta_value[] = $meta_post_translation;
+				} else if ( $meta_type === 'term' ) {
+					$term = get_term( $object_id );
+					if ( ! $term instanceof WP_Term || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+						continue;
+					}
+					$meta_term_translation = LangInterface::get_term_translation( $object_id, $new_lang );
+					if ( $meta_term_translation === null ) {
+						continue;
+					}
+					$new_meta_value[] = $meta_term_translation;
+				}
+			}
+		}
+
+		if ( is_numeric( $meta_value ) ) {
+			if ( $meta_type === 'post' ) {
+				$post = get_post( $meta_value );
+				if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, Options::get_allowed_post_types(), true )  ) {
+					return;
+				}
+				$new_meta_value = LangInterface::get_post_translation( $meta_value, $new_lang );
+				if ( $new_meta_value === null ) {
+					$new_meta_value = '';
+				}
+			} else if ( $meta_type === 'term' ) {
+				$term = get_term( $meta_value );
+				if ( ! $term instanceof WP_Post || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+					return;
+				}
+				$new_meta_value = LangInterface::get_term_translation( $meta_value, $new_lang );
+				if ( $new_meta_value === null ) {
+					$new_meta_value = '';
+				}
+			}
+		}
+
+		if ( $new_meta_value === null ) {
+			return;
+		}
+
+		if ( empty( $new_meta_value ) ) {
+			$status = delete_metadata_by_mid( 'post', $meta_id );
+			if ( ! $status ) {
+				// TODO: log.
+			}
+			return;
+		}
+
+		$status = update_metadata_by_mid( 'post', $meta_id, $new_meta_value, $meta_key );
+		if ( ! $status ) {
+			// TODO: log.
+		}
 	}
 }
