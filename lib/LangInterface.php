@@ -149,9 +149,14 @@ class LangInterface {
 			)
 		);
 
+		$languages = Options::get()['allowed_languages'];
 		$lang_list = [];
 		foreach ( $posts as $post ) {
-			$lang_list[ $post->post_id ] = self::get_post_language( $post->post_id );
+			$post_language = self::get_post_language( $post->post_id );
+			if ( ! in_array( $post_language, $languages, true ) ) {
+				continue;
+			}
+			$lang_list[ $post->post_id ] = $post_language;
 		}
 		return $lang_list;
 	}

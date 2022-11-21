@@ -36,7 +36,11 @@ class Redirector {
 		}
 
 		$post_lang = LangInterface::get_post_language( $_REQUEST['post'] );
-		if ( $post_lang === null || $post_lang === $current_lang ) {
+		if (
+			$post_lang === null
+			|| $post_lang === $current_lang
+			|| ! in_array( $post_lang, Options::get()['allowed_languages'], true )
+		) {
 			return;
 		}
 

@@ -15,9 +15,9 @@ class Options {
 		if ( is_array( $options ) ) {
 			return array_merge(
 				[
-					'allowed_languages' => [ 'en', 'pt_PT' ],
-					'default_language'  => 'pt_PT',
-					'post_types'        => [ 'post' ],
+					'allowed_languages' => [],
+					'default_language'  => '',
+					'post_types'        => [],
 					'taxonomies'        => [],
 					'router'            => 'query_var',
 				],
