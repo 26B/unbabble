@@ -57,8 +57,15 @@ class QueryVar {
 		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
 	}
 
-	public function apply_lang_to_post_url( string $post_link, WP_Post $post ) : string {
-		$post_lang = LangInterface::get_post_language( $post->ID );
+	public function apply_lang_to_post_url( string $post_link, $post ) : string {
+		if ( is_numeric( $post ) ) {
+			$post_id = (int) $post;
+		} else if ( $post instanceof WP_Post ) {
+			$post_id = $post->ID;
+		} else {
+			return $post_link;
+		}
+		$post_lang = LangInterface::get_post_language( $post_id );
 		if ( $post_lang ===  Options::get()['default_language'] ) {
 			return $post_link;
 		}
