@@ -11,7 +11,7 @@ class Options {
 
 	public static function get() : array {
 		// TODO: Hook docs.
-		$options = \apply_filters( 'ubb_options', [] );
+		$options = \apply_filters( 'ubb_options', null );
 		if ( is_array( $options ) ) {
 			return array_merge(
 				[
