@@ -10,6 +10,21 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 class Options {
 
 	public static function get() : array {
+		// TODO: Hook docs.
+		$options = \apply_filters( 'ubb_options', [] );
+		if ( is_array( $options ) ) {
+			return array_merge(
+				[
+					'allowed_languages' => [ 'en', 'pt_PT' ],
+					'default_language'  => 'pt_PT',
+					'post_types'        => [ 'post' ],
+					'taxonomies'        => [],
+					'router'            => 'query_var',
+				],
+				$options
+			);
+		}
+
 		$options = \get_option( 'ubb_options' );
 		if ( $options ) {
 			return $options;
@@ -26,7 +41,7 @@ class Options {
 	}
 
 	public static function only_one_language_allowed() : bool {
-		return count( self::get()['allowed_languages'] ) === 1;
+		return count( self::get()['allowed_languages'] ) < 2;
 	}
 
 	public static function get_allowed_post_types() : array {

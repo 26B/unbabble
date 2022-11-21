@@ -18,6 +18,9 @@ class LanguageSwitcher {
 	 * @since 0.0.0
 	 */
 	public function register() {
+		if ( Options::only_one_language_allowed() ) {
+			return;
+		}
 
 		// Backoffice.
 		if ( is_admin() ) {

@@ -32,7 +32,6 @@ class LangInterface {
 			$lang = $options['default_language'];
 		}
 
-		$options = Options::get();
 		if ( ! in_array( $lang, $options['allowed_languages'] ) ) {
 			$lang = $options['default_language'];
 		}
