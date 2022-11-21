@@ -18,6 +18,7 @@ class YoastDuplicatePost {
 
 		// Use Yoast's duplicate-post plugin to duplicate post before redirect.
 		\add_action( 'save_post', [ $this, 'copy_and_redirect' ], PHP_INT_MAX );
+		\add_action( 'edit_attachment', [ $this, 'copy_and_redirect' ], PHP_INT_MAX );
 	}
 
 	public function copy_and_redirect( int $post_id ) : void {
@@ -42,8 +43,25 @@ class YoastDuplicatePost {
 			return;
 		}
 
+		// Attachment language is set on 'add_attachment' via get_current_language.
+		if ( $post_type === 'attachment' ) {
+			$curr_lang = LangInterface::get_current_language();
+			LangInterface::set_current_language( $lang_create );
+			$fix_attachment_title = function ( array $new_post, WP_Post $post ) {
+				$new_post['post_title'] = $post->post_title;
+				return $new_post;
+			};
+			\add_filter( 'duplicate_post_new_post', $fix_attachment_title, 10, 2 );
+		}
+
 		$post_duplicator = new \Yoast\WP\Duplicate_Post\Post_Duplicator();
 		$new_post_id     = $post_duplicator->create_duplicate( get_post( $post_id ), [] );
+
+		// Set language back to the correct current one.
+		if ( $post_type === 'attachment' ) {
+			LangInterface::set_current_language( $curr_lang );
+			\remove_filter( 'duplicate_post_new_post', $fix_attachment_title );
+		}
 
 		if ( $new_post_id instanceof WP_Error ) {
 			error_log( print_r( 'CreateTranslation - New post error', true ) );

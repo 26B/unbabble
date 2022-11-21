@@ -40,6 +40,15 @@ class LangInterface {
 		return apply_filters( 'ubb_current_lang', \sanitize_text_field( $lang ) );
 	}
 
+	public static function set_current_language( string $lang ) : bool {
+		$options = Options::get();
+		if ( ! in_array( $lang, $options['allowed_languages'], true ) ) {
+			return false;
+		}
+		set_query_var( 'lang', $lang );
+		return true;
+	}
+
 	/**
 	 * Set post language in the custom post language table.
 	 *
@@ -57,6 +66,9 @@ class LangInterface {
 
 		if ( ! $force ) {
 			$existing_language = self::get_post_language( $post_id );
+			if ( $existing_language === $language ) {
+				return true;
+			}
 			if ( $existing_language !== null ) {
 				return false;
 			}
