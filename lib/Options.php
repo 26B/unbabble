@@ -9,20 +9,20 @@ namespace TwentySixB\WP\Plugin\Unbabble;
  */
 class Options {
 
+	const DEFAULT = [
+		'allowed_languages' => [],
+		'default_language'  => '',
+		'post_types'        => [],
+		'taxonomies'        => [],
+		'router'            => 'query_var',
+		'router_options'    => [],
+	];
+
 	public static function get() : array {
 		// TODO: Hook docs.
 		$options = \apply_filters( 'ubb_options', null );
 		if ( is_array( $options ) ) {
-			return array_merge(
-				[
-					'allowed_languages' => [],
-					'default_language'  => '',
-					'post_types'        => [],
-					'taxonomies'        => [],
-					'router'            => 'query_var',
-				],
-				$options
-			);
+			return array_merge( self::DEFAULT, $options );
 		}
 
 		$options = \get_option( 'ubb_options' );

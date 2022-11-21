@@ -42,6 +42,8 @@ class OptionsPage {
 		\add_settings_field( 'taxonomies', 'Select translatable taxonomies', [ $this, 'field_taxonomies' ], 'unbabble', 'taxonomies', [] );
 
 		\add_settings_field( 'router', 'Select routing type', [ $this, 'field_router' ], 'unbabble', 'router', [] );
+
+		// TODO: Field for directory names.
 	}
 
 	public function page_output() {

@@ -59,16 +59,18 @@ class Directory {
 			return;
 		}
 
+		$directory = $this->get_directory_name( $lang );
+
 		if (
-			str_starts_with( $_SERVER['REQUEST_URI'], "/{$lang}/" )
-			&& str_starts_with( $_SERVER['PHP_SELF'], "/{$lang}/" )
+			str_starts_with( $_SERVER['REQUEST_URI'], "/{$directory}/" )
+			&& str_starts_with( $_SERVER['PHP_SELF'], "/{$directory}/" )
 		) {
 			$_SERVER['REQUEST_URI'] = add_query_arg(
 				'lang',
 				$lang,
-				substr( $_SERVER['REQUEST_URI'], strlen( "/{$lang}" ) )
+				substr( $_SERVER['REQUEST_URI'], strlen( "/{$directory}" ) )
 			);
-			$_SERVER['PHP_SELF']    = substr( $_SERVER['PHP_SELF'], strlen( "/{$lang}" ) );
+			$_SERVER['PHP_SELF']    = substr( $_SERVER['PHP_SELF'], strlen( "/{$directory}" ) );
 			$_GET['lang']           = $lang;
 		}
 	}
@@ -80,7 +82,8 @@ class Directory {
 			if ( $lang === $default_language ) {
 				continue;
 			}
-			if ( str_starts_with( $uri, "/{$lang}/" ) ) {
+			$directory = $this->get_directory_name( $lang );
+			if ( str_starts_with( $uri, "/{$directory}/" ) ) {
 				return $lang;
 			}
 		}
@@ -97,11 +100,12 @@ class Directory {
 		}
 
 		$post_lang = LangInterface::get_post_language( $post_id );
-		if ( $post_lang === Options::get()['default_language'] ) {
+		if ( empty( $post_lang ) || $post_lang === Options::get()['default_language'] ) {
 			return $post_link;
 		}
-		$site_url = site_url();
-		return str_replace( $site_url, trailingslashit( $site_url ) . $post_lang, $post_link );
+		$site_url  = site_url();
+		$directory = $this->get_directory_name( $post_lang );
+		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $post_link );
 	}
 
 	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
@@ -131,8 +135,9 @@ class Directory {
 		if ( $term_lang === Options::get()['default_language'] ) {
 			return $termlink;
 		}
-		$site_url = site_url();
-		return str_replace( $site_url, trailingslashit( $site_url ) . $term_lang, $termlink );
+		$site_url  = site_url();
+		$directory = $this->get_directory_name( $term_lang );
+		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $termlink );
 	}
 
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
@@ -228,5 +233,17 @@ class Directory {
 		}
 
 		return false;
+	}
+
+	private function get_directory_name( string $lang ) : string {
+		$options = Options::get();
+		if (
+			isset( $options['router_options']['directories'][ $lang ] )
+			&& ! empty( $options['router_options']['directories'][ $lang ] )
+			&& is_string( $options['router_options']['directories'][ $lang ] )
+		) {
+			return $options['router_options']['directories'][ $lang ];
+		}
+		return $lang;
 	}
 }

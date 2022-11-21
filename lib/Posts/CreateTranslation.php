@@ -18,8 +18,6 @@ class CreateTranslation {
 			return;
 		}
 
-		// TODO: Attachment copy not done yet.
-
 		// Redirect to create new post page to create a translation.
 		// FIXME: Saving an auto-draft (no title) does not call save_post and so source is not set.
 		\add_action( 'save_post', [ $this, 'redirect_to_new' ], PHP_INT_MAX );
