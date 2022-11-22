@@ -119,6 +119,7 @@ class Plugin {
 			'attachments_delete_file' => new Attachments\DeleteFile( $this ),
 
 			'posts_create_translation' => new Posts\CreateTranslation( $this ),
+			'posts_link_translation'   => new Posts\LinkTranslation( $this ),
 			'posts_language_filter'    => new Posts\LangFilter( $this ),
 			'posts_change_language'    => new Posts\ChangeLanguage( $this ),
 			'posts_language_metabox'   => new Posts\LangMetaBox( $this ),
@@ -129,6 +130,7 @@ class Plugin {
 			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
 			'terms_language_filter'    => new Terms\LangFilter( $this ),
 			'terms_admin_notices'      => new Terms\AdminNotices( $this ),
+			// TODO: LinkTranslation for terms.
 
 			'router_query_var' => new Router\QueryVar( $this ),
 			'router_directory' => new Router\Directory( $this ),

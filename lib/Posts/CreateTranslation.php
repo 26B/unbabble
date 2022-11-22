@@ -82,7 +82,11 @@ class CreateTranslation {
 		}
 
 		$src_post = get_post( \sanitize_text_field( $_POST['ubb_source'] ) );
-		if ( $src_post === null || ! in_array( $src_post->post_type, $allowed_post_types, true ) ) {
+		if (
+			$src_post === null
+			|| ! in_array( $src_post->post_type, $allowed_post_types, true )
+			|| $src_post->post_type !== $post_type
+		) {
 			return;
 		}
 

@@ -102,10 +102,16 @@ class LangInterface {
 		);
 	}
 
-	public static function set_post_source( int $post_id, int $source_id ) : bool {
-		// TODO: Check already exists.
-		$meta_id = add_post_meta( $post_id, 'ubb_source', $source_id, true );
-		return is_int( $meta_id );
+	public static function set_post_source( int $post_id, int $source_id, bool $force = false ) : bool {
+		if ( $force ) {
+			if ( $source_id === LangInterface::get_post_source( $post_id ) ) {
+				return true;
+			}
+			$meta_id = update_post_meta( $post_id, 'ubb_source', $source_id );
+		} else {
+			$meta_id = add_post_meta( $post_id, 'ubb_source', $source_id, true );
+		}
+		return (bool) $meta_id;
 	}
 
 	public static function get_post_source( int $post_id ) : ?string {
@@ -240,6 +246,20 @@ class LangInterface {
 		return true;
 	}
 
+	public static function get_posts_for_source( int $source_id ) : array {
+		global $wpdb;
+		$posts = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id as ID
+				FROM {$wpdb->postmeta}
+				WHERE meta_key = 'ubb_source'
+				AND meta_value = %s",
+				$source_id,
+			)
+		);
+		return array_map( fn ( $post ) => $post->ID, $posts );
+	}
+
 	// TODO: Documentation.
 
 	public static function set_term_language( int $term_id, string $language, bool $force = false ) : bool {
@@ -275,10 +295,16 @@ class LangInterface {
 		);
 	}
 
-	public static function set_term_source( int $term_id, int $source_id ) : bool {
-		// TODO: Check already exists.
-		$meta_id = add_term_meta( $term_id, 'ubb_source', $source_id, true );
-		return is_int( $meta_id );
+	public static function set_term_source( int $term_id, int $source_id, bool $force = false ) : bool {
+		if ( $force ) {
+			if ( $source_id === LangInterface::get_term_source( $term_id ) ) {
+				return true;
+			}
+			$meta_id = update_term_meta( $term_id, 'ubb_source', $source_id );
+		} else {
+			$meta_id = add_term_meta( $term_id, 'ubb_source', $source_id, true );
+		}
+		return (bool) $meta_id;
 	}
 
 	public static function get_term_source( int $term_id ) : ?string {
@@ -368,6 +394,20 @@ class LangInterface {
 
 		// TODO: Update posts?
 		return true;
+	}
+
+	public static function get_terms_for_source( int $source_id ) : array {
+		global $wpdb;
+		$terms = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT term_id
+				FROM {$wpdb->termmeta}
+				WHERE meta_key = 'ubb_source'
+				AND meta_value = %s",
+				$source_id,
+			)
+		);
+		return array_map( fn ( $term ) => $term->term_id, $terms );
 	}
 
 	private static function translate_post_meta( $post_id, $new_lang, $meta_keys_to_translate ) : bool {

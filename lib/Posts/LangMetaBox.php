@@ -2,8 +2,10 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use WP_Post;
 
 /**
  * Handle Language Meta Box for Posts.
@@ -22,15 +24,9 @@ class LangMetaBox {
 			return;
 		}
 
-		// FIXME: Can't copy from draft. (maybe pending review too)
-
 		// Post meta box.
 		\add_action( 'add_meta_boxes', [ $this, 'post_language_selector' ] );
 		\add_action( 'save_post', [ $this, 'save_post_language' ] );
-
-		// FIXME: Set post language when attachment is saved.
-
-		// TODO: Metaboxes should be somewhat disabled during translation create.
 	}
 
 	/**
@@ -62,7 +58,6 @@ class LangMetaBox {
 		);
 	}
 
-	//
 	/**
 	 * Callback to print the metabox for the post language selection in the post editor.
 	 *
@@ -135,7 +130,7 @@ class LangMetaBox {
 
 		if ( $translation_to_show ) {
 			printf(
-				'<p><b>Translations:</b></p>
+				'<hr><p><b>Translations:</b></p>
 				<table>
 				<tr>
 					<th>Language</th>
@@ -146,7 +141,7 @@ class LangMetaBox {
 				implode( '', $translation_to_show )
 			);
 		} else {
-			printf( '<p><b>No Translations</b></p>' );
+			printf( '<hr><p><b>No Translations</b></p>' );
 		}
 
 		unset( $available_languages[ $lang ] );
@@ -161,19 +156,36 @@ class LangMetaBox {
 		// Display language selector and button to create new translation.
 		// TODO: Only show `ubb_copy_new` input if duplicate-post is active. Add filter and move the input to an integration class.
 		printf(
-			'<p><b>Create Translation</b></p>
-			<div>To: %1$s</div>
-			<input type="submit" %2$s name="ubb_redirect_new" value="Save and Create" class="button"/>
-			<input type="submit" %2$s name="ubb_copy_new" value="Save and Copy" class="button"/>',
+			'<hr><details>
+				<summary><b>Create Translation</b></summary>
+				<div>To: %1$s</div>
+				<input type="submit" %2$s name="ubb_redirect_new" value="Save and Create" class="button"/>
+				<input type="submit" %2$s name="ubb_copy_new" value="Save and Copy" class="button"/>
+			</details>',
 			$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
 			$post->post_status === 'draft' ? 'id="save-post"' : '',
+		);
+
+		$options = array_reduce(
+			$this->get_possible_links( $post, $lang ),
+			fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
+			''
+		);
+		printf(
+			'<hr><details>
+				<summary><b>Linking translation:</b></summary>
+				<label>Link to:</label>
+				<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation">
+				<datalist id="ubb_link_translations_list">%s</datalist>
+			</details>',
+			$options
 		);
 	}
 
 	/**
 	 * Save the selected post language.
 	 *
-	 * If it's already set, it will not change. FIXME: there needs to be a way to change it.
+	 * If it's already set, it will not change.
 	 *
 	 * @param  int $post_id
 	 * @return void
@@ -276,5 +288,39 @@ class LangMetaBox {
 		}
 
 		return true;
+	}
+
+	private function get_possible_links( WP_Post $post, string $post_lang ) : array {
+		global $wpdb;
+		$existing_langs     = array_merge( [ $post_lang ], array_values( LangInterface::get_post_translations( $post->ID ) ) );
+		$lang_string        = implode( "','", array_map( fn( $lang ) => esc_sql( $lang ), $existing_langs ) );
+		$translations_table = ( new PostTable() )->get_table_name();
+
+		$possible_posts = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, post_title, locale
+				FROM (
+					SELECT PT.post_id, P.post_title, locale, IFNULL(meta_value, PT.post_id) AS source
+					FROM {$translations_table} AS PT
+					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
+					INNER JOIN {$wpdb->posts} as P ON (PT.post_id = P.ID)
+					WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
+				) AS A
+				WHERE locale NOT IN ('{$lang_string}')
+				AND source NOT IN (
+					SELECT IFNULL(meta_value, PT.post_id) AS source
+					FROM {$translations_table} AS PT
+					LEFT JOIN {$wpdb->postmeta} AS P ON (PT.post_id = P.post_id AND meta_key = 'ubb_source')
+					WHERE locale IN ('{$lang_string}')
+				)",
+				$post->post_type
+			)
+		);
+
+		$options = [];
+		foreach ( $possible_posts as $post ) {
+			$options[] = [ $post->post_id, "{$post->post_title} ({$post->locale})", ];
+		}
+		return $options;
 	}
 }
