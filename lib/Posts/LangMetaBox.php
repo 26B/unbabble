@@ -137,8 +137,13 @@ class LangMetaBox {
 					<th>Actions</th>
 				</tr>
 				%s
-				</table>',
-				implode( '', $translation_to_show )
+				</table>
+				<hr><details>
+					<summary><b>Unlink:</b></summary>
+					<input type="submit" %2$s name="ubb_unlink" value="Unlink from translations" class="button"/>
+				</details>',
+				implode( '', $translation_to_show ),
+				$post->post_status === 'draft' ? 'id="save-post"' : ''
 			);
 		} else {
 			printf( '<hr><p><b>No Translations</b></p>' );

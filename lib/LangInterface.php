@@ -268,6 +268,10 @@ class LangInterface {
 		return self::get_new_source_id( 'post' );
 	}
 
+	public static function delete_post_source( string $post_id ) : bool {
+		return delete_post_meta( $post_id, 'ubb_source' );
+	}
+
 	// TODO: Documentation.
 
 	public static function set_term_language( int $term_id, string $language, bool $force = false ) : bool {
@@ -423,6 +427,10 @@ class LangInterface {
 
 	public static function get_new_term_source_id() : string {
 		return self::get_new_source_id( 'term' );
+	}
+
+	public static function delete_term_source( string $term_id ) : bool {
+		return delete_term_meta( $term_id, 'ubb_source' );
 	}
 
 	private static function get_new_source_id( string $type = 'post' ) : string {

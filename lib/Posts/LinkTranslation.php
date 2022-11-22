@@ -8,7 +8,8 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 
 /**
- * For hooks related to linking translations between existing posts or translation sets of posts.
+ * For hooks related to linking and unlinking translations between existing posts or translation
+ * sets of posts.
  *
  * @since 0.0.0
  */
@@ -18,6 +19,7 @@ class LinkTranslation {
 			return;
 		}
 		\add_action( 'save_post', [ $this, 'link_translations' ], PHP_INT_MAX );
+		\add_action( 'save_post', [ $this, 'unlink' ], PHP_INT_MAX );
 	}
 
 	public function link_translations( int $post_id ) : void {
@@ -73,5 +75,19 @@ class LinkTranslation {
 			}
 			return;
 		}
+	}
+
+	public function unlink( $post_id ) : void {
+		$post_type          = get_post_type( $post_id );
+		$allowed_post_types = Options::get_allowed_post_types();
+		if (
+			$post_type === 'revision'
+			|| ! in_array( $post_type, $allowed_post_types, true )
+			|| ! isset( $_POST['ubb_unlink'] )
+		) {
+			return;
+		}
+
+		LangInterface::delete_post_source( $post_id );
 	}
 }
