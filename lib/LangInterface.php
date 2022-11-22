@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
+use Ramsey\Uuid\Uuid;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\Options;
@@ -102,7 +103,7 @@ class LangInterface {
 		);
 	}
 
-	public static function set_post_source( int $post_id, int $source_id, bool $force = false ) : bool {
+	public static function set_post_source( int $post_id, string $source_id, bool $force = false ) : bool {
 		if ( $force ) {
 			if ( $source_id === LangInterface::get_post_source( $post_id ) ) {
 				return true;
@@ -246,7 +247,7 @@ class LangInterface {
 		return true;
 	}
 
-	public static function get_posts_for_source( int $source_id ) : array {
+	public static function get_posts_for_source( string $source_id ) : array {
 		global $wpdb;
 		$posts = $wpdb->get_results(
 			$wpdb->prepare(
@@ -257,7 +258,14 @@ class LangInterface {
 				$source_id,
 			)
 		);
+		if ( $posts === null ) {
+			return [];
+		}
 		return array_map( fn ( $post ) => $post->ID, $posts );
+	}
+
+	public static function get_new_post_source_id() : string {
+		return self::get_new_source_id( 'post' );
 	}
 
 	// TODO: Documentation.
@@ -295,7 +303,7 @@ class LangInterface {
 		);
 	}
 
-	public static function set_term_source( int $term_id, int $source_id, bool $force = false ) : bool {
+	public static function set_term_source( int $term_id, string $source_id, bool $force = false ) : bool {
 		if ( $force ) {
 			if ( $source_id === LangInterface::get_term_source( $term_id ) ) {
 				return true;
@@ -396,7 +404,7 @@ class LangInterface {
 		return true;
 	}
 
-	public static function get_terms_for_source( int $source_id ) : array {
+	public static function get_terms_for_source( string $source_id ) : array {
 		global $wpdb;
 		$terms = $wpdb->get_results(
 			$wpdb->prepare(
@@ -407,7 +415,31 @@ class LangInterface {
 				$source_id,
 			)
 		);
+		if ( $terms === null ) {
+			return [];
+		}
 		return array_map( fn ( $term ) => $term->term_id, $terms );
+	}
+
+	public static function get_new_term_source_id() : string {
+		return self::get_new_source_id( 'term' );
+	}
+
+	private static function get_new_source_id( string $type = 'post' ) : string {
+		global $wpdb;
+		$uuid  = Uuid::uuid7()->toString();
+		$table = $type === 'post' ? $wpdb->postmeta : $wpdb->termmeta;
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT count(*) FROM $table
+				WHERE meta_key = 'ubb_source' AND meta_value = %s",
+				$uuid
+			)
+		);
+		if ( 0 !== (int) $count ) {
+			return self::get_new_source_id( $type );
+		}
+		return $uuid;
 	}
 
 	private static function translate_post_meta( $post_id, $new_lang, $meta_keys_to_translate ) : bool {

@@ -126,8 +126,8 @@ class CreateTranslation {
 	private function set_post_source( $post_id, $src_post_id ) {
 		$original_source = LangInterface::get_post_source( $src_post_id );
 		if ( $original_source === null ) {
-			$original_source = $src_post_id;
-			LangInterface::set_post_source( $src_post_id, $src_post_id );
+			$original_source = LangInterface::get_new_post_source_id();
+			LangInterface::set_post_source( $src_post_id, $original_source );
 		}
 
 		LangInterface::set_post_source( $post_id, $original_source );

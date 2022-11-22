@@ -80,8 +80,8 @@ class CreateTranslation {
 
 		$original_source = LangInterface::get_term_source( $src_term->term_id );
 		if ( $original_source === null ) {
-			$original_source = $src_term->term_id;
-			LangInterface::set_term_source( $src_term->term_id, $src_term->term_id );
+			$original_source = LangInterface::get_new_term_source_id();
+			LangInterface::set_term_source( $src_term->term_id, $original_source );
 		}
 
 		LangInterface::set_term_source( $term_id, $original_source );
@@ -140,8 +140,8 @@ class CreateTranslation {
 
 		// If first translations. set source on the original term.
 		if ( ! $source_id ) {
-			$source_id = $term_id;
-			if ( ! LangInterface::set_term_source( $term_id, $term_id ) ) {
+			$source_id = LangInterface::get_new_term_source_id();
+			if ( ! LangInterface::set_term_source( $term_id, $source_id ) ) {
 				error_log( print_r( 'CreateTranslation - set source original failed', true ) );
 				// TODO: What to do when this happens.
 				return;

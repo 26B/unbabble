@@ -9,13 +9,13 @@
   "homepage": "https://github.com/26B/unbabble",
   "license": "GPL-2.0+",
   "require": {
+    "php": ">=7.4",
     "composer/installers": "^1.11",
     "dg/composer-cleaner": "^2.2",
-    "php": ">=7.4"
+    "ramsey/uuid": "^4.6"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.5.7",
-    "10up/wp_mock": "@dev"
+    "phpunit/phpunit": "^9.5.7"
   },
   "authors": [],
   "autoload": {

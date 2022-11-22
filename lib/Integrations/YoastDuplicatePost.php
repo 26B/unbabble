@@ -94,8 +94,8 @@ class YoastDuplicatePost {
 
 		// If first translations. set source on the original post.
 		if ( ! $source_id ) {
-			$source_id = $post_id;
-			if ( ! LangInterface::set_post_source( $post_id, $post_id ) ) {
+			$source_id = LangInterface::get_new_post_source_id();
+			if ( ! LangInterface::set_post_source( $post_id, $source_id ) ) {
 				error_log( print_r( 'CreateTranslation - set source original failed', true ) );
 				wp_delete_post( $new_post_id, true );
 				// TODO: What to do when this happens.

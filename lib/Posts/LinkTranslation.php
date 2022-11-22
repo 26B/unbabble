@@ -46,7 +46,7 @@ class LinkTranslation {
 
 		// If none of them have source, use the lowest ID and set that as source for both.
 		if ( $post_source === null && $link_source === null ) {
-			$source_id = min( $post_id, $link_post->ID );
+			$source_id = LangInterface::get_new_post_source_id();
 			LangInterface::set_post_source( $post_id, $source_id );
 			LangInterface::set_post_source( $link_post->ID, $source_id );
 			return;
