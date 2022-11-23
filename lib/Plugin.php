@@ -127,10 +127,10 @@ class Plugin {
 
 			'terms_language_metabox'   => new Terms\LangMetaBox( $this ),
 			'terms_create_translation' => new Terms\CreateTranslation( $this ),
+			'terms_link_translation'   => new Terms\LinkTranslation( $this ),
 			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
 			'terms_language_filter'    => new Terms\LangFilter( $this ),
 			'terms_admin_notices'      => new Terms\AdminNotices( $this ),
-			// TODO: LinkTranslation for terms.
 
 			'router_query_var' => new Router\QueryVar( $this ),
 			'router_directory' => new Router\Directory( $this ),

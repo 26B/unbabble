@@ -2,8 +2,10 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
+use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use WP_Term;
 
 /**
  * Handle Language Meta Box for Terms.
@@ -67,7 +69,6 @@ class LangMetaBox {
 	}
 
 	public function edit_term_language_metabox( $term ) {
-		error_log( print_r( 'edit_term_language_metabox', true ) );
 		$lang    = LangInterface::get_term_language( $term->term_id );
 		$options = Options::get();
 
@@ -142,25 +143,57 @@ class LangMetaBox {
 				<td>
 				%5$s
 				</td>
-			</tr>
-			%6$s',
+			</tr>',
 			esc_html__( 'Language', 'unbabble' ),
 			$this->print_language_select( 'ubb_lang', $lang, $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' ),
 			esc_html__( 'Translations', 'unbabble' ),
 			$translations_string,
-			empty( $available_languages ) ? '' : sprintf(
+		);
+
+		if ( ! empty( $available_languages ) ) {
+			printf(
 				'<tr class="form-field term-language-wrap-2">
 					<th scope="row"><label for="language">%1$s</label></th>
 					<td>
 					%2$s
 					<input type="submit" name="ubb_redirect_new" value="Save and Create" class="button"/>
-					<input type="submit" name="ubb_copy_new" value="Save and Copy" class="button"/>
+					<input type="submit" disabled name="ubb_copy_new" value="Save and Copy" class="button"/>
 					</td>
 				</tr>',
 				esc_html__( 'Create Translation', 'unbabble' ),
 				$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
-			)
+			);
+		}
+
+		if ( ! empty( $translation_to_show ) ) {
+			printf(
+				'<tr class="form-field term-language-wrap-2">
+				<th scope="row"><label for="language">%1$s</label></th>
+				<td>
+				<input type="submit" name="ubb_unlink" value="Unlink from translations" class="button"/>
+				</td>
+				</tr>',
+				esc_html__( 'Unlink from translations:', 'unbabble' ),
+			);
+		}
+
+		// Linking.
+		$options = array_reduce(
+			$this->get_possible_links( $term, $lang ),
+			fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
+			''
+		);
+		printf(
+			'<tr class="form-field term-language-wrap-3">
+			<th scope="row"><label for="language">%1$s</label></th>
+			<td>
+			<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation">
+			<datalist id="ubb_link_translations_list">%2$s</datalist>
+			</td>
+			</tr>',
+			esc_html__( 'Linking translation:', 'unbabble' ),
+			$options
 		);
 	}
 
@@ -172,8 +205,6 @@ class LangMetaBox {
 		if ( isset( $_POST['ubb_copy_new'] ) ) { // Don't set post language when creating a translation.
 			return;
 		}
-
-		error_log( print_r( 'save_term_language', true ) );
 
 		// TODO: Check the user's permissions.
 
@@ -240,5 +271,40 @@ class LangMetaBox {
 		}
 
 		return true;
+	}
+
+	private function get_possible_links( WP_Term $term, string $term_lang ) : array {
+		global $wpdb;
+		$existing_langs     = array_merge( [ $term_lang ], array_values( LangInterface::get_term_translations( $term->term_id ) ) );
+		$lang_string        = implode( "','", array_map( fn( $lang ) => esc_sql( $lang ), $existing_langs ) );
+		$translations_table = ( new TermTable() )->get_table_name();
+
+		$possible_terms = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT term_id, name, locale
+				FROM (
+					SELECT TT.term_id, T.name, locale, IFNULL(meta_value, TT.term_id) AS source
+					FROM {$translations_table} AS TT
+					LEFT JOIN {$wpdb->termmeta} AS TM ON (TT.term_id = TM.term_id AND meta_key = 'ubb_source')
+					INNER JOIN {$wpdb->terms} as T ON (TT.term_id = T.term_id)
+					INNER JOIN {$wpdb->term_taxonomy} as TAX ON(TAX.term_id = T.term_id)
+					WHERE taxonomy = %s
+				) AS A
+				WHERE locale NOT IN ('{$lang_string}')
+				AND source NOT IN (
+					SELECT IFNULL(meta_value, TT.term_id) AS source
+					FROM {$translations_table} AS TT
+					LEFT JOIN {$wpdb->termmeta} AS TM ON (TM.term_id = TT.term_id AND meta_key = 'ubb_source')
+					WHERE locale IN ('{$lang_string}')
+				)",
+				$term->taxonomy
+			)
+		);
+
+		$options = [];
+		foreach ( $possible_terms as $term ) {
+			$options[] = [ $term->term_id, "{$term->name} ({$term->locale})", ];
+		}
+		return $options;
 	}
 }

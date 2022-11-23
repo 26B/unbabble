@@ -315,7 +315,7 @@ class LangMetaBox {
 				AND source NOT IN (
 					SELECT IFNULL(meta_value, PT.post_id) AS source
 					FROM {$translations_table} AS PT
-					LEFT JOIN {$wpdb->postmeta} AS P ON (PT.post_id = P.post_id AND meta_key = 'ubb_source')
+					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
 					WHERE locale IN ('{$lang_string}')
 				)",
 				$post->post_type
