@@ -20,6 +20,8 @@ class LinkTranslation {
 		}
 		\add_action( 'save_post', [ $this, 'link_translations' ], PHP_INT_MAX );
 		\add_action( 'save_post', [ $this, 'unlink' ], PHP_INT_MAX );
+		\add_action( 'edit_attachment', [ $this, 'unlink' ], PHP_INT_MAX );
+		\add_action( 'edit_attachment', [ $this, 'link_translations' ], PHP_INT_MAX );
 	}
 
 	public function link_translations( int $post_id ) : void {
