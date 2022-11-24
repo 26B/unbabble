@@ -9,14 +9,14 @@ use TwentySixB\WP\Plugin\Unbabble\DB;
  *
  * This class defines all code necessary to run during the plugin's activation.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class Activator {
 
 	/**
 	 * Activation handler.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 * @param bool $network_wide True if WPMU superadmin uses "Network Activate" action,
 	 *                           false if WPMU is disabled or plugin is activated on an
 	 *                           individual blog.
@@ -44,7 +44,7 @@ class Activator {
 	/**
 	 * Single activation handler.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 * @param bool $network_wide True if WPMU superadmin uses "Network Activate" action,
 	 *                           false if WPMU is disabled or plugin is activated on an
 	 *                           individual blog.

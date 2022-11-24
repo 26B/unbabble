@@ -8,7 +8,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 /**
  * For hooks related to creating a translations from an existing post.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class ChangeLanguage {
 	public function register() {

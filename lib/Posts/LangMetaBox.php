@@ -10,14 +10,14 @@ use WP_Post;
 /**
  * Handle Language Meta Box for Posts.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class LangMetaBox {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
@@ -297,9 +297,10 @@ class LangMetaBox {
 
 	private function get_possible_links( WP_Post $post, string $post_lang ) : array {
 		global $wpdb;
-		$existing_langs     = array_merge( [ $post_lang ], array_values( LangInterface::get_post_translations( $post->ID ) ) );
-		$lang_string        = implode( "','", array_map( fn( $lang ) => esc_sql( $lang ), $existing_langs ) );
-		$translations_table = ( new PostTable() )->get_table_name();
+		$existing_langs        = array_merge( [ $post_lang ], array_values( LangInterface::get_post_translations( $post->ID ) ) );
+		$lang_string           = implode( "','", array_map( fn( $lang ) => esc_sql( $lang ), $existing_langs ) );
+		$translations_table    = ( new PostTable() )->get_table_name();
+		$allowed_languages_str = implode( "','", Options::get()['allowed_languages'] );
 
 		$possible_posts = $wpdb->get_results(
 			$wpdb->prepare(
@@ -310,6 +311,7 @@ class LangMetaBox {
 					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
 					INNER JOIN {$wpdb->posts} as P ON (PT.post_id = P.ID)
 					WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
+					AND PT.locale IN ('{$allowed_languages_str}')
 				) AS A
 				WHERE locale NOT IN ('{$lang_string}')
 				AND source NOT IN (

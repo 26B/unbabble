@@ -7,19 +7,30 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 /**
  * For hooks related to the language packs.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class LanguagePacks {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
 
-		\add_action
-		( 'admin_init', [ $this, 'install_lang_packs' ] );
+		\add_action( 'admin_init', [ $this, 'install_lang_packs' ] );
 	}
 
-	// Check if all language packs are installed and install if needed.
+	/**
+	 * Check if all language packs are installed and installs them if needed.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
 	public function install_lang_packs() : void {
 		if ( ! \current_user_can( 'install_languages' ) ) {
 			return;
@@ -37,6 +48,7 @@ class LanguagePacks {
 		if ( empty( $missing_language_packs ) ) {
 			return;
 		}
+
 		foreach ( $missing_language_packs as $lang_code ) {
 			$language = \wp_download_language_pack( $lang_code );
 			if ( $language === false ) {

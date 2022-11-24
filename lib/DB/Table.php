@@ -3,20 +3,51 @@
 namespace TwentySixB\WP\Plugin\Unbabble\DB;
 
 /**
- * Base Custom Table handler.
+ * Base Custom Table creator.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 abstract class Table {
 
+	/**
+	 * Suffix for the table name.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string
+	 */
 	abstract protected function get_table_suffix() : string;
+
+	/**
+	 * Returns the create table mysql.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $table_man
+	 * @param string $charset_collate
+	 * @return string
+	 */
 	abstract protected function get_table_mysql( string $table_name, string $charset_collate ) : string;
 
+	/**
+	 * Get the full table name.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string
+	 */
 	public function get_table_name() : string {
 		global $wpdb;
 		return $wpdb->prefix . $this->get_table_suffix();
 	}
 
+	/**
+	 * Create the table.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return bool Success for creating the table. False if the table already exists.
+	 */
 	public function create_table() : bool {
 		global $wpdb;
 		$table_name = $this->get_table_name();
@@ -41,9 +72,10 @@ abstract class Table {
 	}
 
 	/**
-	 * Delete Countries table if it exists.
+	 * Delete table if it exists.
 	 *
-	 * @since  0.0.0
+	 * @since 0.0.1
+	 *
 	 * @return void
 	 */
 	public function delete_table() : void {
@@ -54,9 +86,9 @@ abstract class Table {
 	}
 
 	/**
-	 * Check if Countries table exists in the BD.
+	 * Check if table exists in the BD.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 *
 	 * @return bool
 	 */
@@ -66,5 +98,4 @@ abstract class Table {
 			$wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $this->get_table_name() ) )
 		) !== null;
 	}
-
 }

@@ -26,32 +26,36 @@ class Directory {
 		// Post Permalinks:
 		$allowed_post_types = Options::get_allowed_post_types();
 
+		/** TODO: Commented filters no longer seem necessary with the use of the `home_url` filter.
+		 * Test further if we can remove them.
+		 */
+
 		if ( in_array( 'post', $allowed_post_types, true ) ) {
 			// Post permalink.
-			\add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+			// \add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'page', $allowed_post_types, true ) ) {
 			// Page permalink.
-			\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+			// \add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'attachment', $allowed_post_types, true ) ) {
 			// Attachment permalink.
-			\add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
+			// \add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
 		}
 
 		// Custom post types permalinks.
-		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
+		// \add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
 
 		// Term archive permalinks.
-		\add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
+		// \add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
 
 		// TODO: post_type_archive_link
 
 		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
 
-		\add_filter( 'home_url', [ $this, 'home_url' ], 10 );
+		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 2 );
 	}
 
 	public function init() : void {
@@ -181,7 +185,7 @@ class Directory {
 			 *
 			 * Returning a truthy value from the filter will redirect only exact post_name matches.
 			 *
-			 * @since 5.5.0
+			 * @since 0.0.1
 			 *
 			 * @param bool $strict_guess Whether to perform a strict guess. Default false (loose guess).
 			 */

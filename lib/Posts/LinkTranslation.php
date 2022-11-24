@@ -11,7 +11,7 @@ use WP_Post;
  * For hooks related to linking and unlinking translations between existing posts or translation
  * sets of posts.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class LinkTranslation {
 	public function register() {

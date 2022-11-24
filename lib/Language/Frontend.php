@@ -6,21 +6,37 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
- * For hooks related to the language of frontend.
+ * Hooks related to the language of frontend.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class Frontend {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
 
 		\add_filter( 'locale', [ $this, 'switch_locale'] );
-		\add_action( 'admin_bar_menu', [ $this, 'admin_bar_locale'], PHP_INT_MIN );
+		\add_action( 'admin_bar_menu', [ $this, 'set_admin_bar_language'], PHP_INT_MIN );
 	}
 
-	public function switch_locale( $locale ) {
+	/**
+	 * Switch the locale for the frontend.
+	 *
+	 * Necessary for loading the correct translations of the themes and plugins.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $locale
+	 * @return string
+	 */
+	public function switch_locale( string $locale ) : string {
 		if ( is_admin() ) {
 			return $locale;
 		}
@@ -31,7 +47,14 @@ class Frontend {
 		return $locale;
 	}
 
-	public function admin_bar_locale() : void {
+	/**
+	 * Sets the admin bar language to the user locale.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function set_admin_bar_language() : void {
 		switch_to_locale( get_user_locale() );
 		\add_filter( 'wp_after_admin_bar_render', function () {
 			restore_previous_locale();

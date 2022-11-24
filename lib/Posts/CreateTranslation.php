@@ -10,7 +10,7 @@ use WP_Post;
 /**
  * For hooks related to creating a translations from an existing post.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class CreateTranslation {
 	public function register() {

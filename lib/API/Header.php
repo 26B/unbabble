@@ -4,7 +4,18 @@ namespace TwentySixB\WP\Plugin\Unbabble\API;
 
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
+/**
+ * Hooks for handling headers in API requests.
+ *
+ * @since 0.0.1
+ */
 class Header {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
@@ -12,6 +23,16 @@ class Header {
 		\add_filter( 'rest_pre_dispatch', [ $this, 'accept_language_header' ], 2, 3 );
 	}
 
+	/**
+	 * Sets language from Accept-Language header.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param mixed           $result
+	 * @param WP_REST_Server  $server
+	 * @param WP_Rest_Request $request
+	 * @return mixed
+	 */
 	public function accept_language_header( mixed $result, \WP_REST_Server $server, \WP_REST_Request $request ) {
 		if ( ! empty( get_query_var( 'lang', '' ) ) ) {
 			return $result;
@@ -24,6 +45,14 @@ class Header {
 		return $result;
 	}
 
+	/**
+	 * Returns the language (if known) from Accept-Language value.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param mixed $header_value
+	 * @return string
+	 */
 	private function get_existing_accept_language( $header_value ) : string {
 		if ( $header_value === '*' ) {
 			return ''; // Default language.

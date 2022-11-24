@@ -12,14 +12,14 @@ use WP_Term_Query;
 /**
  * TODO:
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class LangFilter {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {

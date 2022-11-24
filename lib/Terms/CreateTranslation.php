@@ -10,7 +10,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 /**
  * For hooks related to creating a translations from an existing term.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class CreateTranslation {
 	public function register() {

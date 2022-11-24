@@ -10,14 +10,14 @@ use WP_Term;
 /**
  * Handle Language Meta Box for Terms.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class LangMetaBox {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
@@ -275,9 +275,10 @@ class LangMetaBox {
 
 	private function get_possible_links( WP_Term $term, string $term_lang ) : array {
 		global $wpdb;
-		$existing_langs     = array_merge( [ $term_lang ], array_values( LangInterface::get_term_translations( $term->term_id ) ) );
-		$lang_string        = implode( "','", array_map( fn( $lang ) => esc_sql( $lang ), $existing_langs ) );
-		$translations_table = ( new TermTable() )->get_table_name();
+		$existing_langs        = array_merge( [ $term_lang ], array_values( LangInterface::get_term_translations( $term->term_id ) ) );
+		$lang_string           = implode( "','", array_map( fn( $lang ) => esc_sql( $lang ), $existing_langs ) );
+		$translations_table    = ( new TermTable() )->get_table_name();
+		$allowed_languages_str = implode( "','", Options::get()['allowed_languages'] );
 
 		$possible_terms = $wpdb->get_results(
 			$wpdb->prepare(
@@ -289,6 +290,7 @@ class LangMetaBox {
 					INNER JOIN {$wpdb->terms} as T ON (TT.term_id = T.term_id)
 					INNER JOIN {$wpdb->term_taxonomy} as TAX ON(TAX.term_id = T.term_id)
 					WHERE taxonomy = %s
+					AND TT.locale IN ('{$allowed_languages_str}')
 				) AS A
 				WHERE locale NOT IN ('{$lang_string}')
 				AND source NOT IN (

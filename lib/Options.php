@@ -5,7 +5,7 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 /**
  * Handler for the `ubb_options` option.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class Options {
 

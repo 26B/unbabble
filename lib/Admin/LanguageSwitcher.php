@@ -6,28 +6,35 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 
 /**
- * Handle Language switching for backoffice and frontend.
+ * Hooks for handle language switching for the back-office.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class LanguageSwitcher {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
 
-		// Backoffice.
 		if ( is_admin() ) {
 			add_action( 'admin_bar_menu', [ $this, 'add_switcher_backoffice_admin_bar' ], PHP_INT_MAX - 10 );
 		}
 	}
 
+	/**
+	 * Add language switcher to the admin bar.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param  WP_Admin_Bar $wp_admin_bar
+	 * @return void
+	 */
 	public function add_switcher_backoffice_admin_bar( \WP_Admin_Bar $wp_admin_bar ) : void {
 		$options = Options::get();
 		$current = LangInterface::get_current_language();
@@ -50,7 +57,7 @@ class LanguageSwitcher {
 			}
 
 			$langs[] = sprintf(
-				'<li><a class="ab-item" href="%1$s" %2$s>%3$s</a></li>',
+				'<li><a class="ab-item" style="min-width:36px" href="%1$s" %2$s>%3$s</a></li>',
 				$url,
 				\selected( $allowed_lang, $current, false ),
 				$allowed_lang
@@ -83,7 +90,7 @@ class LanguageSwitcher {
 	}
 
 	/**
-	 * Make the default language switch url.
+	 * Returns the default url for switching languages.
 	 *
 	 * @param  string $lang
 	 * @return string
@@ -100,7 +107,7 @@ class LanguageSwitcher {
 	}
 
 	/**
-	 * Make the post language switch url.
+	 * Returns the url for switching languages for a post.
 	 *
 	 * @param  int    $post_id
 	 * @param  string $lang
@@ -134,7 +141,7 @@ class LanguageSwitcher {
 	}
 
 	/**
-	 * Make the term language switch url.
+	 * Returns the url for switching languages for a term.
 	 *
 	 * @param  int    $term_id
 	 * @param  string $lang

@@ -56,7 +56,8 @@ class QueryVar {
 
 		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
 
-		\add_filter( 'home_url', [ $this, 'home_url' ], 10 );
+		// TODO: The hooks for the permalinks might no longer be necessary with this hook.
+		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 2 );
 	}
 
 	public function apply_lang_to_post_url( string $post_link, $post ) : string {
@@ -134,7 +135,7 @@ class QueryVar {
 			 *
 			 * Returning a truthy value from the filter will redirect only exact post_name matches.
 			 *
-			 * @since 5.5.0
+			 * @since 0.0.1
 			 *
 			 * @param bool $strict_guess Whether to perform a strict guess. Default false (loose guess).
 			 */

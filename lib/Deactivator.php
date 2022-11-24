@@ -7,14 +7,14 @@ namespace TwentySixB\WP\Plugin\Unbabble;
  *
  * This class defines all code necessary to run during the plugin's deactivation.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class Deactivator {
 
 	/**
 	 * Deactivation handler.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 * @param bool $network_wide True if WPMU superadmin uses "Network Deactivate" action,
 	 *                           false if WPMU is disabled or plugin is deactivated on an
 	 *                           individual blog.
@@ -42,7 +42,7 @@ class Deactivator {
 	/**
 	 * Single deactivation handler.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 * @param bool $network_wide True if WPMU superadmin uses "Network Deactivate" action,
 	 *                           false if WPMU is disabled or plugin is deactivated on an
 	 *                           individual blog.

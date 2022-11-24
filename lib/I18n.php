@@ -8,14 +8,14 @@ namespace TwentySixB\WP\Plugin\Unbabble;
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class I18n {
 
 	/**
 	 * The domain specified for this plugin.
 	 *
-	 * @since  0.0.0
+	 * @since  0.0.1
 	 * @access private
 	 * @var    string
 	 */
@@ -24,7 +24,7 @@ class I18n {
 	/**
 	 * Load the plugin text domain for translation.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 */
 	public function load_plugin_textdomain() {
 		\load_plugin_textdomain(
@@ -37,7 +37,7 @@ class I18n {
 	/**
 	 * Set the domain equal to that of the specified domain.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 *
 	 * @param string $domain The domain that represents the locale of this plugin.
 	 */

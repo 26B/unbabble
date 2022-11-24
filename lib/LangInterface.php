@@ -12,7 +12,7 @@ use WP_Term;
 /**
  * Handle Language Meta Box for Posts and Terms.
  *
- * @since 0.0.0
+ * @since 0.0.1
  */
 class LangInterface {
 

@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is uninstalled
  *
- * @since   0.0.0
+ * @since   0.0.1
  * @package 26b
  */
 

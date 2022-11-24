@@ -9,9 +9,13 @@ class OptionsPage {
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.1
 	 */
 	public function register() {
+		// Only show options page on debug mode for now.
+		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+			return;
+		}
 		\add_action( 'admin_menu', [ $this, 'add_options_page' ] );
 		\add_action( 'admin_init', [ $this, 'add_options_to_page' ] );
 	}
