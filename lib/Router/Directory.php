@@ -5,7 +5,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Router;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
-use WP_Query;
 use WP_Term;
 
 /**
@@ -51,6 +50,8 @@ class Directory {
 		// TODO: post_type_archive_link
 
 		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
+
+		\add_filter( 'home_url', [ $this, 'home_url' ], 10 );
 	}
 
 	public function init() : void {
@@ -237,6 +238,27 @@ class Directory {
 		}
 
 		return false;
+	}
+
+	// Add directory to home_url.
+	public function home_url( string $url, string $path ) : string {
+		$curr_lang = LangInterface::get_current_language();
+		if ( $curr_lang === Options::get()['default_language'] ) {
+			return $url;
+		}
+
+		$directory = $this->get_directory_name( $curr_lang );
+		$subpath = $path;
+		if ( str_starts_with( $path, '/' ) ) {
+			$subpath = substr( $path, 1 );
+		}
+
+		if ( empty( $subpath ) ) {
+			$new_url = trailingslashit( $url ) . trailingslashit( $directory );
+		} else {
+			$new_url = str_replace( "/{$subpath}", "/{$directory}/{$subpath}", trailingslashit( $url ) );
+		}
+		return $new_url;
 	}
 
 	private function get_directory_name( string $lang ) : string {

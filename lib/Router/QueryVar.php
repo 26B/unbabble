@@ -55,6 +55,8 @@ class QueryVar {
 		// TODO: post_type_archive_link
 
 		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
+
+		\add_filter( 'home_url', [ $this, 'home_url' ], 10 );
 	}
 
 	public function apply_lang_to_post_url( string $post_link, $post ) : string {
@@ -189,5 +191,15 @@ class QueryVar {
 		}
 
 		return false;
+	}
+
+	// Add lang to home_url.
+	public function home_url( string $url ) : string {
+		$curr_lang = LangInterface::get_current_language();
+		if ( $curr_lang === Options::get()['default_language'] ) {
+			return $url;
+		}
+
+		return add_query_arg( 'lang', $curr_lang, $url );
 	}
 }

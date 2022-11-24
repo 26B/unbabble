@@ -34,7 +34,6 @@ class LanguagePacks {
 		$allowed_languages      = Options::get()['allowed_languages'];
 		$installed_languages    = array_merge( [ 'en_US' ], \get_available_languages() );
 		$missing_language_packs = array_diff( $allowed_languages, $installed_languages );
-		error_log( print_r( $missing_language_packs, true ) );
 		if ( empty( $missing_language_packs ) ) {
 			return;
 		}
