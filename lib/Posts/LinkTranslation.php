@@ -8,12 +8,18 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 
 /**
- * For hooks related to linking and unlinking translations between existing posts or translation
+ * Hooks related to linking and unlinking translations between existing posts or translation
  * sets of posts.
  *
  * @since 0.0.1
  */
 class LinkTranslation {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
@@ -24,6 +30,14 @@ class LinkTranslation {
 		\add_action( 'edit_attachment', [ $this, 'link_translations' ], PHP_INT_MAX );
 	}
 
+	/**
+	 * Link translations for post $post_id.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
 	public function link_translations( int $post_id ) : void {
 		$post_type          = get_post_type( $post_id );
 		$allowed_post_types = Options::get_allowed_post_types();
@@ -79,7 +93,15 @@ class LinkTranslation {
 		}
 	}
 
-	public function unlink( $post_id ) : void {
+	/**
+	 * Unlink post $post_id from its translations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
+	public function unlink( int $post_id ) : void {
 		$post_type          = get_post_type( $post_id );
 		$allowed_post_types = Options::get_allowed_post_types();
 		if (

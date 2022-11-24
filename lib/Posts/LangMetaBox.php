@@ -8,7 +8,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 
 /**
- * Handle Language Meta Box for Posts.
+ * Hooks for the language meta box for posts.
  *
  * @since 0.0.1
  */
@@ -30,7 +30,9 @@ class LangMetaBox {
 	}
 
 	/**
-	 * Add metabox to select the post language in the post editor.
+	 * Adds metabox to select the post language in the post editor.
+	 *
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -62,6 +64,8 @@ class LangMetaBox {
 	 * Callback to print the metabox for the post language selection in the post editor.
 	 *
 	 * FIXME: Refactor.
+	 *
+	 * @since 0.0.1
 	 *
 	 * @param  WP_Post $post
 	 * @return void
@@ -188,9 +192,11 @@ class LangMetaBox {
 	}
 
 	/**
-	 * Save the selected post language.
+	 * Sets the language to the saved post.
 	 *
 	 * If it's already set, it will not change.
+	 *
+	 * @since 0.0.1
 	 *
 	 * @param  int $post_id
 	 * @return void
@@ -223,6 +229,8 @@ class LangMetaBox {
 	/**
 	 * Print language select for the language metabox.
 	 *
+	 * @since 0.0.1
+	 *
 	 * @param  string $name
 	 * @param  $selected
 	 * @param  $options
@@ -231,7 +239,14 @@ class LangMetaBox {
 	 * @param  $echo
 	 * @return string
 	 */
-	private function print_language_select( string $name, $selected, $options, string $nonce_action, string $nonce_name, $echo = true ) : string {
+	private function print_language_select(
+		string $name,
+		$selected,
+		$options,
+		string $nonce_action,
+		string $nonce_name,
+		$echo = true
+	) : string {
 		$create_mode = is_numeric( $_GET['ubb_source'] ?? '' );
 		$langs       = array_map(
 			function ( $text, $lang ) use ( $selected, $create_mode ) {
@@ -267,7 +282,9 @@ class LangMetaBox {
 	}
 
 	/**
-	 * Verify a nonce.
+	 * Verifies a nonce.
+	 *
+	 * @since 0.0.1
 	 *
 	 * @param $name
 	 * @param $action
@@ -295,6 +312,15 @@ class LangMetaBox {
 		return true;
 	}
 
+	/**
+	 * Get possible posts for the $post to link to.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param WP_Post $post
+	 * @param string  $post_lang
+	 * @return array
+	 */
 	private function get_possible_links( WP_Post $post, string $post_lang ) : array {
 		global $wpdb;
 		$existing_langs        = array_merge( [ $post_lang ], array_values( LangInterface::get_post_translations( $post->ID ) ) );

@@ -3,16 +3,20 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use WP_Error;
 use TwentySixB\WP\Plugin\Unbabble\Options;
-use WP_Post;
 
 /**
- * For hooks related to creating a translations from an existing post.
+ * For hooks related to creating translations from an existing post.
  *
  * @since 0.0.1
  */
 class CreateTranslation {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
@@ -29,6 +33,14 @@ class CreateTranslation {
 		\add_action( 'add_attachment', [ $this, 'set_new_source_attachment' ], PHP_INT_MAX );
 	}
 
+	/**
+	 * Redirect to new post creation page to make a new translation.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
 	public function redirect_to_new( int $post_id ) : void {
 		$post_type = get_post_type( $post_id );
 		if ( $post_type === 'revision' || ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
@@ -69,6 +81,14 @@ class CreateTranslation {
 		exit;
 	}
 
+	/**
+	 * Set new source for saved post given the source in the $_POST form.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
 	public function set_new_source( int $post_id ) : void {
 		$post_type          = get_post_type( $post_id );
 		$allowed_post_types = Options::get_allowed_post_types();
@@ -93,6 +113,14 @@ class CreateTranslation {
 		$this->set_post_source( $post_id, $src_post->ID );
 	}
 
+	/**
+	 * Set source for a newly uploaded attachment given the source in the request.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
 	public function set_new_source_attachment( int $post_id ) : void {
 		$post_type          = get_post_type( $post_id );
 		$allowed_post_types = Options::get_allowed_post_types();
@@ -113,6 +141,14 @@ class CreateTranslation {
 		$this->set_post_source( $post_id, $src_post->ID );
 	}
 
+	/**
+	 * Adds necessary url parameters to create attachment translation during attachment upload.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array $plupload_init
+	 * @return array
+	 */
 	public function add_params_to_upload( $plupload_init ) : array {
 		$url = $plupload_init['url'];
 		$url = add_query_arg( 'lang', LangInterface::get_current_language(), $url );
@@ -123,7 +159,18 @@ class CreateTranslation {
 		return $plupload_init;
 	}
 
-	private function set_post_source( $post_id, $src_post_id ) {
+	/**
+	 * Sets a $post_id's source to that of $src_post_id's.
+	 *
+	 * If the post for $src_post_id does not have a source yet, one will be created for it.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id
+	 * @param int $src_post_id
+	 * @return void
+	 */
+	private function set_post_source( int $post_id, int $src_post_id ) : void {
 		$original_source = LangInterface::get_post_source( $src_post_id );
 		if ( $original_source === null ) {
 			$original_source = LangInterface::get_new_post_source_id();

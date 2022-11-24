@@ -8,9 +8,17 @@ use WP_Post;
 use WP_Term;
 
 /**
- * For hooks related to wordpress routing via the query_var lang.
+ * Hooks related to wordpress routing via url directory.
+ *
+ * @since 0.0.1
  */
 class Directory {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() || Options::get_router() !== 'directory' ) {
 			return;
@@ -58,6 +66,18 @@ class Directory {
 		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 2 );
 	}
 
+	/**
+	 * Changes $_SERVER in order to remove directories from the url and let query_var routing take
+	 * place.
+	 *
+	 * Directory routing is a proxy for query_var routing. Every directory uri is changed, the
+	 * directory is removed and the lang query argument is added. This procedure needs to be done as
+	 * early as possible in order to avoid problems.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
 	public function init() : void {
 		$lang = $this->current_lang_from_uri( Options::get()['default_language'], $_SERVER['REQUEST_URI'] );
 		if ( $lang === Options::get()['default_language'] ) {
@@ -80,6 +100,18 @@ class Directory {
 		}
 	}
 
+	/**
+	 * Get the current language from the uri.
+	 *
+	 * If the $uri does not contain a known directory (language), then the first argument $curr_lang
+	 * is returned.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $curr_lang
+	 * @param string $uri
+	 * @return string Language of the directory in the $uri, if known, otherwise returns $curr_lang.
+	 */
 	public function current_lang_from_uri( string $curr_lang, string $uri ) : string {
 		$languages        = Options::get()['allowed_languages'];
 		$default_language = Options::get()['default_language'];
@@ -95,6 +127,15 @@ class Directory {
 		return $curr_lang;
 	}
 
+	/**
+	 * Applies language to the post's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $post_link
+	 * @param WP_Post|int|mixed $post
+	 * @return string
+	 */
 	public function apply_lang_to_post_url( string $post_link, $post ) : string {
 		if ( $post instanceof WP_Post ) {
 			$post_id = $post->ID;
@@ -113,6 +154,15 @@ class Directory {
 		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $post_link );
 	}
 
+	/**
+	 * Applies language to the custom post's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $post_link
+	 * @param WP_Post $post
+	 * @return string
+	 */
 	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
 		$post_type = $post->post_type;
 		if ( ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
@@ -121,6 +171,15 @@ class Directory {
 		return $this->apply_lang_to_post_url( $post_link, $post );
 	}
 
+	/**
+	 * Applies language to the attachment's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $link
+	 * @param int $post_id
+	 * @return string
+	 */
 	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
 		// When attachments are attached to a post, their url already has the lang from the post permalink.
 		$lang = $this->current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
@@ -132,6 +191,16 @@ class Directory {
 		return $this->apply_lang_to_post_url( $link, $post );
 	}
 
+	/**
+	 * Applies language to the term's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $termlink
+	 * @param WP_Term $term
+	 * @param string $taxonomy
+	 * @return string
+	 */
 	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
 		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
 			return $termlink;
@@ -145,6 +214,14 @@ class Directory {
 		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $termlink );
 	}
 
+	/**
+	 * Sets the language for the default homepage.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param WP_Query $query
+	 * @return void
+	 */
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
 		if ( ! $query->is_main_query() || ! is_home()) {
 			return;
@@ -165,7 +242,10 @@ class Directory {
 	}
 
 	/**
-	 * Deal with WP redirecting to post to its permalink (which includes the ?lang=XX) when it
+	 * Stop redirect to 404 if the found post's language is not the same as the current language.
+	 *
+	 * TODO: improve this explanation
+	 * Dealing with WP redirecting to post to its permalink (which includes the ?lang=XX) when it
 	 * shouldn't, because its not the correct language in the original URL.
 	 * Going to the url of an english (non main language) post without the ?lang=en query_var
 	 * then wordpress will try to guess the redirect from the 404 and find the english post and
@@ -175,6 +255,11 @@ class Directory {
 	 * WP method redirect_guess_404_permalink found in canonical.php. This was done since there
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param mixed $pre
+	 * @return null|string|false
 	 */
 	public function pre_redirect_guess_404_permalink( $pre ) {
 		// TODO: What to do with the $pre.
@@ -244,7 +329,15 @@ class Directory {
 		return false;
 	}
 
-	// Add directory to home_url.
+	/**
+	 * Adds directory to home_url.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $url
+	 * @param string $path
+	 * @return string
+	 */
 	public function home_url( string $url, string $path ) : string {
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === Options::get()['default_language'] ) {
@@ -265,6 +358,14 @@ class Directory {
 		return $new_url;
 	}
 
+	/**
+	 * Get the directory name for a language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $lang
+	 * @return string
+	 */
 	private function get_directory_name( string $lang ) : string {
 		$options = Options::get();
 		if (

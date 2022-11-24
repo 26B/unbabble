@@ -6,11 +6,17 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
- * For hooks related to creating a translations from an existing post.
+ * Hooks related to changing a posts language.
  *
  * @since 0.0.1
  */
 class ChangeLanguage {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
@@ -20,6 +26,14 @@ class ChangeLanguage {
 		\add_action( 'save_post', [ $this, 'change_language' ], PHP_INT_MAX - 10 );
 	}
 
+	/**
+	 * Change the language of the saved post.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
 	public function change_language( int $post_id ) : void {
 		$ubb_lang = $_POST['ubb_lang'] ?? '';
 

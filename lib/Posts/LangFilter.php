@@ -8,7 +8,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Query;
 
 /**
- * TODO:
+ * Hooks for filtering posts based on their language.
  *
  * @since 0.0.1
  */
@@ -26,6 +26,15 @@ class LangFilter {
 		\add_filter( 'posts_where', [ $this, 'filter_posts_by_language' ], 10, 2 );
 	}
 
+	/**
+	 * Adds where clauses to query in order to filters posts by language, if necessary.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string   $where
+	 * @param WP_Query $query
+	 * @return string
+	 */
 	public function filter_posts_by_language( string $where, WP_Query $query ) : string {
 		global $wpdb;
 		if ( ! $this->allow_filter( $query ) ) {
@@ -38,6 +47,14 @@ class LangFilter {
 		return $where;
 	}
 
+	/**
+	 * Returns whether the filtering of posts should happen.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param WP_Query $query
+	 * @return bool
+	 */
 	public function allow_filter( WP_Query $query ) : bool {
 		if (
 			! empty( $query->get( 'post_type', null ) )
@@ -45,6 +62,8 @@ class LangFilter {
 		) {
 			return false;
 		}
+
+		// TODO: add hook to stop the filter.
 
 		return true;
 	}

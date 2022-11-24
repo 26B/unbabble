@@ -8,9 +8,17 @@ use WP_Post;
 use WP_Term;
 
 /**
- * For hooks related to wordpress routing via the query_var lang.
+ * Hooks related to wordpress routing via the query_var lang.
+ *
+ * @since 0.0.1
  */
 class QueryVar {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() || Options::get_router() !== 'query_var' ) {
 			return;
@@ -60,6 +68,15 @@ class QueryVar {
 		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 2 );
 	}
 
+	/**
+	 * Applies language to the post's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $post_link
+	 * @param WP_Post|int|mixed $post
+	 * @return string
+	 */
 	public function apply_lang_to_post_url( string $post_link, $post ) : string {
 		if ( is_numeric( $post ) ) {
 			$post_id = (int) $post;
@@ -75,6 +92,15 @@ class QueryVar {
 		return add_query_arg( 'lang', $post_lang, $post_link );
 	}
 
+	/**
+	 * Applies language to the custom post's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $post_link
+	 * @param WP_Post $post
+	 * @return string
+	 */
 	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
 		$post_type = $post->post_type;
 		if ( ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
@@ -83,11 +109,30 @@ class QueryVar {
 		return $this->apply_lang_to_post_url( $post_link, $post );
 	}
 
+	/**
+	 * Applies language to the attachment's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $link
+	 * @param int $post_id
+	 * @return string
+	 */
 	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
 		$post = WP_Post::get_instance( $post_id );
 		return $this->apply_lang_to_post_url( $link, $post );
 	}
 
+	/**
+	 * Applies language to the term's link given it's language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $termlink
+	 * @param WP_Term $term
+	 * @param string $taxonomy
+	 * @return string
+	 */
 	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
 		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
 			return $termlink;
@@ -99,6 +144,14 @@ class QueryVar {
 		return add_query_arg( 'lang', $term_lang, $termlink );
 	}
 
+	/**
+	 * Sets the language for the default homepage.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param WP_Query $query
+	 * @return void
+	 */
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
 		if ( ! $query->is_main_query() || ! is_home()) {
 			return;
@@ -115,6 +168,10 @@ class QueryVar {
 	}
 
 	/**
+	 * Stop redirect to 404 if the found post's language is not the same as the current language.
+	 *
+	 * TODO: improve this explanation
+	 *
 	 * Deal with WP redirecting to post to its permalink (which includes the ?lang=XX) when it
 	 * shouldn't, because its not the correct language in the original URL.
 	 * Going to the url of an english (non main language) post without the ?lang=en query_var
@@ -125,6 +182,11 @@ class QueryVar {
 	 * WP method redirect_guess_404_permalink found in canonical.php. This was done since there
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param mixed $pre
+	 * @return null|string|false
 	 */
 	public function pre_redirect_guess_404_permalink( $pre ) {
 		// TODO: What to do with the $pre.
@@ -194,7 +256,14 @@ class QueryVar {
 		return false;
 	}
 
-	// Add lang to home_url.
+	/**
+	 * Adds directory to home_url.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $url
+	 * @return string
+	 */
 	public function home_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === Options::get()['default_language'] ) {

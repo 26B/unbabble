@@ -7,7 +7,18 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 
+/**
+ * For hooks related to admin notices for posts.
+ *
+ * @since 0.0.1
+ */
 class AdminNotices {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
@@ -17,7 +28,9 @@ class AdminNotices {
 	}
 
 	/**
-	 * Add an admin notice when a post has translation for the same language as itself.
+	 * Adds an admin notice when a post has translation for the same language as itself.
+	 *
+	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
@@ -44,6 +57,13 @@ class AdminNotices {
 		printf( '<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>', esc_html( $message ) );
 	}
 
+	/**
+	 * Adds an admin notice for when there posts with missing languages or with an unknown language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
 	public function posts_missing_language() : void {
 		global $wpdb;
 		$screen = get_current_screen();
