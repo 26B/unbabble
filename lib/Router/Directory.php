@@ -18,8 +18,8 @@ class Directory {
 		}
 
 		if ( ! is_admin() ) {
-			// FIXME: HACKY METHOD TO GET ROUTING TO WORK CORRECTLY.
-			\add_filter( 'init', [ $this, 'init' ], PHP_INT_MIN );
+			// Needs to be done as early as possible.
+			$this->init();
 
 			\add_filter( 'pre_get_posts', [ $this, 'homepage_default_lang_redirect' ], 1 );
 		}
@@ -146,13 +146,17 @@ class Directory {
 		}
 
 		// If there is a language set, that takes precedence.
-		$lang = $this->current_lang_from_uri( '', $_SERVER['REQUEST_URI'] );
+		$lang    = '';
+		$options = Options::get();
+		if ( in_array( $_GET['lang'] ?? '', $options['allowed_languages'], true ) ) {
+			$lang = \sanitize_text_field( $_GET['lang'] );
+		}
 		if ( ! empty( $lang ) ) {
 			return;
 		}
 
 		// Set language of homepage to the default language.
-		set_query_var( 'lang', Options::get()['default_language'] );
+		set_query_var( 'lang', $options['default_language'] );
 	}
 
 	/**

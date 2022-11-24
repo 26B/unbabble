@@ -30,7 +30,7 @@ class LanguageSwitcher {
 
 	public function add_switcher_backoffice_admin_bar( \WP_Admin_Bar $wp_admin_bar ) : void {
 		$options = Options::get();
-		$current = $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];
+		$current = LangInterface::get_current_language();
 
 		// TODO: This shouldn't happen. Should always be array.
 		$allowed_languages = is_array( $options['allowed_languages'] ) ? $options['allowed_languages'] : [];
@@ -50,7 +50,7 @@ class LanguageSwitcher {
 			}
 
 			$langs[] = sprintf(
-				'<option value="%1$s" %2$s>%3$s</option>',
+				'<li><a class="ab-item" href="%1$s" %2$s>%3$s</a></li>',
 				$url,
 				\selected( $allowed_lang, $current, false ),
 				$allowed_lang
@@ -58,9 +58,15 @@ class LanguageSwitcher {
 		}
 
 		$html = sprintf(
-			'<select onChange="window.location.href=this.value" style="width:4.5em;">
+			'<ul><li class="menupop">
 				%1$s
-			</select>',
+				<div class="ab-sub-wrapper">
+				<ul class="ab-submenu">
+				%2$s
+				</ul>
+				</div>
+			</li></ul>',
+			$current,
 			implode( '', $langs )
 		);
 

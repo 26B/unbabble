@@ -135,6 +135,9 @@ class Plugin {
 			'router_query_var' => new Router\QueryVar( $this ),
 			'router_directory' => new Router\Directory( $this ),
 
+			'lang_frontend' => new Language\Frontend( $this ),
+			'lang_packages' => new Language\LanguagePacks( $this ),
+
 			// TODO: Terms
 			// TODO: Disconnect from translations.
 			// TODO: Filter the query for attaching an attachment.

@@ -19,7 +19,6 @@ class LangInterface {
 	public static function get_current_language() : string {
 		$options = Options::get();
 		$lang    = get_query_var( 'lang', null );
-
 		// TODO: Auto-draft saving does not put the query var.
 		if ( ! isset( $lang ) && isset( $_GET['lang'] ) ) {
 			$lang = $_GET['lang'];
@@ -29,7 +28,7 @@ class LangInterface {
 			$lang = $_COOKIE['ubb_lang'] ?? null;
 		}
 
-		if ( ! isset( $lang )  ) {
+		if ( ! isset( $lang ) ) {
 			$lang = $options['default_language'];
 		}
 

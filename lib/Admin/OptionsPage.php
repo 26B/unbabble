@@ -6,14 +6,6 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 
 class OptionsPage {
 
-	// TODO: replace with full list.
-	private $available_langs = [
-		'pt_PT',
-		'en',
-		'es_ES',
-		'en_US',
-	];
-
 	/**
 	 * Register hooks.
 	 *
@@ -69,7 +61,7 @@ class OptionsPage {
 					\selected( in_array( $lang, $options['allowed_languages'], true ), true, false )
 				);
 			},
-			$this->available_langs
+			array_merge( [ 'en_US' ], get_available_languages() )
 		);
 
 		printf(
