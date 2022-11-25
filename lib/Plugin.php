@@ -108,6 +108,7 @@ class Plugin {
 	private function define_admin_hooks() {
 		$components = [
 			'admin'             => new Admin\Admin( $this ),
+			'lang_cookie'       => new Admin\LangCookie( $this ),
 			'options_page'      => new Admin\OptionsPage( $this ),
 			'language_switcher' => new Admin\LanguageSwitcher( $this ),
 			'redirector'        => new Admin\Redirector( $this ),

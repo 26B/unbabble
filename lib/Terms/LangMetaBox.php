@@ -47,7 +47,7 @@ class LangMetaBox {
 
 		foreach ( $taxonomies as $taxonomy ) {
 			\add_action( "{$taxonomy}_add_form_fields", [ $this, 'new_term_language_metabox' ] );
-			\add_action( "{$taxonomy}_edit_form_fields", [ $this, 'edit_term_language_metabox' WP_Term ] );
+			\add_action( "{$taxonomy}_edit_form_fields", [ $this, 'edit_term_language_metabox' ] );
 			\add_action( "edit_{$taxonomy}", [ $this, 'save_term_language' ] );
 			\add_action( "create_{$taxonomy}", [ $this, 'save_term_language' ] );
 		}
