@@ -25,18 +25,18 @@ class LangMetaBox {
 		}
 
 		// Post meta box.
-		\add_action( 'add_meta_boxes', [ $this, 'post_language_selector' ] );
+		\add_action( 'add_meta_boxes', [ $this, 'add_ubb_meta_box' ] );
 		\add_action( 'save_post', [ $this, 'save_post_language' ] );
 	}
 
 	/**
-	 * Adds metabox to select the post language in the post editor.
+	 * Adds post metabox for inputs/actions for language/translations.
 	 *
 	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
-	public function post_language_selector() : void {
+	public function add_ubb_meta_box() : void {
 
 		// Filter for allowed post types.
 		$post_types = array_intersect( \get_post_types(), Options::get_allowed_post_types() );
@@ -49,7 +49,7 @@ class LangMetaBox {
 		\add_meta_box(
 			'ubb_lang',
 			\__( 'Language', 'textdomain' ),
-			[ $this, 'post_language_selector_callback' ],
+			[ $this, 'add_ubb_meta_box_callback' ],
 			$post_types,
 			'side',
 			'high',
@@ -61,7 +61,7 @@ class LangMetaBox {
 	}
 
 	/**
-	 * Callback to print the metabox for the post language selection in the post editor.
+	 * Prints the metabox for the post language selection in the post editor.
 	 *
 	 * FIXME: Refactor.
 	 *
@@ -70,7 +70,7 @@ class LangMetaBox {
 	 * @param  WP_Post $post
 	 * @return void
 	 */
-	public function post_language_selector_callback( \WP_Post $post ) : void {
+	public function add_ubb_meta_box_callback( \WP_Post $post ) : void {
 		$options = Options::get();
 		// TODO: use LangInterface for language.
 		$lang    = $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];

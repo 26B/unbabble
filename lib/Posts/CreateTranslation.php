@@ -6,7 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
- * For hooks related to creating translations from an existing post.
+ * Hooks related to creating translations from an existing post.
  *
  * @since 0.0.1
  */

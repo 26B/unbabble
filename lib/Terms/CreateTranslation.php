@@ -8,15 +8,22 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 
 
 /**
- * For hooks related to creating a translations from an existing term.
+ * Hooks related to creating translations from an existing term.
  *
  * @since 0.0.1
  */
 class CreateTranslation {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
+
 		// Redirect to create new translation.
 		\add_action( 'saved_term', [ $this, 'redirect_to_new' ], PHP_INT_MAX, 4 );
 		\add_action( 'saved_term', [ $this, 'set_new_source' ], PHP_INT_MAX, 4 );
@@ -25,6 +32,17 @@ class CreateTranslation {
 		// \add_action( 'saved_term', [ $this, 'create_and_redirect' ], PHP_INT_MAX, 4 );
 	}
 
+	/**
+	 * Redirect to new term creation page to make a new translation.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $term_id
+	 * @param int    $tt_id
+	 * @param string $taxonomy
+	 * @param bool   $update
+	 * @return void
+	 */
 	public function redirect_to_new( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		if (
 			! $update
@@ -62,6 +80,17 @@ class CreateTranslation {
 		exit;
 	}
 
+	/**
+	 * Set new source for saved term given the source in the $_POST form.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $term_id
+	 * @param int    $tt_id
+	 * @param string $taxonomy
+	 * @param bool   $update
+	 * @return void
+	 */
 	public function set_new_source( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		if (

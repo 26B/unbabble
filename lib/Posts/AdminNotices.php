@@ -58,7 +58,7 @@ class AdminNotices {
 	}
 
 	/**
-	 * Adds an admin notice for when there posts with missing languages or with an unknown language.
+	 * Adds an admin notice for when there's posts with missing languages or with an unknown language.
 	 *
 	 * @since 0.0.1
 	 *

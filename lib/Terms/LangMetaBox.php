@@ -8,7 +8,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Term;
 
 /**
- * Handle Language Meta Box for Terms.
+ * Hooks for the language meta box for posts.
  *
  * @since 0.0.1
  */
@@ -25,10 +25,17 @@ class LangMetaBox {
 		}
 
 		// Term meta box.
-		\add_action( 'admin_init', [ $this, 'term_language_selector' ] );
+		\add_action( 'admin_init', [ $this, 'add_ubb_meta_box' ] );
 	}
 
-	public function term_language_selector() {
+	/**
+	 * Adds term metabox for inputs/actions for language/translations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function add_ubb_meta_box() : void {
 
 		// Filter for allowed taxonomies.
 		$taxonomies = array_intersect( \get_taxonomies(), Options::get_allowed_taxonomies() );
@@ -40,13 +47,20 @@ class LangMetaBox {
 
 		foreach ( $taxonomies as $taxonomy ) {
 			\add_action( "{$taxonomy}_add_form_fields", [ $this, 'new_term_language_metabox' ] );
-			\add_action( "{$taxonomy}_edit_form_fields", [ $this, 'edit_term_language_metabox' ] );
+			\add_action( "{$taxonomy}_edit_form_fields", [ $this, 'edit_term_language_metabox' WP_Term ] );
 			\add_action( "edit_{$taxonomy}", [ $this, 'save_term_language' ] );
 			\add_action( "create_{$taxonomy}", [ $this, 'save_term_language' ] );
 		}
 	}
 
-	public function new_term_language_metabox() {
+	/**
+	 * Prints metabox for when a new term is being created.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
+	public function new_term_language_metabox() : void {
 		$options = Options::get();
 
 		printf(
@@ -68,7 +82,15 @@ class LangMetaBox {
 		}
 	}
 
-	public function edit_term_language_metabox( $term ) {
+	/**
+	 * Prints metabox for when an existing term is being edited.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param WP_Term $term
+	 * @return void
+	 */
+	public function edit_term_language_metabox( WP_Term $term ) : void {
 		$lang    = LangInterface::get_term_language( $term->term_id );
 		$options = Options::get();
 
@@ -197,7 +219,17 @@ class LangMetaBox {
 		);
 	}
 
-	public function save_term_language( $term_id ) {
+	/**
+	 * Sets the language to the saved term.
+	 *
+	 * If it's already set, it will not change.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param  int $term_id
+	 * @return void
+	 */
+	public function save_term_language( int $term_id ) : void {
 		if ( ! $this->verify_nonce( 'ubb_language_metabox', 'ubb_language_metabox_nonce' ) ) {
 			return;
 		}
@@ -214,8 +246,21 @@ class LangMetaBox {
 		LangInterface::set_term_language( $term_id, $lang );
 	}
 
-	// TODO: Duplicated in Posts/LangMetaBox
-	private function print_language_select( string $name, $selected, $options, string $nonce_action, string $nonce_name, $echo = true ) {
+	/**
+	 * Print language select for the language metabox.
+	 *
+	 * @since 0.0.1
+	 * @todo duplicated in Posts/LangMetaBox
+	 *
+	 * @param  string $name
+	 * @param  $selected
+	 * @param  $options
+	 * @param  string $nonce_action
+	 * @param  string $nonce_name
+	 * @param  $echo
+	 * @return string
+	 */
+	private function print_language_select( string $name, $selected, $options, string $nonce_action, string $nonce_name, $echo = true ) : string {
 		$create_mode = is_numeric( $_GET['ubb_source'] ?? '' );
 		$langs       = array_map(
 			function ( $text, $lang ) use ( $selected, $create_mode ) {
@@ -250,7 +295,16 @@ class LangMetaBox {
 		return ! $echo ? $output : printf( $output );
 	}
 
-	// TODO: Duplicated in Posts/LangMetaBox
+	/**
+	 * Verifies a nonce.
+	 *
+	 * @since 0.0.1
+	 * @todo duplicated in Posts/LangMetaBox
+	 *
+	 * @param $name
+	 * @param $action
+	 * @return bool
+	 */
 	private function verify_nonce( $name, $action ) : bool {
 
 		// Check if our nonce is set.
@@ -273,6 +327,15 @@ class LangMetaBox {
 		return true;
 	}
 
+	/**
+	 * Get possible terms for the $term to link to.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param WP_Term $term
+	 * @param string  $term_lang
+	 * @return array
+	 */
 	private function get_possible_links( WP_Term $term, string $term_lang ) : array {
 		global $wpdb;
 		$existing_langs        = array_merge( [ $term_lang ], array_values( LangInterface::get_term_translations( $term->term_id ) ) );

@@ -12,6 +12,12 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
  * @since 0.0.1
  */
 class LinkTranslation {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since 0.0.1
+	 */
 	public function register() {
 		if ( Options::only_one_language_allowed() ) {
 			return;
@@ -20,6 +26,17 @@ class LinkTranslation {
 		\add_action( 'saved_term', [ $this, 'unlink' ], PHP_INT_MAX, 4 );
 	}
 
+	/**
+	 * Link translations for term $term_id.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $term_id
+	 * @param int    $tt_id
+	 * @param string $taxonomy
+	 * @param bool   $update
+	 * @return void
+	 */
 	public function link_translations( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		if (
@@ -73,6 +90,17 @@ class LinkTranslation {
 		}
 	}
 
+	/**
+	 * Unlink term $term_id from its translations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $term_id
+	 * @param int    $tt_id
+	 * @param string $taxonomy
+	 * @param bool   $update
+	 * @return void
+	 */
 	public function unlink( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		if (
 			! $update

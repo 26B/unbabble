@@ -2,15 +2,12 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
-use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
-use WP_Query;
-use WP_Term_Query;
 
 /**
- * TODO:
+ * Hooks for filtering terms based on their language.
  *
  * @since 0.0.1
  */
@@ -28,6 +25,16 @@ class LangFilter {
 		\add_filter( 'terms_clauses', [ $this, 'filter_terms_by_language' ], 10, 3 );
 	}
 
+	/**
+	 * Adds where clauses to query in order to filters terms by language, if necessary.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param array $pieces
+	 * @param array $taxonomies
+	 * @param array $args
+	 * @return array
+	 */
 	public function filter_terms_by_language( array $pieces, array $taxonomies, array $args ) : array {
 
 		// TODO: filter docs.
