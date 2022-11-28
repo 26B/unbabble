@@ -262,9 +262,16 @@ class QueryVar {
 	 * @since 0.0.1
 	 *
 	 * @param string $url
+	 * @param string $path
 	 * @return string
 	 */
-	public function home_url( string $url ) : string {
+	public function home_url( string $url, string $path ) : string {
+
+		// TODO: Docs.
+		if ( apply_filters( 'ubb_home_url', false, $url, $path ) ) {
+			return $url;
+		}
+
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === Options::get()['default_language'] ) {
 			return $url;

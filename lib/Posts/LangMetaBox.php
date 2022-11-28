@@ -141,11 +141,7 @@ class LangMetaBox {
 					<th>Actions</th>
 				</tr>
 				%s
-				</table>
-				<hr><details>
-					<summary><b>Unlink:</b></summary>
-					<input type="submit" %2$s name="ubb_unlink" value="Unlink from translations" class="button"/>
-				</details>',
+				</table>',
 				implode( '', $translation_to_show ),
 				$post->post_status === 'draft' ? 'id="save-post"' : ''
 			);
@@ -156,37 +152,38 @@ class LangMetaBox {
 		unset( $available_languages[ $lang ] );
 
 		// Can't create more translations currently.
-		if ( empty( $available_languages ) ) {
-			return;
+		if ( ! empty( $available_languages ) ) {
+			$available_languages = array_keys( $available_languages );
+
+			// Display language selector and button to create new translation.
+			// TODO: Only show `ubb_copy_new` input if duplicate-post is active. Add filter and move the input to an integration class.
+			printf(
+				'<hr><details>
+					<summary><b>Create Translation</b></summary>
+					<div>To: %1$s</div>
+					<input type="submit" %2$s name="ubb_redirect_new" value="Save and Create" class="button"/>
+					<input type="submit" %2$s name="ubb_copy_new" value="Save and Copy" class="button"/>
+				</details>',
+				$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
+				$post->post_status === 'draft' ? 'id="save-post"' : '',
+			);
 		}
-
-		$available_languages = array_keys( $available_languages );
-
-		// Display language selector and button to create new translation.
-		// TODO: Only show `ubb_copy_new` input if duplicate-post is active. Add filter and move the input to an integration class.
-		printf(
-			'<hr><details>
-				<summary><b>Create Translation</b></summary>
-				<div>To: %1$s</div>
-				<input type="submit" %2$s name="ubb_redirect_new" value="Save and Create" class="button"/>
-				<input type="submit" %2$s name="ubb_copy_new" value="Save and Copy" class="button"/>
-			</details>',
-			$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
-			$post->post_status === 'draft' ? 'id="save-post"' : '',
-		);
 
 		$options = array_reduce(
 			$this->get_possible_links( $post, $lang ),
 			fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
-			''
+			! $translation_to_show ? '' : sprintf( "<option value='%s'>%s</option>\n", 'unlink', __( 'Unlink from translations', 'unbabble' ) )
 		);
+
 		printf(
 			'<hr><details>
 				<summary><b>Linking translation:</b></summary>
-				<label>Link to:</label>
-				<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation">
-				<datalist id="ubb_link_translations_list">%s</datalist>
+				<label>%1$s</label>
+				<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation" placeholder="%2$s">
+				<datalist id="ubb_link_translations_list">%3$s</datalist>
 			</details>',
+			__( 'Linked to:', 'unbabble' ),
+			__( 'Unchanged', 'unbabble' ),
 			$options
 		);
 	}
@@ -323,14 +320,12 @@ class LangMetaBox {
 	 */
 	private function get_possible_links( WP_Post $post, string $post_lang ) : array {
 		global $wpdb;
-		$existing_langs        = array_merge( [ $post_lang ], array_values( LangInterface::get_post_translations( $post->ID ) ) );
-		$lang_string           = implode( "','", array_map( fn( $lang ) => esc_sql( $lang ), $existing_langs ) );
 		$translations_table    = ( new PostTable() )->get_table_name();
 		$allowed_languages_str = implode( "','", Options::get()['allowed_languages'] );
 
-		$possible_posts = $wpdb->get_results(
+		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT post_id, post_title, locale
+				"SELECT MIN(A.post_id) as post_id, GROUP_CONCAT( CONCAT(A.post_title, '(', locale, ')' ) ) as group_label
 				FROM (
 					SELECT PT.post_id, P.post_title, locale, IFNULL(meta_value, PT.post_id) AS source
 					FROM {$translations_table} AS PT
@@ -339,20 +334,22 @@ class LangMetaBox {
 					WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
 					AND PT.locale IN ('{$allowed_languages_str}')
 				) AS A
-				WHERE locale NOT IN ('{$lang_string}')
+				WHERE locale != %s
 				AND source NOT IN (
 					SELECT IFNULL(meta_value, PT.post_id) AS source
 					FROM {$translations_table} AS PT
 					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
-					WHERE locale IN ('{$lang_string}')
-				)",
-				$post->post_type
+					WHERE locale = %s
+				) GROUP BY source",
+				$post->post_type,
+				$post_lang,
+				$post_lang
 			)
 		);
 
 		$options = [];
-		foreach ( $possible_posts as $post ) {
-			$options[] = [ $post->post_id, "{$post->post_title} ({$post->locale})", ];
+		foreach ( $possible_sources as $source ) {
+			$options[] = [ $source->post_id, $source->group_label ];
 		}
 		return $options;
 	}

@@ -59,33 +59,13 @@ class LinkTranslation {
 		$term_source = LangInterface::get_term_source( $term_id );
 		$link_source = LangInterface::get_term_source( $link_term->term_id );
 
-		// If none of them have source, use the lowest ID and set that as source for both.
-		if ( $term_source === null && $link_source === null ) {
-			$source_id = LangInterface::get_new_term_source_id();
-			LangInterface::set_term_source( $term_id, $source_id );
-			LangInterface::set_term_source( $link_term->term_id, $source_id );
-			return;
+		if ( $link_source === null ) {
+			$link_source = LangInterface::get_new_term_source_id();
 		}
 
-		// If the term has source but not the link, set source in link to term source.
-		if ( $term_source !== null && $link_source === null ) {
-			LangInterface::set_term_source( $link_term->term_id, $term_source );
-			return;
-		}
-
-		// If the link has source but not the term, set source in term to link source.
-		if ( $term_source === null && $link_source !== null ) {
-			LangInterface::set_term_source( $term_id, $link_source );
-			return;
-		}
-
-		// If both of them have a source, use lowest source ID and change occurrences of the other one to that value.
-		if ( $term_source !== null && $link_source !== null ) {
-			$source_id = min( $term_source, $link_source );
-			$terms     = LangInterface::get_terms_for_source( max( $term_source, $link_source ) );
-			foreach ( $terms as $term_to_change ) {
-				LangInterface::set_term_source( $term_to_change, $source_id, true );
-			}
+		if ( ! LangInterface::set_term_source( $term_id, $link_source, true ) ) {
+			// TODO: show admin notice of failure to change new term source.
+			LangInterface::set_term_source( $term_id, $term_source );
 			return;
 		}
 	}
@@ -105,7 +85,8 @@ class LinkTranslation {
 		if (
 			! $update
 			|| ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true )
-			|| ! isset( $_POST['ubb_unlink'] )
+			|| ! isset( $_POST['ubb_link_translation'] )
+			|| $_POST['ubb_link_translation'] !== 'unlink'
 		) {
 			return;
 		}

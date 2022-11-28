@@ -34,30 +34,26 @@ class Directory {
 		// Post Permalinks:
 		$allowed_post_types = Options::get_allowed_post_types();
 
-		/** TODO: Commented filters no longer seem necessary with the use of the `home_url` filter.
-		 * Test further if we can remove them.
-		 */
-
 		if ( in_array( 'post', $allowed_post_types, true ) ) {
 			// Post permalink.
-			// \add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+			\add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'page', $allowed_post_types, true ) ) {
 			// Page permalink.
-			// \add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+			\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'attachment', $allowed_post_types, true ) ) {
 			// Attachment permalink.
-			// \add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
+			\add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
 		}
 
 		// Custom post types permalinks.
-		// \add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
+		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
 
 		// Term archive permalinks.
-		// \add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
+		\add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
 
 		// TODO: post_type_archive_link
 
@@ -79,24 +75,20 @@ class Directory {
 	 * @return void
 	 */
 	public function init() : void {
-		$lang = $this->current_lang_from_uri( Options::get()['default_language'], $_SERVER['REQUEST_URI'] );
+
+		// Trailing slash to handle cases like homepage when url/uri does not have / at the end.
+		$request_uri = trailingslashit( $this->clean_path( $_SERVER['REQUEST_URI'] ) );
+		$lang        = $this->current_lang_from_uri( Options::get()['default_language'], $request_uri );
 		if ( $lang === Options::get()['default_language'] ) {
 			return;
 		}
 
 		$directory = $this->get_directory_name( $lang );
-
 		if (
-			str_starts_with( $_SERVER['REQUEST_URI'], "/{$directory}/" )
-			&& str_starts_with( $_SERVER['PHP_SELF'], "/{$directory}/" )
+			str_starts_with( $request_uri, "/{$directory}/" )
+			&& str_starts_with( trailingslashit( $this->clean_path( $_SERVER['PHP_SELF'] ) ), "/{$directory}/" )
 		) {
-			$_SERVER['REQUEST_URI'] = add_query_arg(
-				'lang',
-				$lang,
-				substr( $_SERVER['REQUEST_URI'], strlen( "/{$directory}" ) )
-			);
-			$_SERVER['PHP_SELF']    = substr( $_SERVER['PHP_SELF'], strlen( "/{$directory}" ) );
-			$_GET['lang']           = $lang;
+			$_GET['lang'] = $lang;
 		}
 	}
 
@@ -149,7 +141,12 @@ class Directory {
 		if ( empty( $post_lang ) || $post_lang === Options::get()['default_language'] ) {
 			return $post_link;
 		}
-		$site_url  = site_url();
+
+		$site_url = site_url();
+		if ( $this->path_has_directory( str_replace( $site_url, '', $post_link ), $post_lang ) ) {
+			return $post_link;
+		}
+
 		$directory = $this->get_directory_name( $post_lang );
 		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $post_link );
 	}
@@ -210,6 +207,10 @@ class Directory {
 			return $termlink;
 		}
 		$site_url  = site_url();
+		if ( $this->path_has_directory( str_replace( $site_url, '', $termlink ), $term_lang ) ) {
+			return $termlink;
+		}
+
 		$directory = $this->get_directory_name( $term_lang );
 		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $termlink );
 	}
@@ -339,6 +340,12 @@ class Directory {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path ) : string {
+
+		// TODO: Docs.
+		if ( apply_filters( 'ubb_home_url', false, $url, $path ) ) {
+			return $url;
+		}
+
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === Options::get()['default_language'] ) {
 			return $url;
@@ -376,5 +383,32 @@ class Directory {
 			return $options['router_options']['directories'][ $lang ];
 		}
 		return $lang;
+	}
+
+	private function clean_path( string $path ) : string {
+		if ( is_multisite() ) {
+			$site_info = get_site();
+			if ( $site_info->path !== '/' ) {
+				return str_replace( untrailingslashit( $site_info->path ), '', $path );
+			}
+		}
+		return $path;
+	}
+
+	private function remove_directory_from_path( string $path, string $directory ) : string {
+		if ( is_multisite() ) {
+			$site_info = get_site();
+			if ( $site_info->path !== '/' ) {
+				return untrailingslashit( $site_info->path ) . substr(
+					str_replace( untrailingslashit( $site_info->path ), '', $path ),
+					strlen( "/{$directory}" )
+				);
+			}
+		}
+		return substr( $path, strlen( "/{$directory}" ) );
+	}
+
+	private function path_has_directory( string $path, string $lang ) : bool {
+		return $lang === $this->current_lang_from_uri( '', $path );
 	}
 }
