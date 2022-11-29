@@ -173,6 +173,12 @@ class LangCookie {
 			return $_COOKIE['ubb_lang_expire'];
 		}
 
+		/**
+		 * Filters the Unbabble's language cookie's expire time.
+		 *
+		 * @since 0.0.1
+		 * @param int $expire_time
+		 */
 		return \apply_filters( 'ubb_lang_cookie_expire_time', time() + 14 * DAY_IN_SECONDS );
 	}
 }

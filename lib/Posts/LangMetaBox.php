@@ -42,7 +42,11 @@ class LangMetaBox {
 		$post_types = array_intersect( \get_post_types(), Options::get_allowed_post_types() );
 
 		/**
-		 * Allow for the post types that are translatable to be filtered.
+		 * Filters post types that will have the language meta box.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param string[] $post_types
 		 */
 		$post_types = \apply_filters( 'ubb_translatable_post_types', $post_types );
 

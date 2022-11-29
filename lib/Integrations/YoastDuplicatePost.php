@@ -129,6 +129,7 @@ class YoastDuplicatePost {
 		}
 
 		// TODO: Handle wildcards/regex.
+		// Similar to `ubb_change_language_post_meta_translate_keys` in lib\LangInterface.php.
 		$meta_to_translate = \apply_filters( 'ubb_yoast_duplicate_post_meta_translate_keys', $default_meta, $post_id, $new_lang );
 
 		$self = $this;
@@ -153,6 +154,7 @@ class YoastDuplicatePost {
 	public function translate_meta_value( $check, $new_post_id, $meta_key, $meta_value, $unique, $meta_to_translate, $post_id, $new_lang ) {
 
 		// TODO: Filter docs. Might need more arguments.
+		// Similar to `ubb_change_language_post_meta_translate_value` in lib\LangInterface.php.
 		$return = \apply_filters( 'ubb_yoast_duplicate_post_meta_translate_value', null, $meta_value, $new_post_id, $post_id, $new_lang );
 		if ( $return !== null ) {
 			$result = $this->insert_meta( $new_post_id, $meta_key, $return );

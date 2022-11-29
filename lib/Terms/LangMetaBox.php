@@ -41,7 +41,11 @@ class LangMetaBox {
 		$taxonomies = array_intersect( \get_taxonomies(), Options::get_allowed_taxonomies() );
 
 		/**
-		 * Allow for the taxonomies that are translatable to be filtered.
+		 * Filters taxonomies that will have the language meta box.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param string[] $taxonomies
 		 */
 		$taxonomies = \apply_filters( 'ubb_translatable_taxonomies', $taxonomies );
 

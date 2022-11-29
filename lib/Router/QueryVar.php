@@ -267,7 +267,15 @@ class QueryVar {
 	 */
 	public function home_url( string $url, string $path ) : string {
 
-		// TODO: Docs.
+		/**
+		 * Filters whether to change the home url or not, given the routing type and the current
+		 * language.
+		 *
+		 * @since 0.0.1
+		 * @param bool   $stop_url_change Whether to change the home url or not.
+		 * @param string $url             Home url.
+		 * @param string $path            Url path.
+		 */
 		if ( apply_filters( 'ubb_home_url', false, $url, $path ) ) {
 			return $url;
 		}

@@ -37,8 +37,17 @@ class LangFilter {
 	 */
 	public function filter_terms_by_language( array $pieces, array $taxonomies, array $args ) : array {
 
-		// TODO: filter docs.
-		if ( ! \apply_filters( 'ubb_use_term_lang_filter', true ) ) {
+		/**
+		 * Filters whether terms should be filtered by their language.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param bool  $apply_filter
+		 * @param array $pieces
+		 * @param array $taxonomies
+		 * @param array $args
+		 */
+		if ( ! \apply_filters( 'ubb_use_term_lang_filter', true, $pieces, $taxonomies, $args ) ) {
 			return $pieces;
 		}
 

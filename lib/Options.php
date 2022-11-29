@@ -33,7 +33,31 @@ class Options {
 	 * @return array
 	 */
 	public static function get() : array {
-		// TODO: Hook docs.
+
+		/**
+		 * Filters the Unbabble options array.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param ?array $options {
+		 *     Contains all the options for unbabble functionality. If returned null, the options in
+		 *     the DB are fetched or a default value is generated. Returned options will be merged
+		 *     with a set of empty defaults to prevent missing keys.
+		 *
+		 *     Expected entries are the following:
+		 *     @type string[] $allowed_languages List of allowed language codes for translation and
+		 *                                       language switching.
+		 *     @type string   $default_language  The code of the default language.
+		 *     @type string[] $post_types        List of post type slugs allowed to be translated.
+		 *     @type string[] $taxonomies        List of taxonomy slugs allowed to be translated.
+		 *     @type string   $router            Routing type. Accepted values are 'query_var' or 'directory'.
+		 *     @type array    $router_options    {
+		 *         Options related to routing.
+		 *
+		 *         @type array $directories Map of language codes to directory names.
+		 *     }
+		 * }
+		 */
 		$options = \apply_filters( 'ubb_options', null );
 		if ( is_array( $options ) ) {
 			return array_merge( self::DEFAULT, $options );

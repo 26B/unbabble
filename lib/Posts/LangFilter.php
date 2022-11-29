@@ -63,7 +63,17 @@ class LangFilter {
 			return false;
 		}
 
-		// TODO: add hook to stop the filter.
+		/**
+		 * Filters whether posts should be filtered by their language.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param bool $apply_filter
+		 * @param WP_Query $query
+		 */
+		if ( ! \apply_filters( 'ubb_use_post_lang_filter', true, $query ) ) {
+			return false;
+		}
 
 		return true;
 	}

@@ -43,7 +43,13 @@ class LangInterface {
 			$lang = $options['default_language'];
 		}
 
-		// TODO: which sanitize to use.
+		/**
+		 * Filters the current language.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param string $language Current language.
+		 */
 		return apply_filters( 'ubb_current_lang', \sanitize_text_field( $lang ) );
 	}
 
@@ -318,7 +324,24 @@ class LangInterface {
 		if ( in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
 			$default_meta['_thumbnail_id'] = 'post';
 		}
-		// TODO: Filter docs. Use same filter as the one is YoastDuplicatePost.
+
+		/**
+		 * Filters the list of meta keys to translate during post language change.
+		 *
+		 * TODO: Maybe use the same filter as the one in YoastDuplicatePost.
+		 *
+		 * @since 0.0.1
+		 *
+		 * @param string[] $meta_keys {
+		 *     List of meta_keys (key) and their type (value) ('post' or 'term').
+		 *
+		 *     @type string $meta_key  Meta key to be translated
+		 *     @type string $meta_type Type of the meta value, if they are IDs for post's or term's.
+		 * }
+		 * @param int    $post_id  ID of the post where the language is being changed.
+		 * @param string $lang     New language of the post/meta.
+		 * @param string $old_lang Old language of the post/meta.
+		 */
 		$meta_keys_to_translate = apply_filters( 'ubb_change_language_post_meta_translate_keys', $default_meta, $post_id, $lang, $old_lang );
 		if ( ! self::translate_post_meta( $post_id, $lang, $meta_keys_to_translate ) ) {
 			// TODO: Failure state
@@ -698,8 +721,24 @@ class LangInterface {
 
 		// Code similar to one in YoastDuplicatePost.
 		foreach ( $meta as $meta_data ) {
-			$meta_key       = $meta_data['meta_key'];
-			$meta_value     = maybe_unserialize( $meta_data['meta_value'] );
+			$meta_key   = $meta_data['meta_key'];
+			$meta_value = maybe_unserialize( $meta_data['meta_value'] );
+
+			/**
+			 * Filters the value being saved for a post meta translation, before the new translated
+			 * value is fetched.
+			 *
+			 * If the value returned is not null, that value is used to update the post meta.
+			 *
+			 * @since 0.0.1
+			 *
+			 * @param mixed  $pre        Value to save to database.
+			 * @param mixed  $meta_value Meta value being updated.
+			 * @param string $meta_key   Meta key being updated.
+			 * @param int    $post_id    ID of the post for which the meta is being updated.
+			 * @param string $new_lang   New language of the meta value.
+			 * @param int    $meta_id    Meta ID being updated.
+			 */
 			$new_meta_value = \apply_filters( 'ubb_change_language_post_meta_translate_value', null, $meta_value, $meta_key, $post_id, $new_lang, $meta_data['meta_id'] );
 			if ( $new_meta_value !== null ) {
 				$status = update_metadata_by_mid( 'post', $meta_data['meta_id'], $new_meta_value, $meta_key );
