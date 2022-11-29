@@ -71,10 +71,6 @@ class LangFilter {
 		 * @param bool $apply_filter
 		 * @param WP_Query $query
 		 */
-		if ( ! \apply_filters( 'ubb_use_post_lang_filter', true, $query ) ) {
-			return false;
-		}
-
-		return true;
+		return \apply_filters( 'ubb_use_post_lang_filter', true, $query );
 	}
 }

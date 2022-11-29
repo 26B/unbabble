@@ -35,6 +35,11 @@ class ChangeLanguage {
 	 * @return void
 	 */
 	public function change_language( int $post_id ) : void {
+		$post_type = get_post_type( $post_id );
+		if ( ( $_POST['post_type'] ?? '' ) !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
+			return;
+		}
+
 		$ubb_lang = $_POST['ubb_lang'] ?? '';
 
 		if ( empty( LangInterface::get_post_language( $post_id ) ) ) {

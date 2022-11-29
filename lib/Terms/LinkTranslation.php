@@ -61,6 +61,7 @@ class LinkTranslation {
 
 		if ( $link_source === null ) {
 			$link_source = LangInterface::get_new_term_source_id();
+			LangInterface::set_term_source( $link_term->term_id, $link_source, true );
 		}
 
 		if ( ! LangInterface::set_term_source( $term_id, $link_source, true ) ) {

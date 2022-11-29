@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use Exception;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
@@ -24,13 +25,13 @@ class CreateTranslation {
 
 		// Redirect to create new post page to create a translation.
 		// FIXME: Saving an auto-draft (no title) does not call save_post and so source is not set.
-		\add_action( 'save_post', [ $this, 'redirect_to_new' ], PHP_INT_MAX );
-		\add_action( 'save_post', [ $this, 'set_new_source' ], PHP_INT_MAX );
+		\add_action( 'save_post', [ $this, 'redirect_to_new' ], PHP_INT_MAX - 10 );
+		\add_action( 'save_post', [ $this, 'set_new_source' ], PHP_INT_MAX - 10 );
 
 		// Attachment translations.
-		\add_action( 'edit_attachment', [ $this, 'redirect_to_new' ], PHP_INT_MAX );
-		\add_filter( 'plupload_init', [ $this, 'add_params_to_upload' ], PHP_INT_MAX );
-		\add_action( 'add_attachment', [ $this, 'set_new_source_attachment' ], PHP_INT_MAX );
+		\add_action( 'edit_attachment', [ $this, 'redirect_to_new' ], PHP_INT_MAX - 10 );
+		\add_filter( 'plupload_init', [ $this, 'add_params_to_upload' ], PHP_INT_MAX - 10 );
+		\add_action( 'add_attachment', [ $this, 'set_new_source_attachment' ], PHP_INT_MAX - 10 );
 	}
 
 	/**
@@ -43,6 +44,9 @@ class CreateTranslation {
 	 */
 	public function redirect_to_new( int $post_id ) : void {
 		$post_type = get_post_type( $post_id );
+		if ( ( $_POST['post_type'] ?? '' ) !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
+			return;
+		}
 		if ( $post_type === 'revision' || ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
 			return;
 		}
@@ -97,6 +101,8 @@ class CreateTranslation {
 			|| ! in_array( $post_type, $allowed_post_types, true )
 			|| ! isset( $_POST['ubb_source'] )
 			|| ! is_numeric( $_POST['ubb_source'] )
+			||$_POST['post_type'] !== $post_type
+			|| $post_id !== (int) $_POST['post_ID']
 		) {
 			return;
 		}

@@ -40,6 +40,10 @@ class Frontend {
 		if ( is_admin() ) {
 			return $locale;
 		}
+		if ( apply_filters( 'ubb_stop_switch_locale', false, $locale ) ) {
+			return $locale;
+		}
+
 		$current = LangInterface::get_current_language();
 		if ( in_array( $current, get_available_languages(), true ) ) {
 			return $current;

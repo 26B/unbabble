@@ -26,7 +26,7 @@ class LangMetaBox {
 
 		// Post meta box.
 		\add_action( 'add_meta_boxes', [ $this, 'add_ubb_meta_box' ] );
-		\add_action( 'save_post', [ $this, 'save_post_language' ] );
+		\add_action( 'save_post', [ $this, 'save_post_language' ], PHP_INT_MAX - 10 );
 	}
 
 	/**
@@ -205,6 +205,11 @@ class LangMetaBox {
 	public function save_post_language( int $post_id ) : void {
 		if ( 'auto-draft' === get_post( $post_id )->post_status ) {
 			LangInterface::set_post_language( $post_id, LangInterface::get_current_language() );
+			return;
+		}
+
+		$post_type = get_post_type( $post_id );
+		if ( $_POST['post_type'] !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
 			return;
 		}
 

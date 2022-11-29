@@ -17,12 +17,18 @@ class YoastDuplicatePost {
 		// TODO: Move post lang metabox input here.
 
 		// Use Yoast's duplicate-post plugin to duplicate post before redirect.
-		\add_action( 'save_post', [ $this, 'copy_and_redirect' ], PHP_INT_MAX );
-		\add_action( 'edit_attachment', [ $this, 'copy_and_redirect' ], PHP_INT_MAX );
+		\add_action( 'save_post', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
+		\add_action( 'edit_attachment', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
 	}
 
 	public function copy_and_redirect( int $post_id ) : void {
 		$post_type = get_post_type( $post_id );
+
+		// Sometimes ACF saves attachments (uses `save_post`) before the actual post, so we need to account for it.
+		if ( ( $_POST['post_type'] ?? '' ) !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
+			return;
+		}
+
 		if ( $post_type === 'revision' || ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
 			return;
 		}

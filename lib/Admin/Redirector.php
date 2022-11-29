@@ -54,11 +54,19 @@ class Redirector {
 		$expiration = LangCookie::get_lang_expire_cookie();
 		setcookie( 'ubb_lang', $new_lang, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 
+		$uri = $_SERVER['REQUEST_URI'];
+		if ( is_multisite() ) {
+			$site_info = get_site();
+			if ( $site_info->path !== '/' ) {
+				$uri = str_replace( untrailingslashit( $site_info->path ), '', $uri );
+			}
+		}
+
 		// Change `ubb_switch_lang` in query in url to `lang` if not default language.
 		$path    = str_replace(
 			"ubb_switch_lang={$new_lang}",
 			$new_lang === $options['default_language'] ? '' : "lang={$new_lang}",
-			$_SERVER['REQUEST_URI']
+			$uri
 		);
 		$new_url = home_url( $path );
 

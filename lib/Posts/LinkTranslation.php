@@ -24,10 +24,10 @@ class LinkTranslation {
 		if ( Options::only_one_language_allowed() ) {
 			return;
 		}
-		\add_action( 'save_post', [ $this, 'link_translations' ], PHP_INT_MAX );
-		\add_action( 'save_post', [ $this, 'unlink' ], PHP_INT_MAX );
-		\add_action( 'edit_attachment', [ $this, 'unlink' ], PHP_INT_MAX );
-		\add_action( 'edit_attachment', [ $this, 'link_translations' ], PHP_INT_MAX );
+		\add_action( 'save_post', [ $this, 'link_translations' ], PHP_INT_MAX - 10 );
+		\add_action( 'save_post', [ $this, 'unlink' ], PHP_INT_MAX - 10 );
+		\add_action( 'edit_attachment', [ $this, 'unlink' ], PHP_INT_MAX - 10 );
+		\add_action( 'edit_attachment', [ $this, 'link_translations' ], PHP_INT_MAX - 10 );
 	}
 
 	/**
@@ -46,6 +46,8 @@ class LinkTranslation {
 			|| ! in_array( $post_type, $allowed_post_types, true )
 			|| ! isset( $_POST['ubb_link_translation'] )
 			|| ! is_numeric( $_POST['ubb_link_translation'] )
+			|| $_POST['post_type'] !== $post_type
+			|| $post_id !== (int) $_POST['post_ID']
 		) {
 			return;
 		}
@@ -64,6 +66,7 @@ class LinkTranslation {
 
 		if ( $link_source === null ) {
 			$link_source = LangInterface::get_new_post_source_id();
+			LangInterface::set_post_source( $link_post->ID, $link_source, true );
 		}
 
 		if ( ! LangInterface::set_post_source( $post_id, $link_source, true ) ) {
@@ -89,6 +92,8 @@ class LinkTranslation {
 			|| ! in_array( $post_type, $allowed_post_types, true )
 			|| ! isset( $_POST['ubb_link_translation'] )
 			|| $_POST['ubb_link_translation'] !== 'unlink'
+			|| $_POST['post_type'] !== $post_type
+			|| $post_id !== (int) $_POST['post_ID']
 		) {
 			return;
 		}

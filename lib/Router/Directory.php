@@ -129,6 +129,12 @@ class Directory {
 	 * @return string
 	 */
 	public function apply_lang_to_post_url( string $post_link, $post ) : string {
+
+		// Don't do anything if switched to a site without unbabble.
+		if ( ! LangInterface::is_unbabble_active() ) {
+			return $post_link;
+		}
+
 		if ( $post instanceof WP_Post ) {
 			$post_id = $post->ID;
 		} else if ( is_int( $post ) ) {
@@ -199,6 +205,12 @@ class Directory {
 	 * @return string
 	 */
 	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
+
+		// Don't do anything if switched to a site without unbabble.
+		if ( ! LangInterface::is_unbabble_active() ) {
+			return $termlink;
+		}
+
 		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
 			return $termlink;
 		}
@@ -224,7 +236,13 @@ class Directory {
 	 * @return void
 	 */
 	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
-		if ( ! $query->is_main_query() || ! is_home()) {
+
+		// Don't do anything if switched to a site without unbabble.
+		if ( ! LangInterface::is_unbabble_active() ) {
+			return;
+		}
+
+		if ( ! $query->is_main_query() || ! is_home() ) {
 			return;
 		}
 
@@ -340,7 +358,6 @@ class Directory {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path ) : string {
-
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
 		 * language.

@@ -2,6 +2,8 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
+use Exception;
+
 /**
  * Handler for the `ubb_options` option.
  *
@@ -68,7 +70,9 @@ class Options {
 			return $options;
 		}
 
+		add_filter( 'ubb_stop_switch_locale', '__return_true' );
 		$wp_locale = \get_locale();
+		remove_filter( 'ubb_stop_switch_locale', '__return_true' );
 		return [
 			'allowed_languages' => [ $wp_locale ],
 			'default_language'  => $wp_locale,

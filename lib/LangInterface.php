@@ -668,6 +668,23 @@ class LangInterface {
 	}
 
 	/**
+	 * Check whether Unbabble is active in the current blog.
+	 *
+	 * Helpful for stop some functionalities during switch_to_blog's.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return bool
+	 */
+	public static function is_unbabble_active() : bool {
+		if ( ! is_multisite() ) {
+			return true;
+		}
+		$active_plugins = (array) get_option( 'active_plugins', [] );
+		return in_array( 'unbabble/wp-plugin.php', $active_plugins, true );
+	}
+
+	/**
 	 * Returns a new unique source ID.
 	 *
 	 * @since 0.0.1

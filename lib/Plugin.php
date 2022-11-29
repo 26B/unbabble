@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble;
 
+use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 
 /**
@@ -155,7 +156,8 @@ class Plugin {
 
 	private function define_integrations() : void {
 		$integrations = [
-			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
+			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
 		];
 		\add_action( 'admin_init', function() use ( $integrations ) {
 			foreach ( $integrations as $integration_class => $plugin_name ) {
