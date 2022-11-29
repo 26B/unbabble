@@ -16,6 +16,13 @@ use WP_Term;
  */
 class LangInterface {
 
+	/**
+	 * Returns the current language code.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string The current language code.
+	 */
 	public static function get_current_language() : string {
 		$options = Options::get();
 		$lang    = get_query_var( 'lang', null );
@@ -40,6 +47,14 @@ class LangInterface {
 		return apply_filters( 'ubb_current_lang', \sanitize_text_field( $lang ) );
 	}
 
+	/**
+	 * Sets the current language.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $lang New current language.
+	 * @return bool True if language is known and allowed and was set, false otherwise.
+	 */
 	public static function set_current_language( string $lang ) : bool {
 		$options = Options::get();
 		if ( ! in_array( $lang, $options['allowed_languages'], true ) ) {
@@ -50,19 +65,24 @@ class LangInterface {
 	}
 
 	/**
-	 * Set post language in the custom post language table.
+	 * Sets a posts language.
 	 *
-	 * If the language is already set, nothing will happen and it will return `false`. To force
-	 * language change, you can use the force argument.
+	 * If the language is already set, nothing will happen and it will return `false`. Use the $force
+	 * argument to force the language change.
 	 *
-	 * @param  int    $post_id
-	 * @param  string $language
-	 * @param  bool   $force
-	 * @return bool
+	 * @param  int    $post_id  The post that language is being set for.
+	 * @param  string $language Language being set for post.
+	 * @param  bool   $force    Whether to force the language set. If false (default) and the
+	 *                          language is already set, nothing happens.
+	 * @return bool True if language was set, false otherwise.
 	 */
 	public static function set_post_language( int $post_id, string $language, bool $force = false ) : bool {
 		global $wpdb;
 		$table_name = ( new PostTable() )->get_table_name();
+
+		if ( ! in_array( $language, Options::get()['allowed_languages'], true ) ) {
+			return false;
+		}
 
 		if ( ! $force ) {
 			$existing_language = self::get_post_language( $post_id );
@@ -85,7 +105,7 @@ class LangInterface {
 	}
 
 	/**
-	 * Get post language from the custom post language table.
+	 * Returns a post's language.
 	 *
 	 * @param  int    $post_id
 	 * @return ?string String if the post has a language, null otherwise.
@@ -102,6 +122,19 @@ class LangInterface {
 		);
 	}
 
+	/**
+	 * Sets a post's source.
+	 *
+	 * A post's source, via a meta entry, is what links it to other posts (translations).
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $post_id   Post to set source for.
+	 * @param string $source_id Source ID (translation map ID) to set post to.
+	 * @param bool   $force     Whether to force the source set. If false (default) and the
+	 *                          source is already set, nothing happens.
+	 * @return bool True if source was set, false otherwise or if meta insert/update failed.
+	 */
 	public static function set_post_source( int $post_id, string $source_id, bool $force = false ) : bool {
 		if ( $force ) {
 			if ( $source_id === LangInterface::get_post_source( $post_id ) ) {
@@ -114,6 +147,14 @@ class LangInterface {
 		return (bool) $meta_id;
 	}
 
+	/**
+	 * Returns the post's source ID.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id ID of the post to get source for.
+	 * @return ?string String if the source is found, null otherwise.
+	 */
 	public static function get_post_source( int $post_id ) : ?string {
 		$source_id = get_post_meta( $post_id, 'ubb_source', true );;
 		if ( empty( $source_id ) ) {
@@ -122,16 +163,28 @@ class LangInterface {
 		return $source_id;
 	}
 
-	// TODO: Test me!
+	/**
+	 * Returns a post's translation for a specific language code.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $post_id ID of the post to get translation for.
+	 * @param string $lang    Language of the translation.
+	 * @return ?int Int if the translation is found, null if there is no translation or the language
+	 *              is not known/allowed.
+	 */
 	public static function get_post_translation( int $post_id, string $lang ) : ?int {
 		global $wpdb;
 		$source_id = self::get_post_source( $post_id );
-		if ( $source_id === null ) {
+		if (
+			$source_id === null
+			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
+		) {
 			return null;
 		}
 
 		$post_lang_table = ( new PostTable() )->get_table_name();
-		$post_id         = $wpdb->get_var(
+		return $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT post_id
 				FROM {$wpdb->postmeta}
@@ -143,11 +196,21 @@ class LangInterface {
 				$lang
 			)
 		);
-
-		return $post_id;
 	}
 
-	// TODO: better name
+	/**
+	 * Returns a post's translations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $post_id ID of post to get translatiosn for.
+	 * @return array {
+	 *     Array of translations.
+	 *
+	 *     @type int    $key   Translation post ID.
+	 *     @type string $value Translation post language code.
+	 * }
+	 */
 	public static function get_post_translations( int $post_id ) : array {
 		global $wpdb;
 		$source_id = self::get_post_source( $post_id );
@@ -179,6 +242,21 @@ class LangInterface {
 		return $lang_list;
 	}
 
+	/**
+	 * Changes a post's language.
+	 *
+	 * When changing a post's language, the translatable terms and meta are changed to their
+	 * translation if they exist, otherwise the term relation is lost and the meta value becomes
+	 * empty. The translatable terms are set via the Unbabble Options and the meta keys via the
+	 * `ubb_change_language_post_meta_translate_keys` filter, more in-depth description on the
+	 * filter documentation.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $post_id ID of the post being changed.
+	 * @param string $lang    Language code to change post to.
+	 * @return bool True if language was changed.
+	 */
 	public static function change_post_language( int $post_id, string $lang ) : bool {
 		global $wpdb;
 
@@ -191,19 +269,23 @@ class LangInterface {
 			return false;
 		}
 
+		// If the target language is already used by the translation map, do not change language.
 		$translations = self::get_post_translations( $post_id );
 		if ( in_array( $lang, $translations, true ) ) {
 			return false;
 		}
 
+		// Get post terms before language update.
 		$terms = wp_get_post_terms( $post_id, get_post_taxonomies( $post_id ) );
 
+		// Update the language.
 		$rows_updated = $wpdb->update(
 			( new PostTable() )->get_table_name(),
 			[ 'locale' => $lang ],
 			[ 'post_id' => $post_id ],
 		);
 
+		// Check for failure.
 		if ( $rows_updated === false ) {
 			return false;
 		}
@@ -246,6 +328,14 @@ class LangInterface {
 		return true;
 	}
 
+	/**
+	 * Returns the posts for a source ID.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $source_id The source ID to get translations map.
+	 * @return array Array of post IDs.
+	 */
 	public static function get_posts_for_source( string $source_id ) : array {
 		global $wpdb;
 		$posts = $wpdb->get_results(
@@ -263,19 +353,50 @@ class LangInterface {
 		return array_map( fn ( $post ) => $post->ID, $posts );
 	}
 
+	/**
+	 * Returns a new unique source id (UUID) for posts.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string Source UUID
+	 */
 	public static function get_new_post_source_id() : string {
 		return self::get_new_source_id( 'post' );
 	}
 
+	/**
+	 * Removes a post's source ID meta.
+	 *
+	 * Unlinks post from its translations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $post_id ID of the post to delete source.
+	 * @return bool True on success, false on failure.
+	 */
 	public static function delete_post_source( string $post_id ) : bool {
 		return delete_post_meta( $post_id, 'ubb_source' );
 	}
 
-	// TODO: Documentation.
-
+	/**
+	 * Sets a term language.
+	 *
+	 * If the language is already set, nothing will happen and it will return `false`. Use the $force
+	 * argument to force the language change.
+	 *
+	 * @param  int    $term_id  The term that language is being set for.
+	 * @param  string $language Language being set for term.
+	 * @param  bool   $force    Whether to force the language set. If false (default) and the
+	 *                          language is already set, nothing happens.
+	 * @return bool True if language was set, false otherwise.
+	 */
 	public static function set_term_language( int $term_id, string $language, bool $force = false ) : bool {
 		global $wpdb;
 		$table_name = ( new TermTable() )->get_table_name();
+
+		if ( ! in_array( $language, Options::get()['allowed_languages'], true ) ) {
+			return false;
+		}
 
 		if ( ! $force ) {
 			$existing_language = self::get_term_language( $term_id );
@@ -294,6 +415,12 @@ class LangInterface {
 		return is_int( $inserted );
 	}
 
+	/**
+	 * Returns a term's language.
+	 *
+	 * @param  int    $term_id
+	 * @return ?string String if the term has a language, null otherwise.
+	 */
 	public static function get_term_language( int $term_id ) : ?string {
 		global $wpdb;
 		$table_name = ( new TermTable() )->get_table_name();
@@ -306,6 +433,19 @@ class LangInterface {
 		);
 	}
 
+	/**
+	 * Sets a term's source.
+	 *
+	 * A term's source, via a meta entry, is what links it to other terms (translations).
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $term_id   Post to set source for.
+	 * @param string $source_id Source ID (translation map ID) to set term to.
+	 * @param bool   $force     Whether to force the source set. If false (default) and the
+	 *                          source is already set, nothing happens.
+	 * @return bool True if source was set, false otherwise or if meta insert/update failed.
+	 */
 	public static function set_term_source( int $term_id, string $source_id, bool $force = false ) : bool {
 		if ( $force ) {
 			if ( $source_id === LangInterface::get_term_source( $term_id ) ) {
@@ -318,6 +458,14 @@ class LangInterface {
 		return (bool) $meta_id;
 	}
 
+	/**
+	 * Returns the term's source ID.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $term_id ID of the term to get source for.
+	 * @return ?string String if the source is found, null otherwise.
+	 */
 	public static function get_term_source( int $term_id ) : ?string {
 		$source_id = get_term_meta( $term_id, 'ubb_source', true );;
 		if ( empty( $source_id ) ) {
@@ -326,15 +474,28 @@ class LangInterface {
 		return $source_id;
 	}
 
+	/**
+	 * Returns a term's translation for a specific language code.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $term_id ID of the term to get translation for.
+	 * @param string $lang    Language of the translation.
+	 * @return ?int Int if the translation is found, null if there is no translation or the language
+	 *              is not known/allowed.
+	 */
 	public static function get_term_translation( int $term_id, string $lang ) : ?int {
 		global $wpdb;
 		$source_id = self::get_term_source( $term_id );
-		if ( $source_id === null ) {
+		if (
+			$source_id === null
+			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
+		) {
 			return null;
 		}
 
 		$term_lang_table = ( new TermTable() )->get_table_name();
-		$term_id         = $wpdb->get_var(
+		return $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT term_id
 				FROM {$wpdb->termmeta}
@@ -346,10 +507,21 @@ class LangInterface {
 				$lang
 			)
 		);
-
-		return $term_id;
 	}
 
+	/**
+	 * Returns a term's translations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int $term_id ID of term to get translatiosn for.
+	 * @return array {
+	 *     Array of translations.
+	 *
+	 *     @type int    $key   Translation term ID.
+	 *     @type string $value Translation term language code.
+	 * }
+	 */
 	public static function get_term_translations( int $term_id ) : array {
 		global $wpdb;
 		$source_id = self::get_term_source( $term_id );
@@ -369,14 +541,29 @@ class LangInterface {
 			)
 		);
 
+		$languages = Options::get()['allowed_languages'];
 		$lang_list = [];
 		foreach ( $terms as $term ) {
-			$lang_list[ $term->term_id ] = self::get_term_language( $term->term_id );
+			$term_language = self::get_term_language( $term->term_id );
+			if ( ! in_array( $term_language, $languages, true ) ) {
+				continue;
+			}
+			$lang_list[ $term->term_id ] = $term_language;
 		}
 		return $lang_list;
 	}
 
-	// TODO: What to do when term language changes? How to handle post relationships?
+	/**
+	 * Changes a term's language.
+	 *
+	 *  TODO: What to do when term language changes? How to handle post relationships?
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $term_id ID of the term being changed.
+	 * @param string $lang    Language code to change term to.
+	 * @return bool True if language was changed.
+	 */
 	public static function change_term_language( int $term_id, string $lang ) : bool {
 		global $wpdb;
 
@@ -407,6 +594,14 @@ class LangInterface {
 		return true;
 	}
 
+	/**
+	 * Returns the terms for a source ID.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $source_id The source ID to get translations map.
+	 * @return array Array of term IDs.
+	 */
 	public static function get_terms_for_source( string $source_id ) : array {
 		global $wpdb;
 		$terms = $wpdb->get_results(
@@ -424,14 +619,39 @@ class LangInterface {
 		return array_map( fn ( $term ) => $term->term_id, $terms );
 	}
 
+	/**
+	 * Returns a new unique source id (UUID) for terms.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @return string Source UUID
+	 */
 	public static function get_new_term_source_id() : string {
 		return self::get_new_source_id( 'term' );
 	}
 
+	/**
+	 * Removes a term's source ID meta.
+	 *
+	 * Unlinks term from its translations.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $term_id ID of the term to delete source.
+	 * @return bool True on success, false on failure.
+	 */
 	public static function delete_term_source( string $term_id ) : bool {
 		return delete_term_meta( $term_id, 'ubb_source' );
 	}
 
+	/**
+	 * Returns a new unique source ID.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $type Type of source id, 'post' or 'term'.
+	 * @return string Source UUID
+	 */
 	private static function get_new_source_id( string $type = 'post' ) : string {
 		global $wpdb;
 		$uuid  = Uuid::uuid7()->toString();
@@ -449,7 +669,17 @@ class LangInterface {
 		return $uuid;
 	}
 
-	private static function translate_post_meta( $post_id, $new_lang, $meta_keys_to_translate ) : bool {
+	/**
+	 * Translate a posts meta entries.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param int    $post_id                ID of the post to translate meta for.
+	 * @param string $new_lang               Target code of the language translation.
+	 * @param array  $meta_keys_to_translate List of meta keys to translate and their type of meta_value.
+	 * @return bool True on success, false on failure.
+	 */
+	private static function translate_post_meta( int $post_id, string $new_lang, array $meta_keys_to_translate ) : bool {
 		global $wpdb;
 		$meta_keys_str = implode(
 			"','",
@@ -484,7 +714,19 @@ class LangInterface {
 		return true;
 	}
 
-	private static function translate_post_meta_type_ids( $meta_type, $meta_id, $meta_key, $meta_value, $new_lang ) : void {
+	/**
+	 * Updates a meta_id with the updated translated value.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $meta_type   Meta type, 'post' or 'term'.
+	 * @param int    $meta_id     Id of the meta, necessary to update.
+	 * @param string $meta_key    Meta key.
+	 * @param mixed  $meta_value  Value to translate and update.
+	 * @param string $new_lang    Target language.
+	 * @return void
+	 */
+	private static function translate_post_meta_type_ids( string $meta_type, int $meta_id, string $meta_key, $meta_value, string $new_lang ) : void {
 		if ( $meta_type !== 'post' && $meta_type !== 'term' ) {
 			return;
 		}
