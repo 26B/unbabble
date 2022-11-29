@@ -165,7 +165,7 @@ class LangMetaBox {
 					<input type="submit" %2$s name="ubb_copy_new" value="Save and Copy" class="button"/>
 				</details>',
 				$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
-				$post->post_status === 'draft' ? 'id="save-post"' : '',
+				$post->post_status === 'draft' ? 'id="save-post" style="float:none"' : '',
 			);
 		}
 

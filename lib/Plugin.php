@@ -57,7 +57,7 @@ class Plugin {
 	 */
 	public function run() {
 		$this->set_locale();
-		$this->define_admin_hooks();
+		$this->define_plugin_hooks();
 		$this->define_api_routes();
 		$this->define_integrations();
 	}
@@ -99,13 +99,12 @@ class Plugin {
 	}
 
 	/**
-	 * Register all of the hooks related to the dashboard functionality
-	 * of the plugin.
+	 * Register all of the hooks related to the plugin's base functionality.
 	 *
 	 * @since  0.0.1
 	 * @access private
 	 */
-	private function define_admin_hooks() {
+	private function define_plugin_hooks() {
 		$components = [
 			'admin'             => new Admin\Admin( $this ),
 			'lang_cookie'       => new Admin\LangCookie( $this ),
@@ -139,8 +138,6 @@ class Plugin {
 			'lang_frontend' => new Language\Frontend( $this ),
 			'lang_packages' => new Language\LanguagePacks( $this ),
 
-			// TODO: Terms
-			// TODO: Disconnect from translations.
 			// TODO: Filter the query for attaching an attachment.
 		];
 
