@@ -71,6 +71,18 @@ class LangInterface {
 	}
 
 	/**
+	 * Returns if a post_type is translatable.
+	 *
+	 * @since 0.0.1
+	 *
+	 * @param string $post_type
+	 * @return bool
+	 */
+	public static function is_post_type_translatable( string $post_type ) : bool {
+		return in_array( $post_type, Options::get_allowed_post_types(), true );
+	}
+
+	/**
 	 * Sets a posts language.
 	 *
 	 * If the language is already set, nothing will happen and it will return `false`. Use the $force
@@ -118,6 +130,12 @@ class LangInterface {
 	 */
 	public static function get_post_language( int $post_id ) : ?string {
 		global $wpdb;
+		$post_type = get_post_type( $post_id );
+		if ( ! self::is_post_type_translatable( $post_type ) ) {
+			// TODO: Maybe it should be the default.
+			return self::get_current_language();
+		}
+
 		$table_name = ( new PostTable() )->get_table_name();
 		return $wpdb->get_var(
 			$wpdb->prepare(

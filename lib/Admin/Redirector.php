@@ -92,6 +92,11 @@ class Redirector {
 			return;
 		}
 
+		$post_type = get_post_type( $_REQUEST['post'] );
+		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
+			return;
+		}
+
 		$current_lang = LangInterface::get_current_language();
 		$post_lang    = LangInterface::get_post_language( $_REQUEST['post'] );
 		if (

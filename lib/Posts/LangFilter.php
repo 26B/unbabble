@@ -56,9 +56,15 @@ class LangFilter {
 	 * @return bool
 	 */
 	public function allow_filter( WP_Query $query ) : bool {
+		$post_type = $query->get( 'post_type', null );
+		if ( empty( $post_type ) && ! empty( $query->get( 'pagename', null ) ) ) {
+			$post_type = 'page';
+		}
+
 		if (
-			! empty( $query->get( 'post_type', null ) )
-			&& ! in_array( $query->get( 'post_type', null ), Options::get_allowed_post_types(), true )
+			! empty( $post_type )
+			&& $post_type !== 'any'
+			&& ! in_array( $post_type, Options::get_allowed_post_types(), true )
 		) {
 			return false;
 		}

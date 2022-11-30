@@ -144,17 +144,35 @@ class Directory {
 		}
 
 		$post_lang = LangInterface::get_post_language( $post_id );
-		if ( empty( $post_lang ) || $post_lang === Options::get()['default_language'] ) {
+		if ( empty( $post_lang ) ) {
 			return $post_link;
 		}
 
 		$site_url = site_url();
-		if ( $this->path_has_directory( str_replace( $site_url, '', $post_link ), $post_lang ) ) {
+		$url_lang = $this->current_lang_from_uri( '', str_replace( $site_url, '', $post_link ) );
+		if ( $url_lang === $post_lang ) {
 			return $post_link;
 		}
 
-		$directory = $this->get_directory_name( $post_lang );
-		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $post_link );
+		// The source url might be poluted by the home_url language addition.
+		$source_url = $site_url;
+		if ( ! empty( $url_lang ) && $url_lang !== $post_lang ) {
+			$source_url = trailingslashit( $site_url ) . $this->get_directory_name( $url_lang );
+		}
+
+		// If it's not poluted and the language is the default language don't do anything to it.
+		if ( $post_lang === Options::get()['default_language'] && $source_url === $site_url ) {
+			return $post_link;
+		}
+
+		// If not default language, set the directory to the post language.
+		$target_url = $site_url;
+		if ( $post_lang !== Options::get()['default_language'] ) {
+			$directory  = $this->get_directory_name( $post_lang );
+			$target_url = trailingslashit( $site_url ) . $directory;
+		}
+
+		return str_replace( $source_url, $target_url, $post_link );
 	}
 
 	/**
@@ -214,17 +232,33 @@ class Directory {
 		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
 			return $termlink;
 		}
+
 		$term_lang = LangInterface::get_term_language( $term->term_id );
-		if ( $term_lang === Options::get()['default_language'] ) {
-			return $termlink;
-		}
 		$site_url  = site_url();
-		if ( $this->path_has_directory( str_replace( $site_url, '', $termlink ), $term_lang ) ) {
+		$url_lang  = $this->current_lang_from_uri( '', str_replace( $site_url, '', $termlink ) );
+		if ( $url_lang === $term_lang ) {
 			return $termlink;
 		}
 
-		$directory = $this->get_directory_name( $term_lang );
-		return str_replace( $site_url, trailingslashit( $site_url ) . $directory, $termlink );
+		// The source url might be poluted by the home_url language addition.
+		$source_url = $site_url;
+		if ( ! empty( $url_lang ) && $url_lang !== $term_lang ) {
+			$source_url = trailingslashit( $site_url ) . $this->get_directory_name( $url_lang );
+		}
+
+		// If it's not poluted and the language is the default language don't do anything to it.
+		if ( $term_lang === Options::get()['default_language'] && $source_url === $site_url ) {
+			return $termlink;
+		}
+
+		// If not default language, set the directory to the term language.
+		$target_url = $site_url;
+		if ( $term_lang !== Options::get()['default_language'] ) {
+			$directory  = $this->get_directory_name( $term_lang );
+			$target_url = trailingslashit( $site_url ) . $directory;
+		}
+
+		return str_replace( $source_url, $target_url, $termlink );
 	}
 
 	/**
@@ -358,6 +392,7 @@ class Directory {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path ) : string {
+
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
 		 * language.

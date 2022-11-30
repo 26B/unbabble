@@ -52,6 +52,7 @@ class HiddenContent {
 		$allowed_post_types = implode( "','", Options::get_allowed_post_types() );
 		$translations_table = ( new PostTable() )->get_table_name();
 
+		// TODO: We might only want to place a language in the ones that don't have language, not just on everything that's not allowed.
 		$bad_posts          = $wpdb->get_results(
 			"SELECT *
 			FROM {$wpdb->posts} as P

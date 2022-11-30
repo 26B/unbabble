@@ -114,10 +114,21 @@ class LanguageSwitcher {
 	 * @return string
 	 */
 	private function make_switch_post_url( int $post_id, string $lang ) : string {
+		$post_type = get_post_type( $post_id );
+		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
+			return get_site_url(
+				null,
+				sprintf(
+					"/wp-admin/post.php?post=%s&action=edit&lang=%s",
+					$post_id,
+					$lang
+				)
+			);
+		}
+
 		$translations   = LangInterface::get_post_translations( $post_id );
 		$translation_id = array_search( $lang, $translations, true );
 		if ( ! $translation_id ) {
-			$post_type = get_post_type( $post_id );
 			// TODO: better way to get this
 			return get_site_url(
 				null,
