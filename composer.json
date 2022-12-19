@@ -10,8 +10,6 @@
   "license": "GPL-2.0-or-later",
   "require": {
     "php": ">=7.4",
-    "composer/installers": "^1.11",
-    "dg/composer-cleaner": "^2.2",
     "ramsey/uuid": "^4.6"
   },
   "require-dev": {
@@ -30,10 +28,6 @@
   },
   "minimum-stability": "stable",
   "config": {
-    "sort-packages": true,
-    "allow-plugins": {
-      "composer/installers": true,
-      "dg/composer-cleaner": true
-    }
+    "sort-packages": true
   }
 }
