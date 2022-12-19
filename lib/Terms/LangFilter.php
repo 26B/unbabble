@@ -19,7 +19,7 @@ class LangFilter {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 		\add_filter( 'terms_clauses', [ $this, 'filter_terms_by_language' ], 10, 3 );
@@ -36,6 +36,11 @@ class LangFilter {
 	 * @return array
 	 */
 	public function filter_terms_by_language( array $pieces, array $taxonomies, array $args ) : array {
+
+		// Don't apply filters on switch_to_blog to blogs without the plugin.
+		if ( ! LangInterface::is_unbabble_active() ) {
+			return $pieces;
+		}
 
 		/**
 		 * Filters whether terms should be filtered by their language.

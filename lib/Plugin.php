@@ -132,6 +132,7 @@ class Plugin {
 			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
 			'terms_language_filter'    => new Terms\LangFilter( $this ),
 			'terms_admin_notices'      => new Terms\AdminNotices( $this ),
+			'terms_new_term'           => new Terms\NewTerm( $this ),
 
 			'router_query_var' => new Router\QueryVar( $this ),
 			'router_directory' => new Router\Directory( $this ),

@@ -19,7 +19,7 @@ class CreateTranslation {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 

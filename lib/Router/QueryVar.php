@@ -20,7 +20,7 @@ class QueryVar {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( Options::only_one_language_allowed() || Options::get_router() !== 'query_var' ) {
+		if ( ! Options::should_run_unbabble() || Options::get_router() !== 'query_var' ) {
 			return;
 		}
 

@@ -20,7 +20,7 @@ class LangFilter {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 		\add_filter( 'posts_where', [ $this, 'filter_posts_by_language' ], 10, 2 );
@@ -41,9 +41,22 @@ class LangFilter {
 			return $where;
 		}
 
-		$current_lang    = esc_sql( LangInterface::get_current_language() );
-		$post_lang_table = ( new PostTable() )->get_table_name();
-		$where .= " AND ({$wpdb->posts}.ID IN ( SELECT post_id FROM {$post_lang_table} WHERE locale = '$current_lang' ))";
+		// TODO: Deal with untranslatable post types.
+
+		$current_lang       = esc_sql( LangInterface::get_current_language() );
+		$post_lang_table    = ( new PostTable() )->get_table_name();
+		$allowed_post_types = implode( "','", Options::get_allowed_post_types() );
+		$where .= " AND (
+			{$wpdb->posts}.ID IN (
+				SELECT post_id
+				FROM {$post_lang_table} AS PT
+				WHERE locale = '$current_lang'
+				UNION
+				SELECT ID
+				FROM {$wpdb->posts}
+				WHERE post_type NOT IN ('{$allowed_post_types}')
+			)
+		)";
 		return $where;
 	}
 
@@ -66,6 +79,11 @@ class LangFilter {
 			&& $post_type !== 'any'
 			&& ! in_array( $post_type, Options::get_allowed_post_types(), true )
 		) {
+			return false;
+		}
+
+		// Don't apply filters on switch_to_blog to blogs without the plugin.
+		if ( ! LangInterface::is_unbabble_active() ) {
 			return false;
 		}
 

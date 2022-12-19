@@ -24,8 +24,11 @@ class LangInterface {
 	 * @return string The current language code.
 	 */
 	public static function get_current_language() : string {
+		global $wp_query;
 		$options = Options::get();
-		$lang    = get_query_var( 'lang', null );
+		if ( $wp_query !== null ) {
+			$lang = get_query_var( 'lang', null );
+		}
 		// TODO: Auto-draft saving does not put the query var.
 		if ( ! isset( $lang ) && isset( $_GET['lang'] ) ) {
 			$lang = $_GET['lang'];

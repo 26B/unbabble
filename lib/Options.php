@@ -94,6 +94,32 @@ class Options {
 	}
 
 	/**
+	 * Returns whether unbabble functionality (filtering, etc) should be running.
+	 *
+	 * @since 0.0.1
+	 * @return bool False if only a single language is allowed or other language plugins are
+	 *              active. True otherwise.
+	 */
+	public static function should_run_unbabble() : bool {
+		if ( self::only_one_language_allowed() ) {
+			return false;
+		}
+
+		// Check for conflicting language plugins.
+		$active_plugins         = get_option( 'active_plugins', [] );
+		$known_language_plugins = [
+			'sitepress-multilingual-cms/sitepress.php',
+			// TODO: Add others.
+		];
+		foreach ( $known_language_plugins as $plugin_name ) {
+			if ( in_array( $plugin_name, $active_plugins, true ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Returns the allowed post types.
 	 *
 	 * @since 0.0.1

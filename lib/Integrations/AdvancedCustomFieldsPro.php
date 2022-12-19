@@ -6,7 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 
 class AdvancedCustomFieldsPro {
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 

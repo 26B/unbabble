@@ -10,7 +10,7 @@ use WP_Term;
 
 class YoastDuplicatePost {
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 

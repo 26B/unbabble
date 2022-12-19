@@ -17,7 +17,7 @@ class Header {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 		\add_filter( 'rest_pre_dispatch', [ $this, 'accept_language_header' ], 2, 3 );

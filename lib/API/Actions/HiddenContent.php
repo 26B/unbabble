@@ -16,7 +16,7 @@ class HiddenContent {
 	}
 
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 		\register_rest_route(

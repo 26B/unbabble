@@ -17,7 +17,7 @@ class QueryVar {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( Options::only_one_language_allowed() ) {
+		if ( ! Options::should_run_unbabble() ) {
 			return;
 		}
 		\add_filter( 'rest_pre_dispatch', [ $this, 'set_lang_query_var' ], 1, 3 );
