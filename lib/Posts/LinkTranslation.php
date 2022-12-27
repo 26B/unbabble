@@ -46,6 +46,7 @@ class LinkTranslation {
 			|| ! in_array( $post_type, $allowed_post_types, true )
 			|| ! isset( $_POST['ubb_link_translation'] )
 			|| ! is_numeric( $_POST['ubb_link_translation'] )
+			|| isset( $_POST['menu'] ) // Stop if nav menu updated or saved.
 			|| $_POST['post_type'] !== $post_type
 			|| $post_id !== (int) $_POST['post_ID']
 		) {

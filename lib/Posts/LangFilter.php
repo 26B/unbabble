@@ -57,6 +57,7 @@ class LangFilter {
 				WHERE post_type NOT IN ('{$allowed_post_types}')
 			)
 		)";
+
 		return $where;
 	}
 

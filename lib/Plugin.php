@@ -112,6 +112,7 @@ class Plugin {
 			'options_page'      => new Admin\OptionsPage( $this ),
 			'language_switcher' => new Admin\LanguageSwitcher( $this ),
 			'redirector'        => new Admin\Redirector( $this ),
+			'customize'         => new Admin\Customize( $this ),
 
 			'api_header'     => new API\Header( $this ),
 			'api_query_vars' => new API\QueryVar( $this ),
@@ -136,6 +137,7 @@ class Plugin {
 
 			'router_query_var' => new Router\QueryVar( $this ),
 			'router_directory' => new Router\Directory( $this ),
+			'router_routing'   => new Router\Routing( $this ),
 
 			'lang_frontend' => new Language\Frontend( $this ),
 			'lang_packages' => new Language\LanguagePacks( $this ),

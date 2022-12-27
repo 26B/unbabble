@@ -209,7 +209,7 @@ class LangMetaBox {
 		}
 
 		$post_type = get_post_type( $post_id );
-		if ( $_POST['post_type'] !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
+		if ( ! isset( $_POST['post_type'] ) || $_POST['post_type'] !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
 			return;
 		}
 
@@ -272,13 +272,14 @@ class LangMetaBox {
 			$options
 		);
 
+
 		if ( ! empty( $nonce_action ) && ! empty( $nonce_name ) ) {
 			\wp_nonce_field( $nonce_action, $nonce_name );
 		}
 
 		$output = sprintf(
 			'<select id="%1$s" name="%1$s">
-				%2$s
+			%2$s
 			</select>',
 			$name,
 			implode( '', $langs ),

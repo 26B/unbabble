@@ -25,13 +25,6 @@ class QueryVar {
 		}
 
 		if ( ! is_admin() ) {
-			add_filter( 'query_vars', function( $query_vars ) {
-				if ( ! in_array( 'lang', $query_vars, true ) ) {
-					$query_vars[] = 'lang';
-				}
-				return $query_vars;
-			} );
-
 			// TODO: We might need this sooner.
 			\add_filter( 'pre_get_posts', [ $this, 'homepage_default_lang_redirect' ], 1 );
 		}
@@ -66,6 +59,8 @@ class QueryVar {
 
 		// TODO: The hooks for the permalinks might no longer be necessary with this hook.
 		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 2 );
+
+		add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
 	}
 
 	/**
@@ -297,6 +292,23 @@ class QueryVar {
 			return $url;
 		}
 
+		$curr_lang = LangInterface::get_current_language();
+		if ( $curr_lang === Options::get()['default_language'] ) {
+			return $url;
+		}
+
+		return add_query_arg( 'lang', $curr_lang, $url );
+	}
+
+	/**
+	 * Adds lang query var to admin url.
+	 *
+	 * @since 0.0.3
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	public function admin_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === Options::get()['default_language'] ) {
 			return $url;

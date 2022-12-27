@@ -423,6 +423,18 @@ class LangInterface {
 	}
 
 	/**
+	 * Returns if a taxonomy is translatable.
+	 *
+	 * @since 0.0.3
+	 *
+	 * @param string $taxonomy
+	 * @return bool
+	 */
+	public static function is_taxonomy_translatable( string $taxonomy ) : bool {
+		return in_array( $taxonomy, Options::get_allowed_taxonomies(), true );
+	}
+
+	/**
 	 * Sets a term language.
 	 *
 	 * If the language is already set, nothing will happen and it will return `false`. Use the $force

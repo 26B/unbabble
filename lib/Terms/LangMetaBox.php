@@ -129,10 +129,14 @@ class LangMetaBox {
 
 			$args = $query_args;
 			unset( $args['ubb_create'], $args['ubb_copy'] );
+			$term_link = get_edit_term_link( $translation_id );
+			if ( $term->taxonomy === 'nav_menu' ) {
+				$term_link = admin_url( "nav-menus.php?action=edit&menu={$translation_id}" );
+			}
 			$translation_to_show[] = sprintf(
 				'<tr><td>%1$s</td><td><a href="%2$s" >Edit</a>%3$s</td></tr>',
 				$translation_lang,
-				add_query_arg( 'lang', $translation_lang, get_edit_term_link( $translation_id ) ),
+				add_query_arg( 'lang', $translation_lang, $term_link ),
 				! $duplicate_language ? '' : ' <b style="color:FireBrick">Duplicate</b>',
 			);
 		}
