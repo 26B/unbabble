@@ -4,6 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 
 use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
+use TwentySixB\WP\Plugin\Unbabble\Integrations;
 
 /**
  * The core plugin class.
@@ -158,6 +159,7 @@ class Plugin {
 	}
 
 	private function define_integrations() : void {
+		$this->define_integration_migrators();
 		$integrations = [
 			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
 			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
@@ -167,6 +169,17 @@ class Plugin {
 				if ( \is_plugin_active( $plugin_name ) ) {
 					( new $integration_class() )->register();
 				}
+			}
+		} );
+	}
+
+	private function define_integration_migrators() : void {
+		$integration_migrators = [
+			Integrations\WPML\Migrator::class
+		];
+		\add_action( 'init', function() use ( $integration_migrators ) {
+			foreach ( $integration_migrators as $integration_class ) {
+				( new $integration_class() )->register();
 			}
 		} );
 	}
