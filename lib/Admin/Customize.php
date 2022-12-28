@@ -25,6 +25,8 @@ class Customize {
 			return;
 		}
 
+		// FIXME: Lang cookie usage in customize.php can lead to lang desync.
+
 		// Filter dropdown pages.
 		add_filter( 'wp_dropdown_pages', [ $this, 'wp_dropdown_pages' ], 10, 2 );
 
@@ -139,10 +141,10 @@ class Customize {
 	}
 
 	/**
-	 * Proxy loading of option if the current language is not the default one.
+	 * Proxy loading of option.
 	 *
-	 * For non-default languages, the option value is fetched from an array in the option
-	 * `ubb_wp_options`, if it was previously saved to it.
+	 * Always try to load the option from the proxy, even with the default language. This handles
+	 * cases when default language is changed and the values would otherwise be mixed up.
 	 *
 	 * @since 0.0.3
 	 *
@@ -152,17 +154,15 @@ class Customize {
 	 */
 	public function pre_get_option_proxy( $pre_option, string $option ) {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
-			return $pre_option;
-		}
 		$ubb_wp_options = get_option( 'ubb_wp_options', [] );
 		return $ubb_wp_options[ $curr_lang ][ $option ] ?? $pre_option;
 	}
 
 	/**
-	 * Proxy updating of option if the current language is not the default one.
+	 * Proxy updating of option.
 	 *
-	 * For non-default languages, the option value is saved to an array in the option `ubb_wp_options`.
+	 * Also updates the base WordPress option when the language is the default. This is to keep the
+	 * default information in the core WordPress incase Unbabble is deactivated/uninstalled.
 	 *
 	 * @since 0.0.3
 	 *
@@ -173,13 +173,15 @@ class Customize {
 	 */
 	public function pre_update_option_proxy( $value, $old_value, string $option ) {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
-			return $value;
-		}
 
 		$ubb_wp_options = get_option( 'ubb_wp_options', [] );
 		$ubb_wp_options[ $curr_lang ][ $option ] = $value;
 		update_option( 'ubb_wp_options', $ubb_wp_options );
+
+		// Update base WordPress option too in case of default language.
+		if ( $curr_lang === Options::get()['default_language'] ) {
+			return $value;
+		}
 
 		// Return old value so the value does not get updated.
 		return $old_value;
