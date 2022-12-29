@@ -20,7 +20,6 @@ class Migrator {
 	public function register() : void {
 		if ( class_exists( 'WP_CLI' ) ) {
 			WP_CLI::add_command( 'unbabble migrate-wpml run', [ $this, 'run' ] );
-			WP_CLI::add_command( 'unbabble migrate-wpml restart', [ $this, 'restart' ] );
 		}
 	}
 
@@ -35,6 +34,9 @@ class Migrator {
 	 * [--batch=<batch_size>]
 	 * : (Optional) Number of WPML translation groups to migrate.
 	 *
+	 * [--fresh]
+	 * : (Optional) Run a new migration.
+	 *
 	 * @since 0.0.3
 	 *
 	 * @param array $args
@@ -46,8 +48,20 @@ class Migrator {
 			WP_CLI::error( 'No WPML tables for migration.' );
 		}
 
-		if ( $this->get_migration_pid() ) {
-			WP_CLI::error( 'Migrator already running.' );
+		$fresh = isset( $assoc_args['fresh'] );
+
+		$process_pid = $this->get_migration_pid();
+		if ( $process_pid ) {
+			if ( $fresh ) {
+				WP_CLI::confirm( 'Kill migrator process already running?' );
+				posix_kill( $process_pid, SIGKILL );
+			} else {
+				WP_CLI::error( 'Migrator already running.' );
+			}
+		}
+
+		if ( $fresh ) {
+			update_option( 'ubb_wpml_migrate_offset', 0 );
 		}
 
 		$options = [];
@@ -75,35 +89,6 @@ class Migrator {
 	}
 
 	/**
-	 * Restart WPML to Unbabble migration.
-	 *
-	 * ## OPTIONS
-	 *
-	 * [--batch=<batch_size>]
-	 * : (Optional) Number of WPML translation groups to migrate.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param array $args
-	 * @param array $assoc_args
-	 * @return void
-	 */
-	public function restart( array $args, array $assoc_args ) : void {
-		if ( ! $this->check_for_wpml_tables() ) {
-			WP_CLI::error( 'No WPML tables for migration.' );
-		}
-
-		$process_pid = $this->get_migration_pid();
-		if ( $process_pid ) {
-			WP_CLI::confirm( 'Kill migrator process already running?' );
-			posix_kill( $process_pid, SIGKILL );
-		}
-
-		update_option( 'ubb_wpml_migrate_offset', 0 );
-		$this->run( $args, $assoc_args );
-	}
-
-	/**
 	 * Returns migration process id if it's running.
 	 *
 	 * @since 0.0.3
@@ -112,6 +97,7 @@ class Migrator {
 	 */
 	private function get_migration_pid() : int {
 		// TODO: How to check if shell_exec is permitted.
+		// FIXME: Only works for *nix systems.
 		$grep = shell_exec( 'ps aux | grep "unbabble migrate-wpml run\|unbabble migrate-wpml restart" | grep -v grep | awk \'{print $2}\'' );
 		$rows = explode( "\n", $grep );
 		if ( count( $rows ) < 1 ) {
