@@ -19,7 +19,7 @@ class Migrator {
 	 */
 	public function register() : void {
 		if ( class_exists( 'WP_CLI' ) ) {
-			WP_CLI::add_command( 'unbabble migrate-wpml run', [ $this, 'run' ] );
+			WP_CLI::add_command( 'unbabble migrate-wpml', [ $this, 'run' ] );
 		}
 	}
 
