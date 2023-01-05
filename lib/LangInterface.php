@@ -714,7 +714,7 @@ class LangInterface {
 			return true;
 		}
 		$active_plugins = (array) get_option( 'active_plugins', [] );
-		return in_array( 'unbabble/wp-plugin.php', $active_plugins, true );
+		return in_array( 'unbabble/unbabble.php', $active_plugins, true );
 	}
 
 	/**
