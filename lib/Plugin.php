@@ -136,8 +136,7 @@ class Plugin {
 			'terms_admin_notices'      => new Terms\AdminNotices( $this ),
 			'terms_new_term'           => new Terms\NewTerm( $this ),
 
-			'router_query_var' => new Router\QueryVar( $this ),
-			'router_directory' => new Router\Directory( $this ),
+			'router_resolver'  => new Router\RoutingResolver( $this ),
 			'router_routing'   => new Router\Routing( $this ),
 
 			'lang_frontend' => new Language\Frontend( $this ),

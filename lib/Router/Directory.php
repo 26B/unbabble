@@ -15,56 +15,6 @@ use WP_Term;
 class Directory {
 
 	/**
-	 * Register hooks.
-	 *
-	 * @since 0.0.1
-	 */
-	public function register() {
-		if ( ! Options::should_run_unbabble() || Options::get_router() !== 'directory' ) {
-			return;
-		}
-
-		if ( ! is_admin() ) {
-			// Needs to be done as early as possible.
-			$this->init();
-
-			\add_filter( 'pre_get_posts', [ $this, 'homepage_default_lang_redirect' ], 1 );
-		}
-
-		// Post Permalinks:
-		$allowed_post_types = Options::get_allowed_post_types();
-
-		if ( in_array( 'post', $allowed_post_types, true ) ) {
-			// Post permalink.
-			\add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
-		}
-
-		if ( in_array( 'page', $allowed_post_types, true ) ) {
-			// Page permalink.
-			\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
-		}
-
-		if ( in_array( 'attachment', $allowed_post_types, true ) ) {
-			// Attachment permalink.
-			\add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
-		}
-
-		// Custom post types permalinks.
-		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
-
-		// Term archive permalinks.
-		\add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
-
-		// TODO: post_type_archive_link
-
-		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
-
-		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 2 );
-
-		add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
-	}
-
-	/**
 	 * Changes $_SERVER in order to remove directories from the url and let query_var routing take
 	 * place.
 	 *
@@ -297,6 +247,38 @@ class Directory {
 	}
 
 	/**
+	 * Applies the language to a post type's archvie link.
+	 *
+	 * @since 0.0.3
+	 *
+	 * @param string $link
+	 * @param string $post_type
+	 * @return string
+	 */
+	public function post_type_archive_link( string $link, string $post_type ) : string {
+		$curr_lang = LangInterface::get_current_language();
+		if ( $curr_lang === Options::get()['default_language'] ) {
+			return $link;
+		}
+		$site_url = site_url();
+		$url_lang = $this->current_lang_from_uri( '', str_replace( $site_url, '', $link ) );
+		if ( $url_lang === $curr_lang ) {
+			return $link;
+		}
+
+		$source_url = trailingslashit( $site_url ) . $this->get_directory_name( $url_lang );
+
+		// If not default language, set the directory to the post language.
+		$target_url = $site_url;
+		if ( $curr_lang !== Options::get()['default_language'] ) {
+			$directory  = $this->get_directory_name( $curr_lang );
+			$target_url = trailingslashit( trailingslashit( $site_url ) . $directory );
+		}
+
+		return str_replace( $source_url, $target_url, $link );
+	}
+
+	/**
 	 * Stop redirect to 404 if the found post's language is not the same as the current language.
 	 *
 	 * TODO: improve this explanation
@@ -428,6 +410,63 @@ class Directory {
 	}
 
 	/**
+	 * Applies the language to the network home url.
+	 *
+	 * @since 0.0.3
+	 *
+	 * @param string $url
+	 * @param string $path
+	 * @return string
+	 */
+	public function network_home_url( string $url, string $path ) : string {
+		if ( ! is_multisite() ) {
+			return $url;
+		}
+		$new_url          = $url;
+		$network          = get_network();
+		$main_blog_id     = $network->blog_id;
+		$curr_origin_lang = LangInterface::get_current_language();
+		switch_to_blog( $main_blog_id );
+		if ( Options::should_run_unbabble() ) {
+			if (
+				$curr_origin_lang !== Options::get()['default_language']
+				&& in_array( $curr_origin_lang, Options::get()['allowed_languages'] )
+			) {
+				add_filter( 'ubb_current_lang', $fn = fn () => $curr_origin_lang );
+				$router_type = Options::get()['router'];
+				if ( $router_type === 'query_var' ) {
+					add_filter( 'ubb_home_url', '__return_true' );
+					$home_url = home_url( $path );
+					remove_filter( 'ubb_home_url', '__return_true' );
+					$new_url = ( new QueryVar() )->home_url( $home_url, $path );
+				} else {
+					$new_url = home_url( $path );
+				}
+				remove_filter( 'ubb_current_lang', $fn );
+			}
+		}
+		restore_current_blog();
+		return $new_url;
+	}
+
+	/**
+	 * Adds directory to admin url.
+	 *
+	 * @since 0.0.3
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	public function admin_url( string $url ) : string {
+		$curr_lang = LangInterface::get_current_language();
+		if ( $curr_lang === Options::get()['default_language'] ) {
+			return $url;
+		}
+
+		return add_query_arg( 'lang', $curr_lang, $url );
+	}
+
+	/**
 	 * Get the directory name for a language.
 	 *
 	 * @since 0.0.1
@@ -455,22 +494,5 @@ class Directory {
 			}
 		}
 		return $path;
-	}
-
-	/**
-	 * Adds directory to admin url.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param string $url
-	 * @return string
-	 */
-	public function admin_url( string $url ) : string {
-		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
-			return $url;
-		}
-
-		return add_query_arg( 'lang', $curr_lang, $url );
 	}
 }
