@@ -172,6 +172,48 @@ class Options {
 	}
 
 	/**
+	 * Returns information about the allowed languages.
+	 *
+	 * @since 0.0.3
+	 * @todo Perhaps move this to LangInterface.
+	 *
+	 * @return array
+	 */
+	public static function get_languages_info() : array {
+		$lang_info = get_option( 'ubb_lang_info', [] );
+		$languages = self::get()['allowed_languages'];
+		if ( $languages == array_keys( $lang_info ) ) {
+			return $lang_info;
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+		$wp_translations = wp_get_available_translations();
+		$new_lang_info   = [];
+		foreach ( $languages as $ubb_lang ) {
+			if ( $ubb_lang === 'en_US' ) {
+				$new_lang_info[ $ubb_lang ] = [
+					'locale'      => 'en_US',
+					'native_name' => 'English'
+				];
+				continue;
+			}
+
+
+			// Shouldn't happen.
+			if ( ! isset( $wp_translations[ $ubb_lang ] ) ) {
+				$new_lang_info[ $ubb_lang ] = [ 'locale' => $ubb_lang ];
+				continue;
+			}
+
+			$new_lang_info[ $ubb_lang ]           = $wp_translations[ $ubb_lang ];
+			$new_lang_info[ $ubb_lang ]['locale'] = $ubb_lang;
+		}
+
+		update_option( 'ubb_lang_info', $new_lang_info );
+		return $new_lang_info;
+	}
+
+	/**
 	 * Builds the default post types allowed for translation.
 	 *
 	 * @since 0.0.1
