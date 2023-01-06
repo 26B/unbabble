@@ -333,6 +333,8 @@ class LangMetaBox {
 		$translations_table    = ( new PostTable() )->get_table_name();
 		$allowed_languages_str = implode( "','", Options::get()['allowed_languages'] );
 
+		// TODO: Add filters to add WHERE conditions.
+
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT MIN(A.post_id) as post_id, GROUP_CONCAT( CONCAT(A.post_title, '(', locale, ')' ) ) as group_label
@@ -356,6 +358,8 @@ class LangMetaBox {
 				$post_lang
 			)
 		);
+
+		// TODO: Add filter to filter possible sources after the sql fetch.
 
 		$options = [];
 		foreach ( $possible_sources as $source ) {
