@@ -36,10 +36,7 @@ class Directory {
 		}
 
 		$directory = $this->get_directory_name( $lang );
-		if (
-			str_starts_with( $request_uri, "/{$directory}/" )
-			&& str_starts_with( trailingslashit( $this->clean_path( $_SERVER['PHP_SELF'] ) ), "/{$directory}/" )
-		) {
+		if ( str_starts_with( $request_uri, "/{$directory}/" ) ) {
 			$_GET['lang'] = $lang;
 		}
 	}
