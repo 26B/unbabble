@@ -101,9 +101,9 @@ class LanguageSwitcher {
 		$params['ubb_switch_lang'] = $lang;
 		$query                     = http_build_query( $params );
 		if ( empty( $query ) ) {
-			return $_SERVER['PHP_SELF'];
+			return strtok( $_SERVER["REQUEST_URI"], '?' );
 		}
-		return $_SERVER['PHP_SELF'] . '?' . $query;
+		return strtok( $_SERVER["REQUEST_URI"], '?' ) . '?' . $query;
 	}
 
 	/**
@@ -126,6 +126,11 @@ class LanguageSwitcher {
 			);
 		}
 
+		// Return same url if the language is the same.
+		if ( $lang === LangInterface::get_post_language( $post_id ) ) {
+			return $_SERVER["REQUEST_URI"];
+		}
+
 		$translations   = LangInterface::get_post_translations( $post_id );
 		$translation_id = array_search( $lang, $translations, true );
 		if ( ! $translation_id ) {
@@ -146,9 +151,9 @@ class LanguageSwitcher {
 		$params['ubb_switch_lang'] = $lang;
 		$query                     = http_build_query( $params );
 		if ( empty( $query ) ) {
-			return $_SERVER['PHP_SELF'];
+			return strtok( $_SERVER["REQUEST_URI"], '?' );
 		}
-		return $_SERVER['PHP_SELF'] . '?' . $query;
+		return strtok( $_SERVER["REQUEST_URI"], '?' ) . '?' . $query;
 	}
 
 	/**
@@ -159,6 +164,12 @@ class LanguageSwitcher {
 	 * @return string
 	 */
 	private function make_switch_term_url( int $term_id, string $lang ) : string {
+
+		// Return same url if the language is the same.
+		if ( $lang === LangInterface::get_term_language( $term_id ) ) {
+			return $_SERVER["REQUEST_URI"];
+		}
+
 		$translations   = LangInterface::get_term_translations( $term_id );
 		$translation_id = array_search( $lang, $translations, true );
 		if ( ! $translation_id ) {
@@ -180,8 +191,8 @@ class LanguageSwitcher {
 		$params['ubb_switch_lang'] = $lang;
 		$query                     = http_build_query( $params );
 		if ( empty( $query ) ) {
-			return $_SERVER['PHP_SELF'];
+			return strtok( $_SERVER["REQUEST_URI"], '?' );
 		}
-		return $_SERVER['PHP_SELF'] . '?' . $query;
+		return strtok( $_SERVER["REQUEST_URI"], '?' ) . '?' . $query;
 	}
 }

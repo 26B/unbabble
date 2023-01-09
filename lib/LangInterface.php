@@ -816,7 +816,23 @@ class LangInterface {
 	 */
 	private static function get_new_source_id( string $type = 'post' ) : string {
 		global $wpdb;
-		$uuid  = Uuid::uuid7()->toString();
+
+		/**
+		 * Filters a new source id.
+		 *
+		 * Return a non-empty and string value to bypass uuid generation.
+		 *
+		 * @since 0.0.4
+		 *
+		 * @param string $source_id
+		 * @param string $type
+		 * @return string
+		 */
+		$uuid = apply_filters( 'ubb_new_source_id', '', $type );
+		if ( empty( $uuid ) || ! is_string( $uuid ) ) {
+			$uuid = Uuid::uuid7()->toString();
+		}
+
 		$table = $type === 'post' ? $wpdb->postmeta : $wpdb->termmeta;
 		$count = $wpdb->get_var(
 			$wpdb->prepare(
