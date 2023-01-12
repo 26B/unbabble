@@ -230,8 +230,7 @@ class Post extends Command {
 		}
 
 		self::log_color( '%4About post:%N' );
-
-		$this->format_and_log( $lines, self::INDENT );
+		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
 	private function print_translations_info( $post_id ) : void {
@@ -239,8 +238,8 @@ class Post extends Command {
 
 		$translations = LangInterface::get_post_translations( $post_id );
 		if ( empty( $translations ) ) {
-			// TODO: add function for single line.
-			self::format_and_log( [ [ "Post has no translations." ] ], self::INDENT );
+			// TODO: add function forsingle line.
+			self::format_lines_and_log( [ [ "Post has no translations." ] ], self::INDENT );
 		} else {
 			foreach ( $translations as $tr_id => $tr_lang ) {
 				$this->print_translation_info( $tr_id, $tr_lang );
@@ -268,8 +267,7 @@ class Post extends Command {
 			},
 			$lines
 		);
-
-		$this->format_and_log( $lines, self::INDENT );
+		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
 	private function print_post_linked_to( int $post_id, bool $hide_post = false ) : void {
@@ -300,8 +298,8 @@ class Post extends Command {
 		}
 
 		$post_language = LangInterface::get_post_language( $post_id );
-		self::log_color( "%4Post {$post_id} ({$post_language}) is currently linked to:%N" );
-		self::format_and_log( $lines, self::INDENT );
+		self::log_color( "%4Post $post_id} ({$post_language}) is currently linked to:%N" );
+		self::format_lines_and_log( $lines, self::INDENT );
 	}
 
 	private function get_posts_for_source( string $post_source, ?int $ignored_post_id = null ) {

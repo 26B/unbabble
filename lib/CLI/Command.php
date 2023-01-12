@@ -23,31 +23,59 @@ abstract class Command extends WP_CLI_Command {
 		return Shell::columns();
 	}
 
-	protected static function log_color( string $string  ) : void {
+	protected static function log_color( string $string ) : void {
 		WP_CLI::log( WP_CLI::colorize( $string ) );
 	}
 
-	protected static function warning_color( string $string  ) : void {
+	protected static function warning_color( string $string ) : void {
 		WP_CLI::warning( WP_CLI::colorize( $string ) );
 	}
 
-	protected static function confirm_color( string $string  ) : void {
+	protected static function confirm_color( string $string ) : void {
 		WP_CLI::confirm( WP_CLI::colorize( $string ) );
 	}
 
-	protected function format_and_log( $lines, int $indent = 0 ) : void {
+	private function get_indentation( int $indent_level ) : string {
+		if ( $indent_level > 0 ) {
+			return str_repeat( ' ', $indent_level * self::INDENT - 3 );
+		}
+		return '';
+	}
+
+	protected function format_data_and_log( $data, int $indent_level = 0 ) : void {
+
+		// If first key is not a string, assume all are not strings.
+		if ( ! is_string( current( array_keys( $data ) ) ) ) {
+			self::format_lines_and_log( $data, $indent_level );
+			WP_CLI::line();
+			return;
+		}
+
+		foreach ( $data as $index => $value ) {
+			if ( is_string( $index ) ) {
+				// Output header with $indent_level.
+				// TODO: color headers according to indentation level.
+				self::log_color( $this->get_indentation( $indent_level + 1 ) . $index );
+
+				self::format_data_and_log( $value, $indent_level + 1 );
+				continue;
+			}
+		}
+	}
+
+	protected function format_lines_and_log( $lines, int $indent_level = 0 ) : void {
 
 		// Remove keys for formatter.
 		$lines = array_values( $lines );
 
 		// Add indent as a first column.
-		if ( $indent > 0 ) {
-			$lines = array_map( function ( $line ) use ( $indent ) {
+		if ( $indent_level > 0 ) {
+			$lines = array_map( function ( $line ) use ( $indent_level ) {
 				/**
 				 * Subtract 3 to account for border padding for the first column (left and right)
 				 * and left padding on the second column.
 				 */
-				array_unshift( $line, str_repeat( ' ', $indent - 3 ) );
+				array_unshift( $line, $this->get_indentation( $indent_level ) );
 				return $line;
 			}, $lines );
 		}
@@ -81,13 +109,17 @@ abstract class Command extends WP_CLI_Command {
 		self::log_color( $formatter->format( $lines ) );
 	}
 
-	protected function get_lang_info( string $language ) : string {
+	protected function get_lang_info( string $language, bool $show_code = true ) : string {
 		$lang_info       = Options::get_languages_info()[ $language ] ?? [];
 		if ( empty( $lang_info ) ) {
-			return "%B($language, " . __( 'Unknown/removed locale', 'unbabble' ) . ')%N';
+			return '%B' . sprintf(
+				'(%s%s)',
+				$show_code ? "{$language}, " : '',
+				__( 'Unknown/removed locale', 'unbabble' )
+			) . '%N';
 		}
 		$lang_info_str   = '';
-		$lang_info_parts = [ $language ];
+		$lang_info_parts = $show_code ? [ $language ] : [];
 		if ( isset( $lang_info['english_name'] ) ) {
 			$lang_info_parts[] = $lang_info['english_name'];
 		}

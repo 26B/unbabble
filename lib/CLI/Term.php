@@ -231,7 +231,7 @@ class Term extends Command {
 
 		self::log_color( '%4About term:%N' );
 
-		$this->format_and_log( $lines, self::INDENT );
+		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
 	private function print_translations_info( $term_id ) : void {
@@ -240,7 +240,7 @@ class Term extends Command {
 		$translations = LangInterface::get_term_translations( $term_id );
 		if ( empty( $translations ) ) {
 			// TODO: add function for single line.
-			self::format_and_log( [ [ "Term has no translations." ] ], self::INDENT );
+			self::format_lines_and_log( [ [ "Term has no translations." ] ], self::INDENT );
 		} else {
 			foreach ( $translations as $tr_id => $tr_lang ) {
 				$this->print_translation_info( $tr_id, $tr_lang );
@@ -269,7 +269,7 @@ class Term extends Command {
 			$lines
 		);
 
-		$this->format_and_log( $lines, self::INDENT );
+		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
 	private function print_term_linked_to( int $term_id, bool $hide_term = false ) : void {
@@ -301,7 +301,7 @@ class Term extends Command {
 
 		$term_language = LangInterface::get_term_language( $term_id );
 		self::log_color( "%4Term {$term_id} ({$term_language}) is currently linked to:%N" );
-		self::format_and_log( $lines, self::INDENT );
+		self::format_lines_and_log( $lines, self::INDENT );
 	}
 
 	private function get_terms_for_source( string $term_source, ?int $ignored_term_id = null ) {
