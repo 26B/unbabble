@@ -145,9 +145,11 @@ class Plugin {
 			// TODO: Filter the query for attaching an attachment.
 		];
 
-		foreach ( $components as $component ) {
-			$component->register();
-		}
+		add_action( 'init', function () use ( $components ) {
+			foreach ( $components as $component ) {
+				$component->register();
+			}
+		} );
 	}
 
 	private function define_api_routes() : void {

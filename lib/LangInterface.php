@@ -142,10 +142,9 @@ class LangInterface {
 		$table_name = ( new PostTable() )->get_table_name();
 		return $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT * FROM {$table_name} WHERE post_id = %s LIMIT 1",
+				"SELECT locale FROM {$table_name} WHERE post_id = %s LIMIT 1",
 				$post_id
-			),
-			1
+			)
 		);
 	}
 
