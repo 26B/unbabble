@@ -5,6 +5,8 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
+use TwentySixB\WP\Plugin\Unbabble\CLI;
+use WP_CLI;
 
 /**
  * The core plugin class.
@@ -61,6 +63,7 @@ class Plugin {
 		$this->set_locale();
 		$this->define_plugin_hooks();
 		$this->define_api_routes();
+		$this->define_commands();
 		$this->define_integrations();
 	}
 
@@ -156,6 +159,20 @@ class Plugin {
 		add_action( 'rest_api_init', function () {
 			$namespace = 'unbabble/v1';
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
+		} );
+	}
+
+	private function define_commands() : void {
+		$commands = [
+			CLI\Post::class => 'ubb post',
+			CLI\Term::class => 'ubb term',
+		];
+		\add_action( 'init', function () use ( $commands ) {
+			foreach ( $commands as $cli_class => $command_name ) {
+				if ( class_exists( 'WP_CLI' ) ) {
+					WP_CLI::add_command( $command_name, $cli_class );
+				}
+			}
 		} );
 	}
 
