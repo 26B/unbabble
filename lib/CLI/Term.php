@@ -7,7 +7,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_CLI;
 
 /**
- * TODO:
+ * CLI commands for terms.
  *
  * @todo translations (__) in logs, warnings and errors.
  * @todo add --yes to all confirmations
