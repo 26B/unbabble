@@ -9,7 +9,7 @@
   "homepage": "https://github.com/26B/unbabble",
   "license": "GPL-2.0-or-later",
   "require": {
-    "php": ">=7.4",
+    "php": ">=8.0",
     "ramsey/uuid": "^4.6"
   },
   "require-dev": {

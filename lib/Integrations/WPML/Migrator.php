@@ -19,7 +19,7 @@ class Migrator {
 	 */
 	public function register() : void {
 		if ( class_exists( 'WP_CLI' ) ) {
-			WP_CLI::add_command( 'unbabble migrate-wpml', [ $this, 'run' ] );
+			WP_CLI::add_command( 'ubb migrate-wpml', [ $this, 'run' ] );
 		}
 	}
 
@@ -71,7 +71,7 @@ class Migrator {
 
 		$offset = $this->get_migration_offset();
 		if ( $offset ) {
-			WP_CLI::warning( 'Continuing previous migration. Use `wp unbabble migrate-wpml restart` to start a new one.' );
+			WP_CLI::warning( 'Continuing previous migration. Use `wp ubb migrate-wpml restart` to start a new one.' );
 			$options['trid_offset'] = $offset;
 		}
 
@@ -98,7 +98,7 @@ class Migrator {
 	private function get_migration_pid() : int {
 		// TODO: How to check if shell_exec is permitted.
 		// FIXME: Only works for *nix systems.
-		$grep = shell_exec( 'ps aux | grep "unbabble migrate-wpml run\|unbabble migrate-wpml restart" | grep -v grep | awk \'{print $2}\'' );
+		$grep = shell_exec( 'ps aux | grep "ubb migrate-wpml run\|ubb migrate-wpml restart" | grep -v grep | awk \'{print $2}\'' );
 		$rows = explode( "\n", $grep );
 		if ( count( $rows ) < 1 ) {
 			return 0;
