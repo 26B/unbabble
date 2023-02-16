@@ -4,6 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use WP_Error;
 
 /**
  * Hooks related to new terms.
@@ -26,6 +27,9 @@ class NewTerm {
 		foreach ( $taxonomies as $taxonomy ) {
 			\add_action( "create_{$taxonomy}", [ $this, 'new_term_ajax' ] );
 		}
+
+		// Check if a term's slug already existed when being inserted due to the language filter applied to terms.
+		\add_filter( 'pre_insert_term', [ $this, 'check_term_slug_exists' ], 10, 3 );
 	}
 
 	/**
@@ -42,5 +46,49 @@ class NewTerm {
 		}
 
 		LangInterface::set_term_language( $term_id, LangInterface::get_current_language() );
+	}
+
+	/**
+	 * Return WP_Error if the term being created has a slug that already exists.
+	 *
+	 * This check is needed to circumvent the language filter in terms, to prevent for false
+	 * positives when creating terms with the same slug in the backoffice.
+	 *
+	 * @param string|WP_Error $term
+	 * @param string          $taxonomy
+	 * @param array|string    $args
+	 * @return string|WP_Error
+	 */
+	public function check_term_slug_exists( $term, $taxonomy, $args ) {
+		global $wpdb;
+
+		if ( is_wp_error( $term ) ) {
+			return $term;
+		}
+
+		$args = wp_parse_args( $args );
+
+		if ( empty( $args['slug'] ?? '' ) ) {
+			$slug = sanitize_title( wp_unslash( $term ) );
+		} else {
+			$slug = $args['slug'];
+		}
+
+		$term_exists = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT t.term_id
+					FROM $wpdb->terms AS t
+					INNER JOIN $wpdb->term_taxonomy AS tt ON ( tt.term_id = t.term_id )
+					WHERE t.slug = %s AND tt.taxonomy = %s LIMIT 1",
+				$slug,
+				$taxonomy,
+			)
+		);
+
+		if ( $term_exists ) {
+			return new WP_Error( 'term_exists', __( 'A term with the name provided already exists in this taxonomy.' ), $term_exists );
+		}
+
+		return $term;
 	}
 }
