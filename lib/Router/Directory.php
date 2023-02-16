@@ -28,17 +28,21 @@ class Directory {
 	 */
 	public function init() : void {
 
-		// Trailing slash to handle cases like homepage when url/uri does not have / at the end.
-		$request_uri = trailingslashit( $this->clean_path( $_SERVER['REQUEST_URI'] ) );
-		$lang        = $this->current_lang_from_uri( Options::get()['default_language'], $request_uri );
-		if ( $lang === Options::get()['default_language'] ) {
-			return;
-		}
+		// Delayed until `wp_loaded` to let `ubb_options` filter to be added before the directory language is found.
+		add_action( 'wp_loaded', function () {
 
-		$directory = $this->get_directory_name( $lang );
-		if ( str_starts_with( $request_uri, "/{$directory}/" ) ) {
-			$_GET['lang'] = $lang;
-		}
+			// Trailing slash to handle cases like homepage when url/uri does not have / at the end.
+			$request_uri = trailingslashit( $this->clean_path( $_SERVER['REQUEST_URI'] ) );
+			$lang        = $this->current_lang_from_uri( Options::get()['default_language'], $request_uri );
+			if ( $lang === Options::get()['default_language'] ) {
+				return;
+			}
+
+			$directory = $this->get_directory_name( $lang );
+			if ( str_starts_with( $request_uri, "/{$directory}/" ) ) {
+				$_GET['lang'] = $lang;
+			}
+		} );
 	}
 
 	/**
