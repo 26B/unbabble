@@ -36,6 +36,6 @@
   },
   "homepage": "https://github.com/26B/unbabble#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^22.3.0"
+    "@wordpress/scripts": "^22.5.0"
   }
 }
