@@ -51,17 +51,21 @@ class Options extends Command {
 					case 'default_language':
 						$sub_data[] = [ $value,  self::get_lang_info( $value, false ) ];
 						break;
+
 					case 'router':
 						$sub_data[] = [ ucfirst( $value ) ];
 						break;
+
 					case 'post_types':
 						$label      = get_post_type_object( $value )->label;
 						$sub_data[] = [ $value, "%y{$label}%N" ];
 						break;
+
 					case 'taxonomies':
 						$label      = get_taxonomy( $value )->label;
 						$sub_data[] = [ $value, "%y{$label}%N" ];
 						break;
+
 					case 'router_options':
 						$sub_header = ucfirst( str_replace( '_', ' ', $index ) );
 						$sub_header = "%8{$sub_header}:%N";
@@ -93,6 +97,7 @@ class Options extends Command {
 						}
 
 						break;
+
 					default:
 						$sub_data[] = [ $value ];
 				}
