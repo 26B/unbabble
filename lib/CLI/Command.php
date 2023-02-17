@@ -16,25 +16,71 @@ use DIQA\Formatter;
  */
 abstract class Command extends WP_CLI_Command {
 
+	/**
+	 * @var int Number spaces used for a single indentation level.
+	 */
 	protected const INDENT                   = 4;
-	private   const FORMAT_IGNORED_SEQUENCES = [ '%y', '%g', '%b', '%r', '%p', '%m', '%c', '%w', '%k', '%n', '%Y', '%G', '%B', '%R', '%P', '%M', '%C', '%W', '%K', '%N', '%3', '%2', '%4', '%1', '%5', '%6', '%7', '%0', '%F', '%U', '%8', '%9', '%_' ];
 
+	/**
+	 * @var string[] WP_CLI color sequences to ignore when formatting the output.
+	 */
+	private const FORMAT_IGNORED_SEQUENCES = [ '%y', '%g', '%b', '%r', '%p', '%m', '%c', '%w', '%k', '%n', '%Y', '%G', '%B', '%R', '%P', '%M', '%C', '%W', '%K', '%N', '%3', '%2', '%4', '%1', '%5', '%6', '%7', '%0', '%F', '%U', '%8', '%9', '%_' ];
+
+	/**
+	 * Number of columns for command output.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @return int
+	 */
 	protected function columns() : int {
 		return Shell::columns();
 	}
 
+	/**
+	 * Log with color.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param string $string
+	 * @return void
+	 */
 	protected static function log_color( string $string ) : void {
 		WP_CLI::log( WP_CLI::colorize( $string ) );
 	}
 
+	/**
+	 * Warn with color.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param string $string
+	 * @return void
+	 */
 	protected static function warning_color( string $string ) : void {
 		WP_CLI::warning( WP_CLI::colorize( $string ) );
 	}
 
+	/**
+	 * Confirm with color.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param string $string
+	 * @return void
+	 */
 	protected static function confirm_color( string $string ) : void {
 		WP_CLI::confirm( WP_CLI::colorize( $string ) );
 	}
 
+	/**
+	 * Returns the indentation string according to the indentation level.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int $striindent_level
+	 * @return string
+	 */
 	private function get_indentation( int $indent_level ) : string {
 		if ( $indent_level > 0 ) {
 			return str_repeat( ' ', $indent_level * self::INDENT - 3 );
@@ -42,7 +88,16 @@ abstract class Command extends WP_CLI_Command {
 		return '';
 	}
 
-	protected function format_data_and_log( $data, int $indent_level = 0 ) : void {
+	/**
+	 * Formats data and logs it.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param array $data
+	 * @param int   $indent_level
+	 * @return void
+	 */
+	protected function format_data_and_log( array $data, int $indent_level = 0 ) : void {
 
 		// If first key is not a string, assume all are not strings.
 		if ( ! is_string( current( array_keys( $data ) ) ) ) {
@@ -63,7 +118,16 @@ abstract class Command extends WP_CLI_Command {
 		}
 	}
 
-	protected function format_lines_and_log( $lines, int $indent_level = 0 ) : void {
+	/**
+	 * Formats lines and logs them.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param array $lines
+	 * @param int   $indent_level
+	 * @return void
+	 */
+	protected function format_lines_and_log( array $lines, int $indent_level = 0 ) : void {
 
 		// Remove keys for formatter.
 		$lines = array_values( $lines );
@@ -109,6 +173,15 @@ abstract class Command extends WP_CLI_Command {
 		self::log_color( $formatter->format( $lines ) );
 	}
 
+	/**
+	 * Returns a string with a language's information.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param string $language  Code of the language.
+	 * @param bool   $show_code Whether to show the code in the language info string.
+	 * @return string
+	 */
 	protected function get_lang_info( string $language, bool $show_code = true ) : string {
 		$lang_info       = Options::get_languages_info()[ $language ] ?? [];
 		if ( empty( $lang_info ) ) {

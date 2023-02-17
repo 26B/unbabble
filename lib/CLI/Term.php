@@ -206,7 +206,17 @@ class Term extends Command {
 		WP_CLI::success( "Term {$term_id} unlinked." );
 	}
 
+	/**
+	 * Prints language information about the term.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int $term_id
+	 * @return void
+	 */
 	private function print_term_info( int $term_id ) : void {
+
+		// Lines to output for the term.
 		$lines = [
 			'language' => [
 				'%g' . __( 'Language' ) . ':%N',
@@ -217,30 +227,46 @@ class Term extends Command {
 				__( 'No source ID.', 'unbabble' ),
 			]
 		];
+
+		// Get language and term source.
 		$language     = LangInterface::get_term_language( $term_id );
 		$term_source  = LangInterface::get_term_source( $term_id );
 
+		// Add language information to the output.
 		if ( ! empty( $language ) ) {
 			$lang_info_str = $this->get_lang_info( $language );
 			$lines['language'][1] = "{$language} {$lang_info_str}";
 		}
 
+		// Add source information to the output.
 		if ( ! empty( $term_source ) ) {
 			$lines['ubb_source'][1] = $term_source;
 		}
 
+		// Print term information.
 		self::log_color( '%4About term:%N' );
-
 		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
-	private function print_translations_info( $term_id ) : void {
+	/**
+	 * Prints information about a term's translations.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int $term_id
+	 * @return void
+	 */
+	private function print_translations_info( int $term_id ) : void {
 		self::log_color( "\n%4Translations:%N" );
 
+		// Get term's translations.
 		$translations = LangInterface::get_term_translations( $term_id );
+
+		// Print translations information.
 		if ( empty( $translations ) ) {
 			// TODO: add function for single line.
 			self::format_lines_and_log( [ [ "Term has no translations." ] ], self::INDENT );
+
 		} else {
 			foreach ( $translations as $tr_id => $tr_lang ) {
 				$this->print_translation_info( $tr_id, $tr_lang );
@@ -249,8 +275,19 @@ class Term extends Command {
 		}
 	}
 
-	private function print_translation_info( $term_id, $language ) : void {
+	/**
+	 * Prints information about a single translation.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int    $term_id
+	 * @param string $language
+	 * @return void
+	 */
+	private function print_translation_info( int $term_id, string $language ) : void {
 		$tr_term = get_term( $term_id );
+
+		// Lines to output for the term.
 		$lines   = [
 			'ID'       => [ 'ID', $term_id ],
 			'language' => [
@@ -261,6 +298,8 @@ class Term extends Command {
 				__( 'Name' ),
 				$tr_term->name ]
 		];
+
+		// Add color to the output strings.
 		$lines = array_map(
 			function ( $line ) {
 				$line[0] = "%g{$line[0]}:%N";
@@ -269,11 +308,24 @@ class Term extends Command {
 			$lines
 		);
 
+		// Print term information.
 		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
+	/**
+	 * Prints information about other terms that a term is linked to.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int  $term_id
+	 * @param bool $hide_term
+	 * @return void
+	 */
 	private function print_term_linked_to( int $term_id, bool $hide_term = false ) : void {
 		$no_links_message = "%4Term {$term_id} is not linked to other terms.%N";
+
+		// Check first if the term has a source and translations.
+
 		$term_source      = LangInterface::get_term_source( $term_id );
 		if ( $term_source === null ) {
 			self::log_color( $no_links_message );
@@ -286,6 +338,7 @@ class Term extends Command {
 			return;
 		}
 
+		// If the term has source/translations, get information about each of them.
 		$lines = [];
 		foreach ( $source_terms as $source_term_id ) {
 			$lines[] = [
@@ -299,12 +352,22 @@ class Term extends Command {
 			return;
 		}
 
+		// Print linked to information.
 		$term_language = LangInterface::get_term_language( $term_id );
 		self::log_color( "%4Term {$term_id} ({$term_language}) is currently linked to:%N" );
 		self::format_lines_and_log( $lines, self::INDENT );
 	}
 
-	private function get_terms_for_source( string $term_source, ?int $ignored_term_id = null ) {
+	/**
+	 * Returns the terms for a specific source.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param string $term_source
+	 * @param ?int   $ignored_term_id Whether to ignore a specific term_id.
+	 * @return array
+	 */
+	private function get_terms_for_source( string $term_source, ?int $ignored_term_id = null ) : array {
 		$source_terms = LangInterface::get_terms_for_source( $term_source );
 		if ( $ignored_term_id === null ) {
 			return $source_terms;
@@ -312,6 +375,15 @@ class Term extends Command {
 		return array_filter( $source_terms, fn ( $source_term_id ) => $ignored_term_id !== (int) $source_term_id );
 	}
 
+	/**
+	 * Checks if there are language conflicts between two terms.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int $term_A_id
+	 * @param int $term_B_id
+	 * @return bool
+	 */
 	private function has_language_conflicts( int $term_A_id, int $term_B_id ) : bool {
 		$term_A_source = LangInterface::get_term_source( $term_A_id );
 		$term_B_source = LangInterface::get_term_source( $term_B_id );

@@ -206,7 +206,17 @@ class Post extends Command {
 		WP_CLI::success( "Post {$post_id} unlinked." );
 	}
 
+	/**
+	 * Prints language information about the post.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
 	private function print_post_info( int $post_id ) : void {
+
+		// Lines to output for the post.
 		$lines = [
 			'language' => [
 				'%g' . __( 'Language' ) . ':%N',
@@ -217,29 +227,46 @@ class Post extends Command {
 				__( 'No source ID.', 'unbabble' ),
 			]
 		];
+
+		// Get language and post source.
 		$language     = LangInterface::get_post_language( $post_id );
 		$post_source  = LangInterface::get_post_source( $post_id );
 
+		// Add language information to the output.
 		if ( ! empty( $language ) ) {
 			$lang_info_str = $this->get_lang_info( $language );
 			$lines['language'][1] = "{$language} {$lang_info_str}";
 		}
 
+		// Add source information to the output.
 		if ( ! empty( $post_source ) ) {
 			$lines['ubb_source'][1] = $post_source;
 		}
 
+		// Print post information.
 		self::log_color( '%4About post:%N' );
 		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
-	private function print_translations_info( $post_id ) : void {
+	/**
+	 * Prints information about a post's translations.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int $post_id
+	 * @return void
+	 */
+	private function print_translations_info( int $post_id ) : void {
 		self::log_color( "\n%4Translations:%N" );
 
+		// Get post's translations.
 		$translations = LangInterface::get_post_translations( $post_id );
+
+		// Print translations information.
 		if ( empty( $translations ) ) {
-			// TODO: add function forsingle line.
+			// TODO: add function for single line.
 			self::format_lines_and_log( [ [ "Post has no translations." ] ], self::INDENT );
+
 		} else {
 			foreach ( $translations as $tr_id => $tr_lang ) {
 				$this->print_translation_info( $tr_id, $tr_lang );
@@ -248,8 +275,19 @@ class Post extends Command {
 		}
 	}
 
-	private function print_translation_info( $post_id, $language ) : void {
+	/**
+	 * Prints information about a single translation.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int    $post_id
+	 * @param string $language
+	 * @return void
+	 */
+	private function print_translation_info( int $post_id, string $language ) : void {
 		$tr_post = get_post( $post_id );
+
+		// Lines to output for the post.
 		$lines   = [
 			'ID'       => [ 'ID', $post_id ],
 			'language' => [
@@ -260,6 +298,8 @@ class Post extends Command {
 				__( 'Title' ),
 				$tr_post->post_title ]
 		];
+
+		// Add color to the output strings.
 		$lines = array_map(
 			function ( $line ) {
 				$line[0] = "%g{$line[0]}:%N";
@@ -267,11 +307,25 @@ class Post extends Command {
 			},
 			$lines
 		);
+
+		// Print post information.
 		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
+	/**
+	 * Prints information about other posts that a post is linked to.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int  $post_id
+	 * @param bool $hide_post
+	 * @return void
+	 */
 	private function print_post_linked_to( int $post_id, bool $hide_post = false ) : void {
 		$no_links_message = "%4Post {$post_id} is not linked to other posts.%N";
+
+		// Check first if the post has a source and translations.
+
 		$post_source      = LangInterface::get_post_source( $post_id );
 		if ( $post_source === null ) {
 			self::log_color( $no_links_message );
@@ -284,6 +338,7 @@ class Post extends Command {
 			return;
 		}
 
+		// If the post has source/translations, get information about each of them.
 		$lines = [];
 		foreach ( $source_posts as $source_post_id ) {
 			$lines[] = [
@@ -297,12 +352,22 @@ class Post extends Command {
 			return;
 		}
 
+		// Print linked to information.
 		$post_language = LangInterface::get_post_language( $post_id );
 		self::log_color( "%4Post $post_id} ({$post_language}) is currently linked to:%N" );
 		self::format_lines_and_log( $lines, self::INDENT );
 	}
 
-	private function get_posts_for_source( string $post_source, ?int $ignored_post_id = null ) {
+	/**
+	 * Returns the posts for a specific source.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param string $post_source
+	 * @param ?int   $ignored_post_id Whether to ignore a specific post_id.
+	 * @return array
+	 */
+	private function get_posts_for_source( string $post_source, ?int $ignored_post_id = null ) : array {
 		$source_posts = LangInterface::get_posts_for_source( $post_source );
 		if ( $ignored_post_id === null ) {
 			return $source_posts;
@@ -310,6 +375,15 @@ class Post extends Command {
 		return array_filter( $source_posts, fn ( $source_post_id ) => $ignored_post_id !== (int) $source_post_id );
 	}
 
+	/**
+	 * Checks if there are language conflicts between two posts.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param int $post_A_id
+	 * @param int $post_B_id
+	 * @return bool
+	 */
 	private function has_language_conflicts( int $post_A_id, int $post_B_id ) : bool {
 		$post_A_source = LangInterface::get_post_source( $post_A_id );
 		$post_B_source = LangInterface::get_post_source( $post_B_id );
