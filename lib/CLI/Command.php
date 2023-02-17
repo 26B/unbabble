@@ -12,7 +12,7 @@ use DIQA\Formatter;
 /**
  * Base class for CLI commands.
  *
- * @since 0.0.5
+ * @since 0.0.6
  */
 abstract class Command extends WP_CLI_Command {
 
@@ -29,7 +29,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Number of columns for command output.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @return int
 	 */
@@ -40,7 +40,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Log with color.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param string $string
 	 * @return void
@@ -52,7 +52,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Warn with color.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param string $string
 	 * @return void
@@ -64,7 +64,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Confirm with color.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param string $string
 	 * @return void
@@ -76,7 +76,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Returns the indentation string according to the indentation level.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int $striindent_level
 	 * @return string
@@ -91,7 +91,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Formats data and logs it.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param array $data
 	 * @param int   $indent_level
@@ -121,7 +121,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Formats lines and logs them.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param array $lines
 	 * @param int   $indent_level
@@ -176,7 +176,7 @@ abstract class Command extends WP_CLI_Command {
 	/**
 	 * Returns a string with a language's information.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param string $language  Code of the language.
 	 * @param bool   $show_code Whether to show the code in the language info string.

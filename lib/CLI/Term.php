@@ -12,7 +12,7 @@ use WP_CLI;
  * @todo translations (__) in logs, warnings and errors.
  * @todo add --yes to all confirmations
  *
- * @since 0.0.5
+ * @since 0.0.6
  */
 class Term extends Command {
 
@@ -23,6 +23,8 @@ class Term extends Command {
 	 *
 	 * <term_id>
 	 * : ID of the term.
+	 *
+	 * @since 0.0.6
 	 *
 	 * @param array $args
 	 * @return void
@@ -57,6 +59,8 @@ class Term extends Command {
 	 *
 	 * <language>
 	 * : Code of the language to set.
+	 *
+	 * @since 0.0.6
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -115,6 +119,8 @@ class Term extends Command {
 	 *
 	 * [--force]
 	 * : (Optional) Force linking change. By default, term is not changed if it's already linked.
+	 *
+	 * @since 0.0.6
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -182,6 +188,8 @@ class Term extends Command {
 	 * <term_id>
 	 * : ID of the term to unlink.
 	 *
+	 * @since 0.0.6
+	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 * @return void
@@ -209,7 +217,7 @@ class Term extends Command {
 	/**
 	 * Prints language information about the term.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int $term_id
 	 * @return void
@@ -251,7 +259,7 @@ class Term extends Command {
 	/**
 	 * Prints information about a term's translations.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int $term_id
 	 * @return void
@@ -278,7 +286,7 @@ class Term extends Command {
 	/**
 	 * Prints information about a single translation.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int    $term_id
 	 * @param string $language
@@ -315,7 +323,7 @@ class Term extends Command {
 	/**
 	 * Prints information about other terms that a term is linked to.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int  $term_id
 	 * @param bool $hide_term
@@ -361,7 +369,7 @@ class Term extends Command {
 	/**
 	 * Returns the terms for a specific source.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param string $term_source
 	 * @param ?int   $ignored_term_id Whether to ignore a specific term_id.
@@ -378,7 +386,7 @@ class Term extends Command {
 	/**
 	 * Checks if there are language conflicts between two terms.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int $term_A_id
 	 * @param int $term_B_id

@@ -7,14 +7,14 @@ use TwentySixB\WP\Plugin\Unbabble\Options as UbbOptions;
 /**
  * CLI commands for Unbabble's options.
  *
- * @since 0.0.5
+ * @since 0.0.6
  */
 class Options extends Command {
 
 	/**
 	 * Show Unbabble's options.
 	 *
-	 * @since 0.0.5
+	 * @since 0.0.6
 	 * @return void
 	 */
 	public function get() : void {

@@ -12,7 +12,7 @@ use WP_CLI;
  * @todo translations (__) in logs, warnings and errors.
  * @todo add --yes to all confirmations
  *
- * @since 0.0.5
+ * @since 0.0.6
  */
 class Post extends Command {
 
@@ -23,6 +23,8 @@ class Post extends Command {
 	 *
 	 * <post_id>
 	 * : ID of the post.
+	 *
+	 * @since 0.0.6
 	 *
 	 * @param array $args
 	 * @return void
@@ -57,6 +59,8 @@ class Post extends Command {
 	 *
 	 * <language>
 	 * : Code of the language to set.
+	 *
+	 * @since 0.0.6
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -115,6 +119,8 @@ class Post extends Command {
 	 *
 	 * [--force]
 	 * : (Optional) Force linking change. By default, post is not changed if it's already linked.
+	 *
+	 * @since 0.0.6
 	 *
 	 * @param array $args
 	 * @param array $assoc_args
@@ -182,6 +188,8 @@ class Post extends Command {
 	 * <post_id>
 	 * : ID of the post to unlink.
 	 *
+	 * @since 0.0.6
+	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 * @return void
@@ -209,7 +217,7 @@ class Post extends Command {
 	/**
 	 * Prints language information about the post.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int $post_id
 	 * @return void
@@ -251,7 +259,7 @@ class Post extends Command {
 	/**
 	 * Prints information about a post's translations.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int $post_id
 	 * @return void
@@ -278,7 +286,7 @@ class Post extends Command {
 	/**
 	 * Prints information about a single translation.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int    $post_id
 	 * @param string $language
@@ -315,7 +323,7 @@ class Post extends Command {
 	/**
 	 * Prints information about other posts that a post is linked to.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int  $post_id
 	 * @param bool $hide_post
@@ -361,7 +369,7 @@ class Post extends Command {
 	/**
 	 * Returns the posts for a specific source.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param string $post_source
 	 * @param ?int   $ignored_post_id Whether to ignore a specific post_id.
@@ -378,7 +386,7 @@ class Post extends Command {
 	/**
 	 * Checks if there are language conflicts between two posts.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.6
 	 *
 	 * @param int $post_A_id
 	 * @param int $post_B_id
