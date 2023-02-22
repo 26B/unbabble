@@ -8,15 +8,9 @@
   ],
   "homepage": "https://github.com/26B/unbabble",
   "license": "GPL-2.0-or-later",
-  "repositories": [
-    {
-        "type": "vcs",
-        "url":  "https://github.com/26B/diqa-formatter"
-    }
-  ],
   "require": {
     "php": ">=8.0",
-    "diqa/formatter": "1.1",
+    "26b/diqa-formatter": "^1.2",
     "ramsey/uuid": "^4.6",
     "wp-cli/wp-cli": "^2.7"
   },
