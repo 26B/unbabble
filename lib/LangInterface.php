@@ -936,9 +936,16 @@ class LangInterface {
 			foreach ( $meta_value as $object_id ) {
 				if ( $meta_type === 'post' ) {
 					$post = get_post( $object_id );
-					if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, Options::get_allowed_post_types(), true )  ) {
+					if ( ! $post instanceof WP_Post ) {
 						continue;
 					}
+
+					// Keep same ID for non translatable post types.
+					if ( ! in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
+						$new_meta_value[] = $object_id;
+						continue;
+					}
+
 					$meta_post_translation = LangInterface::get_post_translation( $object_id, $new_lang );
 					if ( $meta_post_translation === null ) {
 						continue;
@@ -946,9 +953,16 @@ class LangInterface {
 					$new_meta_value[] = $meta_post_translation;
 				} else if ( $meta_type === 'term' ) {
 					$term = get_term( $object_id );
-					if ( ! $term instanceof WP_Term || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+					if ( ! $term instanceof WP_Term ) {
 						continue;
 					}
+
+					// Keep same ID for non translatable taxonomies.
+					if ( ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+						$new_meta_value[] = $object_id;
+						continue;
+					}
+
 					$meta_term_translation = LangInterface::get_term_translation( $object_id, $new_lang );
 					if ( $meta_term_translation === null ) {
 						continue;
@@ -961,21 +975,32 @@ class LangInterface {
 		if ( is_numeric( $meta_value ) ) {
 			if ( $meta_type === 'post' ) {
 				$post = get_post( $meta_value );
-				if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, Options::get_allowed_post_types(), true )  ) {
+				if ( ! $post instanceof WP_Post ) {
 					return;
 				}
-				$new_meta_value = LangInterface::get_post_translation( $meta_value, $new_lang );
-				if ( $new_meta_value === null ) {
-					$new_meta_value = '';
+
+				// Keep same ID for non translatable post types.
+				$new_meta_value = $meta_value;
+				if ( in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
+					$new_meta_value = LangInterface::get_post_translation( $meta_value, $new_lang );
+					if ( $new_meta_value === null ) {
+						$new_meta_value = '';
+					}
 				}
+
 			} else if ( $meta_type === 'term' ) {
 				$term = get_term( $meta_value );
-				if ( ! $term instanceof WP_Post || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+				if ( ! $term instanceof WP_Term ) {
 					return;
 				}
-				$new_meta_value = LangInterface::get_term_translation( $meta_value, $new_lang );
-				if ( $new_meta_value === null ) {
-					$new_meta_value = '';
+
+				// Keep same ID for non translatable taxonomies.
+				$new_meta_value = $meta_value;
+				if ( in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+					$new_meta_value = LangInterface::get_term_translation( $meta_value, $new_lang );
+					if ( $new_meta_value === null ) {
+						$new_meta_value = '';
+					}
 				}
 			}
 		}

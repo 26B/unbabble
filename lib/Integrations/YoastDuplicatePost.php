@@ -195,9 +195,16 @@ class YoastDuplicatePost {
 			$new_meta_value = [];
 			foreach ( $meta_value as $meta_post_id ) {
 				$post = get_post( $meta_post_id );
-				if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, Options::get_allowed_post_types(), true )  ) {
+				if ( ! $post instanceof WP_Post ) {
 					continue;
 				}
+
+				// Keep same ID for non translatable post types.
+				if ( ! in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
+					$new_meta_value[] = $meta_post_id;
+					continue;
+				}
+
 				$meta_post_translation = LangInterface::get_post_translation( $meta_post_id, $new_lang );
 				if ( $meta_post_translation === null ) {
 					continue;
@@ -208,9 +215,15 @@ class YoastDuplicatePost {
 
 		if ( is_numeric( $meta_value ) ) {
 			$post = get_post( $meta_value );
-			if ( ! $post instanceof WP_Post || ! in_array( $post->post_type, Options::get_allowed_post_types(), true )  ) {
+			if ( ! $post instanceof WP_Post ) {
 				return $check;
 			}
+
+			// Keep same ID for non translatable post types.
+			if ( ! in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
+				return $meta_value;
+			}
+
 			$new_meta_value = LangInterface::get_post_translation( $meta_value, $new_lang );
 			if ( $new_meta_value === null ) {
 				return ''; // Save nothing to meta_value.
@@ -243,9 +256,16 @@ class YoastDuplicatePost {
 			$new_meta_value = [];
 			foreach ( $meta_value as $meta_term_id ) {
 				$term = get_term( $meta_term_id );
-				if ( ! $term instanceof WP_Term || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+				if ( ! $term instanceof WP_Term ) {
 					continue;
 				}
+
+				// Keep same ID for non translatable taxonomies.
+				if ( ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+					$new_meta_value[] = $meta_term_id;
+					continue;
+				}
+
 				$meta_term_translation = LangInterface::get_term_translation( $meta_term_id, $new_lang );
 				if ( $meta_term_translation === null ) {
 					continue;
@@ -256,9 +276,15 @@ class YoastDuplicatePost {
 
 		if ( is_numeric( $meta_value ) ) {
 			$term = get_term( $meta_value );
-			if ( ! $term instanceof WP_Post || ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )  ) {
+			if ( ! $term instanceof WP_Term ) {
 				return $check;
 			}
+
+			// Keep same ID for non translatable taxonomies.
+			if ( ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+				return $meta_value;
+			}
+
 			$new_meta_value = LangInterface::get_term_translation( $meta_value, $new_lang );
 			if ( $new_meta_value === null ) {
 				return ''; // Save nothing to meta_value.
