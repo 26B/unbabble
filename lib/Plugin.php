@@ -118,6 +118,8 @@ class Plugin {
 			'redirector'        => new Admin\Redirector( $this ),
 			'customize'         => new Admin\Customize( $this ),
 
+			'multisite_blog_switch' => new Multisite\BlogSwitch( $this ),
+
 			'api_header'     => new API\Header( $this ),
 			'api_query_vars' => new API\QueryVar( $this ),
 
