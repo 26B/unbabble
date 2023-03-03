@@ -106,13 +106,12 @@ class Options {
 		}
 
 		// Check for conflicting language plugins.
-		$active_plugins         = get_option( 'active_plugins', [] );
 		$known_language_plugins = [
 			'sitepress-multilingual-cms/sitepress.php',
 			// TODO: Add others.
 		];
 		foreach ( $known_language_plugins as $plugin_name ) {
-			if ( in_array( $plugin_name, $active_plugins, true ) ) {
+			if ( is_plugin_active( $plugin_name ) ) {
 				return false;
 			}
 		}

@@ -709,11 +709,7 @@ class LangInterface {
 	 * @return bool
 	 */
 	public static function is_unbabble_active() : bool {
-		if ( ! is_multisite() ) {
-			return true;
-		}
-		$active_plugins = (array) get_option( 'active_plugins', [] );
-		return in_array( 'unbabble/unbabble.php', $active_plugins, true );
+		return is_plugin_active( 'unbabble/unbabble.php' );
 	}
 
 	/**

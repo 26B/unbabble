@@ -110,6 +110,7 @@ class Plugin {
 	 * @access private
 	 */
 	private function define_plugin_hooks() {
+		// TODO: review where should_run_unbabble is needed/missing. Maybe have it here for all of them.
 		$components = [
 			'admin'             => new Admin\Admin( $this ),
 			'lang_cookie'       => new Admin\LangCookie( $this ),
