@@ -2,6 +2,8 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
+use TwentySixB\WP\Plugin\Unbabble\Options;
+
 /**
  * General hooks for the back-office.
  *
@@ -15,12 +17,32 @@ class Admin {
 	 * @since 0.0.1
 	 */
 	public function register() {
+		if ( ! Options::should_run_unbabble() ) {
+			\add_action( 'admin_notices', [ $this, 'idle_notice' ], PHP_INT_MAX );
+			return;
+		}
 
 		// Admin scripts.
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts'] );
 
 		// Whitelist query vars.
 		add_filter( 'query_vars', [ $this, 'whitelist_query_vars' ] );
+	}
+
+	/**
+	 * Add an admin notice when Unbabble is idling.
+	 *
+	 * @since 0.0.9
+	 *
+	 * @return void
+	 */
+	public function idle_notice() : void {
+		$message = sprintf(
+			/* translators: %s: Code html with constant name */
+			esc_html( __( 'Unbabble is not running due to the constant %s.', 'unbabble' ) ),
+			'<code>UNBABBLE_IDLE</code>'
+		);
+		printf( '<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>', $message );
 	}
 
 	/**

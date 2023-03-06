@@ -1,7 +1,6 @@
 window.addEventListener('load', function() {
   const copyBtnEl = document.getElementById('ubb-translate-action');
 
-  console.log( 'qweqweqwe' );
   if (copyBtnEl) {
     copyBtnEl.addEventListener('click', function() {
       const targetLangInput = document.querySelector('[name="ubb_create"]');

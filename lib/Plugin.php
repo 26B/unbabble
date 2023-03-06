@@ -110,7 +110,6 @@ class Plugin {
 	 * @access private
 	 */
 	private function define_plugin_hooks() {
-		// TODO: review where should_run_unbabble is needed/missing. Maybe have it here for all of them.
 		$components = [
 			'admin'             => new Admin\Admin( $this ),
 			'lang_cookie'       => new Admin\LangCookie( $this ),
@@ -123,7 +122,7 @@ class Plugin {
 			'api_query_vars' => new API\QueryVar( $this ),
 
 			'attachments_set_language' => new Attachments\SetLanguage( $this ),
-			'attachments_delete_file' => new Attachments\DeleteFile( $this ),
+			'attachments_delete_file'  => new Attachments\DeleteFile( $this ),
 
 			'posts_create_translation' => new Posts\CreateTranslation( $this ),
 			'posts_link_translation'   => new Posts\LinkTranslation( $this ),

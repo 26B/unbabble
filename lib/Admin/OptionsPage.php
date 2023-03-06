@@ -12,6 +12,10 @@ class OptionsPage {
 	 * @since 0.0.1
 	 */
 	public function register() {
+		if ( ! Options::should_run_unbabble() ) {
+			return;
+		}
+
 		// Only show options page on debug mode for now.
 		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
 			return;

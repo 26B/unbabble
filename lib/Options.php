@@ -97,25 +97,15 @@ class Options {
 	 * Returns whether unbabble functionality (filtering, etc) should be running.
 	 *
 	 * @since 0.0.1
-	 * @return bool False if only a single language is allowed or other language plugins are
-	 *              active. True otherwise.
+	 * @return bool False if only a single language is allowed or the idle constant is defined
+	 *              as true. True otherwise.
 	 */
 	public static function should_run_unbabble() : bool {
 		if ( self::only_one_language_allowed() ) {
 			return false;
 		}
 
-		// Check for conflicting language plugins.
-		$known_language_plugins = [
-			'sitepress-multilingual-cms/sitepress.php',
-			// TODO: Add others.
-		];
-		foreach ( $known_language_plugins as $plugin_name ) {
-			if ( is_plugin_active( $plugin_name ) ) {
-				return false;
-			}
-		}
-		return true;
+		return ! ( defined( 'UNBABBLE_IDLE' ) && UNBABBLE_IDLE );
 	}
 
 	/**

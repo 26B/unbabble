@@ -18,9 +18,14 @@ class SetLanguage {
 	 * @since 0.0.1
 	 */
 	public function register() {
+		if ( ! Options::should_run_unbabble() ) {
+			return;
+		}
+
 		if ( ! in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
 			return;
 		}
+
 		\add_action( 'add_attachment', [ $this, 'set_language_on_attachment' ] );
 	}
 
