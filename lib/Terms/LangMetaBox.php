@@ -20,9 +20,6 @@ class LangMetaBox {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Term meta box.
 		\add_action( 'admin_init', [ $this, 'add_ubb_meta_box' ] );

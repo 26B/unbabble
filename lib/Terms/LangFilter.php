@@ -19,9 +19,6 @@ class LangFilter {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 		\add_filter( 'terms_clauses', [ $this, 'filter_terms_by_language' ], 10, 3 );
 	}
 

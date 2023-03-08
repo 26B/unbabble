@@ -20,11 +20,6 @@ class Customize {
 	 * @since 0.0.3
 	 */
 	public function register() {
-		global $pagenow;
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		// FIXME: Lang cookie usage in customize.php can lead to lang desync.
 
 		// Filter dropdown pages.
@@ -42,9 +37,12 @@ class Customize {
 		add_action( 'create_nav_menu', [ $this, 'set_menu_lang' ], 10, 2 );
 
 		// Add script for language metabox for nav menu.
-		if ( $pagenow === 'nav-menus.php' && ( $_GET['action'] ?? '' ) !== 'locations' ) {
-			add_action( 'admin_footer', array( $this, 'nav_menu_lang_metaboxes' ), 10 );
-		}
+		add_action( 'init', function () {
+			global $pagenow;
+			if ( $pagenow === 'nav-menus.php' && ( $_GET['action'] ?? '' ) !== 'locations' ) {
+				add_action( 'admin_footer', array( $this, 'nav_menu_lang_metaboxes' ), 10 );
+			}
+		} );
 	}
 
 	/**
@@ -118,6 +116,8 @@ class Customize {
 			! in_array(
 				$parsed_args['name'],
 				[
+					'page_on_front',
+					'page_for_posts',
 					'_customize-dropdown-pages-page_on_front',
 					'_customize-dropdown-pages-page_for_posts'
 				]
@@ -127,12 +127,14 @@ class Customize {
 			return $output;
 		}
 
+
 		// Get pages filtered by current language.
 		$query = new WP_Query(
 			[
-				'post_type'   => 'page',
-				'post_status' => 'publish',
-				'fields'      => 'ids',
+				'post_type'      => 'page',
+				'post_status'    => 'publish',
+				'fields'         => 'ids',
+				'posts_per_page' => -1
 			]
 		);
 		$parsed_args['include']         = $query->get_posts();

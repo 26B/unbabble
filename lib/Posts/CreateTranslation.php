@@ -19,9 +19,6 @@ class CreateTranslation {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Redirect to create new post page to create a translation.
 		// FIXME: Saving an auto-draft (no title) does not call save_post and so source is not set.

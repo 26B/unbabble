@@ -6,10 +6,6 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 
 class AdvancedCustomFieldsPro {
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		add_filter( 'option_acf_pro_license', [ $this, 'change_home_url' ] );
 	}
 

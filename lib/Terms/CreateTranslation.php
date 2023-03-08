@@ -20,9 +20,6 @@ class CreateTranslation {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Redirect to create new translation.
 		\add_action( 'saved_term', [ $this, 'redirect_to_new' ], PHP_INT_MAX, 4 );

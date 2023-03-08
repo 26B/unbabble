@@ -17,10 +17,6 @@ class Admin {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			\add_action( 'admin_notices', [ $this, 'idle_notice' ], PHP_INT_MAX );
-			return;
-		}
 
 		// Admin scripts.
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts'] );

@@ -19,9 +19,6 @@ class LinkTranslation {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 		\add_action( 'saved_term', [ $this, 'link_translations' ], PHP_INT_MAX, 4 );
 		\add_action( 'saved_term', [ $this, 'unlink' ], PHP_INT_MAX, 4 );
 	}

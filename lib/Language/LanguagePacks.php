@@ -17,10 +17,6 @@ class LanguagePacks {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		\add_action( 'admin_init', [ $this, 'install_lang_packs' ] );
 	}
 

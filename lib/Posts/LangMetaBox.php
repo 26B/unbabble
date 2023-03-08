@@ -20,9 +20,6 @@ class LangMetaBox {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Post meta box.
 		\add_action( 'add_meta_boxes', [ $this, 'add_ubb_meta_box' ] );

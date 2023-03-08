@@ -18,10 +18,6 @@ class Frontend {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		\add_filter( 'locale', [ $this, 'switch_locale'] );
 		\add_action( 'admin_bar_menu', [ $this, 'set_admin_bar_language'], PHP_INT_MIN );
 	}
@@ -45,7 +41,7 @@ class Frontend {
 		}
 
 		$current = LangInterface::get_current_language();
-		if ( in_array( $current, get_available_languages(), true ) ) {
+		if ( $current === 'en_US' || in_array( $current, get_available_languages(), true ) ) {
 			return $current;
 		}
 		return $locale;

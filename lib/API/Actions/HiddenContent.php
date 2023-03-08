@@ -16,9 +16,6 @@ class HiddenContent {
 	}
 
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 		\register_rest_route(
 			$this->namespace,
 			'/default_on_hidden/posts',

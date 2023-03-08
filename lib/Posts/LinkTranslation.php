@@ -21,9 +21,6 @@ class LinkTranslation {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 		\add_action( 'save_post', [ $this, 'link_translations' ], PHP_INT_MAX - 10 );
 		\add_action( 'save_post', [ $this, 'unlink' ], PHP_INT_MAX - 10 );
 		\add_action( 'edit_attachment', [ $this, 'unlink' ], PHP_INT_MAX - 10 );

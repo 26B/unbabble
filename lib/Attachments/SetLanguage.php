@@ -18,10 +18,6 @@ class SetLanguage {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		if ( ! in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
 			return;
 		}

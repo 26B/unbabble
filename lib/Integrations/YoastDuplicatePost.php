@@ -10,10 +10,6 @@ use WP_Term;
 
 class YoastDuplicatePost {
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		// TODO: Move post lang metabox input here.
 
 		// Use Yoast's duplicate-post plugin to duplicate post before redirect.

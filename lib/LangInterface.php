@@ -217,6 +217,7 @@ class LangInterface {
 				WHERE meta_key = 'ubb_source'
 				AND meta_value = %s
 				AND post_id IN ( SELECT post_id FROM {$post_lang_table} WHERE locale = %s )
+				ORDER BY post_id ASC
 				LIMIT 1",
 				$source_id,
 				$lang
@@ -250,7 +251,8 @@ class LangInterface {
 				FROM {$wpdb->postmeta}
 				WHERE meta_key = 'ubb_source'
 				AND meta_value = %s
-				AND post_id != %s",
+				AND post_id != %s
+				ORDER BY post_id ASC",
 				$source_id,
 				$post_id
 			)

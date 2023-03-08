@@ -21,10 +21,6 @@ class RoutingResolver {
 	 * @since 0.0.3
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		if ( ! is_admin() ) {
 			// Needs to be done as early as possible.
 			$this->init();
@@ -65,7 +61,7 @@ class RoutingResolver {
 
 		\add_filter( 'network_home_url', [ $this, 'network_home_url' ], 10, 3 );
 
-		add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
+		\add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
 	}
 
 	/**

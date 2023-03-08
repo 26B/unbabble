@@ -6,6 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
+use TwentySixB\WP\Plugin\Unbabble\Language\Frontend;
 use WP_CLI;
 
 /**
@@ -110,52 +111,64 @@ class Plugin {
 	 * @access private
 	 */
 	private function define_plugin_hooks() {
+
 		$components = [
-			'admin'             => new Admin\Admin( $this ),
-			'lang_cookie'       => new Admin\LangCookie( $this ),
-			'options_page'      => new Admin\OptionsPage( $this ),
-			'language_switcher' => new Admin\LanguageSwitcher( $this ),
-			'redirector'        => new Admin\Redirector( $this ),
-			'customize'         => new Admin\Customize( $this ),
+			'admin'             => Admin\Admin::class,
+			'lang_cookie'       => Admin\LangCookie::class,
+			'options_page'      => Admin\OptionsPage::class,
+			'language_switcher' => Admin\LanguageSwitcher::class,
+			'redirector'        => Admin\Redirector::class,
+			'customize'         => Admin\Customize::class,
 
-			'api_header'     => new API\Header( $this ),
-			'api_query_vars' => new API\QueryVar( $this ),
+			'api_header'     => API\Header::class,
+			'api_query_vars' => API\QueryVar::class,
 
-			'attachments_set_language' => new Attachments\SetLanguage( $this ),
-			'attachments_delete_file'  => new Attachments\DeleteFile( $this ),
+			'attachments_set_language' => Attachments\SetLanguage::class,
+			'attachments_delete_file'  => Attachments\DeleteFile::class,
 
-			'posts_create_translation' => new Posts\CreateTranslation( $this ),
-			'posts_link_translation'   => new Posts\LinkTranslation( $this ),
-			'posts_language_filter'    => new Posts\LangFilter( $this ),
-			'posts_change_language'    => new Posts\ChangeLanguage( $this ),
-			'posts_language_metabox'   => new Posts\LangMetaBox( $this ),
-			'posts_admin_notices'      => new Posts\AdminNotices( $this ),
+			'posts_create_translation' => Posts\CreateTranslation::class,
+			'posts_link_translation'   => Posts\LinkTranslation::class,
+			'posts_language_filter'    => Posts\LangFilter::class,
+			'posts_change_language'    => Posts\ChangeLanguage::class,
+			'posts_language_metabox'   => Posts\LangMetaBox::class,
+			'posts_admin_notices'      => Posts\AdminNotices::class,
 
-			'terms_language_metabox'   => new Terms\LangMetaBox( $this ),
-			'terms_create_translation' => new Terms\CreateTranslation( $this ),
-			'terms_link_translation'   => new Terms\LinkTranslation( $this ),
-			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
-			'terms_language_filter'    => new Terms\LangFilter( $this ),
-			'terms_admin_notices'      => new Terms\AdminNotices( $this ),
-			'terms_new_term'           => new Terms\NewTerm( $this ),
+			'terms_language_metabox'   => Terms\LangMetaBox::class,
+			'terms_create_translation' => Terms\CreateTranslation::class,
+			'terms_link_translation'   => Terms\LinkTranslation::class,
+			'terms_change_language'    => Terms\ChangeLanguage::class,
+			'terms_language_filter'    => Terms\LangFilter::class,
+			'terms_admin_notices'      => Terms\AdminNotices::class,
+			'terms_new_term'           => Terms\NewTerm::class,
 
-			'router_resolver'  => new Router\RoutingResolver( $this ),
-			'router_routing'   => new Router\Routing( $this ),
+			'router_resolver'  => Router\RoutingResolver::class,
+			'router_routing'   => Router\Routing::class,
 
-			'lang_frontend' => new Language\Frontend( $this ),
-			'lang_packages' => new Language\LanguagePacks( $this ),
+			'lang_frontend' => Language\Frontend::class,
+			'lang_packages' => Language\LanguagePacks::class,
+
+			'db_options' => DB\Options::class,
 
 			// TODO: Filter the query for attaching an attachment.
 		];
 
-		add_action( 'init', function () use ( $components ) {
-			foreach ( $components as $component ) {
-				$component->register();
-			}
-		} );
+		// TODO: add filter to remove components.
+
+		if ( ! Options::should_run_unbabble() ) {
+			\add_action( 'admin_notices', [ ( new Admin\Admin() ), 'idle_notice' ], PHP_INT_MAX );
+			$components = [ 'db_options' => DB\Options::class ];
+		}
+
+		foreach ( $components as $component ) {
+			( new $component() )->register();
+		}
 	}
 
 	private function define_api_routes() : void {
+		if ( ! Options::should_run_unbabble() ) {
+			return;
+		}
+
 		add_action( 'rest_api_init', function () {
 			$namespace = 'unbabble/v1';
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();

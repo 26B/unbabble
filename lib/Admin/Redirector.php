@@ -18,9 +18,6 @@ class Redirector {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Handle language switching.
 		if ( is_admin() && isset( $_GET['ubb_switch_lang'] ) ) {

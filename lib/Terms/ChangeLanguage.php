@@ -18,9 +18,6 @@ class ChangeLanguage {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 		\add_action( 'saved_term', [ $this, 'change_language' ], PHP_INT_MAX );
 	}
 

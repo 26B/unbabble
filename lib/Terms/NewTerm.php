@@ -19,10 +19,6 @@ class NewTerm {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		$taxonomies = array_intersect( \get_taxonomies(), Options::get_allowed_taxonomies() );
 		foreach ( $taxonomies as $taxonomy ) {
 			\add_action( "create_{$taxonomy}", [ $this, 'new_term_ajax' ] );

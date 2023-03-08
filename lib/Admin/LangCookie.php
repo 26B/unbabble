@@ -17,10 +17,6 @@ class LangCookie {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		\add_action( 'admin_init', [ $this, 'update_lang_cookie' ] );
 		\add_action( 'set_auth_cookie', [ $this, 'set_lang_cookie_on_login' ], PHP_INT_MAX, 3 );
 		\add_action( 'wp_logout', [ $this, 'unset_lang_cookie_on_logout' ] );
