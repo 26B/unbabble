@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Attachments;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -18,7 +19,7 @@ class DeleteFile {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
+		if ( ! LangInterface::is_post_type_translatable( 'attachment' ) ) {
 			return;
 		}
 

@@ -38,10 +38,9 @@ class Redirector {
 	 * @return void
 	 */
 	public function handle_language_switch_redirect( string $new_lang ) : void {
-		$options = Options::get();
 
 		// Validate new_lang.
-		if ( ! in_array( $new_lang, $options['allowed_languages'], true ) ) {
+		if ( ! LangInterface::is_language_allowed( $new_lang ) ) {
 			return;
 		}
 
@@ -62,7 +61,7 @@ class Redirector {
 		// Change `ubb_switch_lang` in query in url to `lang` if not default language.
 		$path    = str_replace(
 			"ubb_switch_lang={$new_lang}",
-			$new_lang === $options['default_language'] ? '' : "lang={$new_lang}",
+			$new_lang === LangInterface::get_default_language() ? '' : "lang={$new_lang}",
 			$uri
 		);
 		$new_url = home_url( $path );
@@ -99,7 +98,7 @@ class Redirector {
 		if (
 			$post_lang === null
 			|| $post_lang === $current_lang
-			|| ! in_array( $post_lang, Options::get()['allowed_languages'], true )
+			|| ! LangInterface::is_language_allowed( $post_lang )
 		) {
 			return;
 		}

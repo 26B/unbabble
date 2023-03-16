@@ -32,14 +32,9 @@ class LanguageSwitcher {
 	 * @return void
 	 */
 	public function add_switcher_backoffice_admin_bar( \WP_Admin_Bar $wp_admin_bar ) : void {
-		$options = Options::get();
 		$current = LangInterface::get_current_language();
-
-		// TODO: This shouldn't happen. Should always be array.
-		$allowed_languages = is_array( $options['allowed_languages'] ) ? $options['allowed_languages'] : [];
-
-		$langs = [];
-		foreach ( $allowed_languages as $allowed_lang ) {
+		$langs   = [];
+		foreach ( LangInterface::get_languages() as $allowed_lang ) {
 			// TODO: Better way of handling this.
 			if (
 				( ! isset( $_REQUEST['post'] ) || ! is_numeric( $_REQUEST['post'] ) )

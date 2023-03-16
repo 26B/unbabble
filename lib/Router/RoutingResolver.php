@@ -29,19 +29,19 @@ class RoutingResolver {
 		}
 
 		// Post Permalinks:
-		$allowed_post_types = Options::get_allowed_post_types();
+		$translatable_post_types = LangInterface::get_translatable_post_types();
 
-		if ( in_array( 'post', $allowed_post_types, true ) ) {
+		if ( in_array( 'post', $translatable_post_types, true ) ) {
 			// Post permalink.
 			\add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
 		}
 
-		if ( in_array( 'page', $allowed_post_types, true ) ) {
+		if ( in_array( 'page', $translatable_post_types, true ) ) {
 			// Page permalink.
 			\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
 		}
 
-		if ( in_array( 'attachment', $allowed_post_types, true ) ) {
+		if ( in_array( 'attachment', $translatable_post_types, true ) ) {
 			// Attachment permalink.
 			\add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
 		}
@@ -255,7 +255,7 @@ class RoutingResolver {
 	 * @return ?object
 	 */
 	private function get_current_router_object() : ?object {
-		$router_type  = Options::get()['router'];
+		$router_type  = Options::get_router();
 		$router_class = null;
 		switch ( $router_type ) {
 			case 'directory':

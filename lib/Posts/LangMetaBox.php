@@ -36,7 +36,7 @@ class LangMetaBox {
 	public function add_ubb_meta_box() : void {
 
 		// Filter for allowed post types.
-		$post_types = array_intersect( \get_post_types(), Options::get_allowed_post_types() );
+		$post_types = array_intersect( \get_post_types(), LangInterface::get_translatable_post_types() );
 
 		/**
 		 * Filters post types that will have the language meta box.
@@ -72,14 +72,10 @@ class LangMetaBox {
 	 * @return void
 	 */
 	public function add_ubb_meta_box_callback( \WP_Post $post ) : void {
-		$options = Options::get();
-		// TODO: use LangInterface for language.
-		$lang    = $_GET['lang'] ?? $_COOKIE['ubb_lang'] ?? $options['default_language'];
-		if ( empty( $lang ) ) {
-			$lang = $options['default_language'];
-		}
+		$lang              = LangInterface::get_current_language();
+		$allowed_languages = LangInterface::get_languages();
 
-		$this->print_language_select( 'ubb_lang', $lang, $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox' );
+		$this->print_language_select( 'ubb_lang', $lang, $allowed_languages, 'ubb_language_metabox_nonce', 'ubb_language_metabox' );
 
 		if ( is_numeric( $_GET['ubb_source'] ?? '' ) ) {
 			printf(
@@ -94,7 +90,7 @@ class LangMetaBox {
 		}
 
 		$translations                  = LangInterface::get_post_translations( $post->ID );
-		$available_languages           = array_flip( $options['allowed_languages'] );
+		$available_languages           = array_flip( $allowed_languages );
 
 		$query_args = $_GET;
 		unset( $query_args['lang'] );
@@ -103,7 +99,7 @@ class LangMetaBox {
 		$translation_to_show = [];
 		$seen_languages      = [];
 		foreach ( $translations as $translation_id => $translation_lang ) {
-			if ( ! in_array( $translation_lang, $options['allowed_languages'], true ) ) {
+			if ( ! LangInterface::is_language_allowed( $translation_lang ) ) {
 				continue;
 			}
 
@@ -328,7 +324,7 @@ class LangMetaBox {
 	private function get_possible_links( WP_Post $post, string $post_lang ) : array {
 		global $wpdb;
 		$translations_table    = ( new PostTable() )->get_table_name();
-		$allowed_languages_str = implode( "','", Options::get()['allowed_languages'] );
+		$allowed_languages_str = implode( "','", LangInterface::get_languages() );
 
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(

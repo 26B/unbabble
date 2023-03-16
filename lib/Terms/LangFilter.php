@@ -54,12 +54,10 @@ class LangFilter {
 		}
 
 		// Divide $taxonomies into taxonomies with and without language.
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		$taxonomies_w_lang  = [];
 		$taxonomies_wo_lang = [];
 		foreach ( $taxonomies as $taxonomy ) {
-			// TODO: maybe use intersect.
-			if ( ! in_array( $taxonomy, $allowed_taxonomies, true ) ) {
+			if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
 				$taxonomies_wo_lang[] = esc_sql( $taxonomy );
 				continue;
 			}

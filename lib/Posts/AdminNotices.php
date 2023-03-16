@@ -39,7 +39,7 @@ class AdminNotices {
 			|| $screen->parent_base !== 'edit'
 			|| $screen->base !== 'post'
 			|| ! $post instanceof WP_Post
-			|| ! in_array( $post->post_type, Options::get_allowed_post_types(), true )
+			|| ! LangInterface::is_post_type_translatable( $post->post_type )
 		) {
 			return;
 		}
@@ -75,11 +75,11 @@ class AdminNotices {
 
 		$post_type = $_GET['post_type'] ?? 'post';
 
-		if ( ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
+		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return;
 		}
 
-		$allowed_languages  = implode( "','", Options::get()['allowed_languages'] );
+		$allowed_languages  = implode( "','", LangInterface::get_languages() );
 		$translations_table = ( new PostTable() )->get_table_name();
 		$bad_posts          = $wpdb->get_results(
 			$wpdb->prepare(

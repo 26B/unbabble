@@ -30,8 +30,8 @@ class Directory {
 
 		// Trailing slash to handle cases like homepage when url/uri does not have / at the end.
 		$request_uri = trailingslashit( $this->clean_path( $_SERVER['REQUEST_URI'] ) );
-		$lang        = $this->current_lang_from_uri( Options::get()['default_language'], $request_uri );
-		if ( $lang === Options::get()['default_language'] ) {
+		$lang        = $this->current_lang_from_uri( LangInterface::get_default_language(), $request_uri );
+		if ( $lang === LangInterface::get_default_language() ) {
 			return;
 		}
 
@@ -54,8 +54,8 @@ class Directory {
 	 * @return string Language of the directory in the $uri, if known, otherwise returns $curr_lang.
 	 */
 	public function current_lang_from_uri( string $curr_lang, string $uri ) : string {
-		$languages        = Options::get()['allowed_languages'];
-		$default_language = Options::get()['default_language'];
+		$languages        = LangInterface::get_languages();
+		$default_language = LangInterface::get_default_language();
 		foreach ( $languages as $lang ) {
 			if ( $lang === $default_language ) {
 				continue;
@@ -110,13 +110,13 @@ class Directory {
 		}
 
 		// If it's not poluted and the language is the default language don't do anything to it.
-		if ( $post_lang === Options::get()['default_language'] && $source_url === $site_url ) {
+		if ( $post_lang === LangInterface::get_default_language() && $source_url === $site_url ) {
 			return $post_link;
 		}
 
 		// If not default language, set the directory to the post language.
 		$target_url = $site_url;
-		if ( $post_lang !== Options::get()['default_language'] ) {
+		if ( $post_lang !== LangInterface::get_default_language() ) {
 			$directory  = $this->get_directory_name( $post_lang );
 			$target_url = trailingslashit( $site_url ) . $directory;
 		}
@@ -135,7 +135,7 @@ class Directory {
 	 */
 	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
 		$post_type = $post->post_type;
-		if ( ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
+		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return $post_link;
 		}
 		return $this->apply_lang_to_post_url( $post_link, $post );
@@ -178,7 +178,7 @@ class Directory {
 			return $termlink;
 		}
 
-		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+		if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
 			return $termlink;
 		}
 
@@ -196,13 +196,13 @@ class Directory {
 		}
 
 		// If it's not poluted and the language is the default language don't do anything to it.
-		if ( $term_lang === Options::get()['default_language'] && $source_url === $site_url ) {
+		if ( $term_lang === LangInterface::get_default_language() && $source_url === $site_url ) {
 			return $termlink;
 		}
 
 		// If not default language, set the directory to the term language.
 		$target_url = $site_url;
-		if ( $term_lang !== Options::get()['default_language'] ) {
+		if ( $term_lang !== LangInterface::get_default_language() ) {
 			$directory  = $this->get_directory_name( $term_lang );
 			$target_url = trailingslashit( $site_url ) . $directory;
 		}
@@ -230,9 +230,8 @@ class Directory {
 		}
 
 		// If there is a language set, that takes precedence.
-		$lang    = '';
-		$options = Options::get();
-		if ( in_array( $_GET['lang'] ?? '', $options['allowed_languages'], true ) ) {
+		$lang = '';
+		if ( LangInterface::is_language_allowed( $_GET['lang'] ?? '' ) ) {
 			$lang = \sanitize_text_field( $_GET['lang'] );
 		}
 		if ( ! empty( $lang ) ) {
@@ -240,7 +239,7 @@ class Directory {
 		}
 
 		// Set language of homepage to the default language.
-		set_query_var( 'lang', $options['default_language'] );
+		set_query_var( 'lang', LangInterface::get_default_language() );
 	}
 
 	/**
@@ -254,7 +253,7 @@ class Directory {
 	 */
 	public function post_type_archive_link( string $link, string $post_type ) : string {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
+		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $link;
 		}
 		$site_url = site_url();
@@ -267,7 +266,7 @@ class Directory {
 
 		// If not default language, set the directory to the post language.
 		$target_url = $site_url;
-		if ( $curr_lang !== Options::get()['default_language'] ) {
+		if ( $curr_lang !== LangInterface::get_default_language() ) {
 			$directory  = $this->get_directory_name( $curr_lang );
 			$target_url = trailingslashit( trailingslashit( $site_url ) . $directory );
 		}
@@ -388,7 +387,7 @@ class Directory {
 		}
 
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
+		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $url;
 		}
 
@@ -426,11 +425,11 @@ class Directory {
 		switch_to_blog( $main_blog_id );
 		if ( Options::should_run_unbabble() ) {
 			if (
-				$curr_origin_lang !== Options::get()['default_language']
-				&& in_array( $curr_origin_lang, Options::get()['allowed_languages'] )
+				$curr_origin_lang !== LangInterface::get_default_language()
+				&& LangInterface::is_language_allowed( $curr_origin_lang )
 			) {
 				add_filter( 'ubb_current_lang', $fn = fn () => $curr_origin_lang );
-				$router_type = Options::get()['router'];
+				$router_type = Options::get_router();
 				if ( $router_type === 'query_var' ) {
 					add_filter( 'ubb_home_url', '__return_true' );
 					$home_url = home_url( $path );
@@ -456,7 +455,7 @@ class Directory {
 	 */
 	public function admin_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
+		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $url;
 		}
 

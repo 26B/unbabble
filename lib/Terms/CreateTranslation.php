@@ -43,7 +43,7 @@ class CreateTranslation {
 	public function redirect_to_new( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		if (
 			! $update
-			|| ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true )
+			|| ! LangInterface::is_taxonomy_translatable( $taxonomy )
 			|| ! ( $_POST['ubb_redirect_new'] ?? false )
 		) {
 			return;
@@ -53,7 +53,7 @@ class CreateTranslation {
 		$lang_create = $_POST['ubb_create'] ?? '';
 		if (
 			empty( $lang_create )
-			|| ! in_array( $lang_create, Options::get()['allowed_languages'] )
+			|| ! LangInterface::is_language_allowed( $lang_create )
 			// TODO: check if term_id has this language already
 		) {
 			// TODO: What else to do when this happens.
@@ -89,10 +89,9 @@ class CreateTranslation {
 	 * @return void
 	 */
 	public function set_new_source( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		if (
 			$update
-			|| ! in_array( $taxonomy, $allowed_taxonomies, true )
+			|| ! LangInterface::is_taxonomy_translatable( $taxonomy )
 			|| ! isset( $_POST['ubb_source'] )
 			|| ! is_numeric( $_POST['ubb_source'] )
 		) {
@@ -100,7 +99,7 @@ class CreateTranslation {
 		}
 
 		$src_term = get_term( \sanitize_text_field( $_POST['ubb_source'] ), $taxonomy );
-		if ( $src_term === null || ! in_array( $src_term->taxonomy, $allowed_taxonomies, true ) ) {
+		if ( $src_term === null || ! LangInterface::is_taxonomy_translatable( $src_term->taxonomy ) ) {
 			return;
 		}
 
@@ -119,7 +118,7 @@ class CreateTranslation {
 		if ( ! $update ) {
 			return;
 		}
-		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+		if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
 			return;
 		}
 		if ( ! ( $_POST['ubb_save_create'] ?? false ) ) {
@@ -131,7 +130,7 @@ class CreateTranslation {
 		$lang_create = $_POST['ubb_create'] ?? '';
 		if (
 			empty( $lang_create )
-			|| ! in_array( $lang_create, Options::get()['allowed_languages'] )
+			|| ! LangInterface::is_language_allowed( $lang_create )
 			// TODO: check if term_id has this language already
 		) {
 			// TODO: What else to do when this happens.

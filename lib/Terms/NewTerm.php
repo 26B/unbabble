@@ -19,7 +19,7 @@ class NewTerm {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		$taxonomies = array_intersect( \get_taxonomies(), Options::get_allowed_taxonomies() );
+		$taxonomies = array_intersect( \get_taxonomies(), LangInterface::get_translatable_taxonomies() );
 		foreach ( $taxonomies as $taxonomy ) {
 			\add_action( "create_{$taxonomy}", [ $this, 'new_term_ajax' ] );
 		}

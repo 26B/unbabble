@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\API;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -69,8 +70,7 @@ class Header {
 		$main_lang       = str_replace( '-', '_', $matches[1] );
 		$other_langs_str = $matches[2];
 
-		$allowed_languages = Options::get()['allowed_languages'];
-		if ( in_array( $main_lang, $allowed_languages, true ) ) {
+		if ( LangInterface::is_language_allowed( $main_lang ) ) {
 			return $main_lang;
 		}
 
@@ -89,7 +89,7 @@ class Header {
 		arsort( $langs );
 
 		foreach ( $langs as $lang => $factor ) {
-			if ( in_array( $lang, $allowed_languages, true ) ) {
+			if ( LangInterface::is_language_allowed( $lang ) ) {
 				return $lang;
 			}
 		}

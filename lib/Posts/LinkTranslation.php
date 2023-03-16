@@ -36,11 +36,10 @@ class LinkTranslation {
 	 * @return void
 	 */
 	public function link_translations( int $post_id ) : void {
-		$post_type          = get_post_type( $post_id );
-		$allowed_post_types = Options::get_allowed_post_types();
+		$post_type = get_post_type( $post_id );
 		if (
 			$post_type === 'revision'
-			|| ! in_array( $post_type, $allowed_post_types, true )
+			|| ! LangInterface::is_post_type_translatable( $post_type )
 			|| ! isset( $_POST['ubb_link_translation'] )
 			|| ! is_numeric( $_POST['ubb_link_translation'] )
 			|| isset( $_POST['menu'] ) // Stop if nav menu updated or saved.
@@ -50,10 +49,10 @@ class LinkTranslation {
 			return;
 		}
 
-		$link_post = get_post( \sanitize_text_field( $_POST['ubb_link_translation'] ) );
+		$link_post = \get_post( \sanitize_text_field( $_POST['ubb_link_translation'] ) );
 		if (
 			$link_post === null
-			|| ! in_array( $link_post->post_type, $allowed_post_types, true )
+			|| ! LangInterface::is_post_type_translatable( $link_post->post_type )
 			|| $link_post->post_type !== $post_type
 		) {
 			return;
@@ -83,11 +82,10 @@ class LinkTranslation {
 	 * @return void
 	 */
 	public function unlink( int $post_id ) : void {
-		$post_type          = get_post_type( $post_id );
-		$allowed_post_types = Options::get_allowed_post_types();
+		$post_type = get_post_type( $post_id );
 		if (
 			$post_type === 'revision'
-			|| ! in_array( $post_type, $allowed_post_types, true )
+			|| ! LangInterface::is_post_type_translatable( $post_type )
 			|| ! isset( $_POST['ubb_link_translation'] )
 			|| $_POST['ubb_link_translation'] !== 'unlink'
 			|| $_POST['post_type'] !== $post_type

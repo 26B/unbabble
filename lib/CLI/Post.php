@@ -68,14 +68,14 @@ class Post extends Command {
 	 */
 	public function set( array $args ) : void {
 		$post_id = (int) $args[0];
-		add_filter( 'ubb_use_post_lang_filter', '__return_false' );
-		if ( $post_id < 0 || ! get_post( $post_id ) ) {
+		\add_filter( 'ubb_use_post_lang_filter', '__return_false' );
+		if ( $post_id < 0 || ! \get_post( $post_id ) ) {
 			WP_CLI::error( "Post {$post_id} does not exist." );
 		}
 
 		$target_language = $args[1];
-		if ( ! in_array( $target_language, Options::get()['allowed_languages'] ) ) {
-			$allowed_languages_str = implode( ', ', Options::get()['allowed_languages'] );
+		if ( ! LangInterface::is_language_allowed( $target_language ) ) {
+			$allowed_languages_str = implode( ', ', LangInterface::get_languages() );
 			WP_CLI::error( "Language {$target_language} is not currently allowed. Allowed languages are: {$allowed_languages_str}" );
 		}
 

@@ -181,7 +181,7 @@ class Customize {
 		update_option( 'ubb_wp_options', $ubb_wp_options );
 
 		// Update base WordPress option too in case of default language.
-		if ( $curr_lang === Options::get()['default_language'] ) {
+		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $value;
 		}
 

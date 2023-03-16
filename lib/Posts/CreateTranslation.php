@@ -44,7 +44,7 @@ class CreateTranslation {
 		if ( ( $_POST['post_type'] ?? '' ) !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
 			return;
 		}
-		if ( $post_type === 'revision' || ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
+		if ( $post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return;
 		}
 		if ( ! ( $_POST['ubb_redirect_new'] ?? false ) ) {
@@ -55,7 +55,7 @@ class CreateTranslation {
 		$lang_create = $_POST['ubb_create'] ?? '';
 		if (
 			empty( $lang_create )
-			|| ! in_array( $lang_create, Options::get()['allowed_languages'] )
+			|| ! LangInterface::is_language_allowed( $lang_create )
 			// TODO: check if post_id has this language already
 		) {
 			// TODO: What else to do when this happens.
@@ -91,11 +91,10 @@ class CreateTranslation {
 	 * @return void
 	 */
 	public function set_new_source( int $post_id ) : void {
-		$post_type          = get_post_type( $post_id );
-		$allowed_post_types = Options::get_allowed_post_types();
+		$post_type = \get_post_type( $post_id );
 		if (
 			$post_type === 'revision'
-			|| ! in_array( $post_type, $allowed_post_types, true )
+			|| ! LangInterface::is_post_type_translatable( $post_type )
 			|| ! isset( $_POST['ubb_source'] )
 			|| ! is_numeric( $_POST['ubb_source'] )
 			||$_POST['post_type'] !== $post_type
@@ -104,10 +103,10 @@ class CreateTranslation {
 			return;
 		}
 
-		$src_post = get_post( \sanitize_text_field( $_POST['ubb_source'] ) );
+		$src_post = \get_post( \sanitize_text_field( $_POST['ubb_source'] ) );
 		if (
 			$src_post === null
-			|| ! in_array( $src_post->post_type, $allowed_post_types, true )
+			|| ! LangInterface::is_post_type_translatable( $src_post->post_type )
 			|| $src_post->post_type !== $post_type
 		) {
 			return;
@@ -125,19 +124,21 @@ class CreateTranslation {
 	 * @return void
 	 */
 	public function set_new_source_attachment( int $post_id ) : void {
-		$post_type          = get_post_type( $post_id );
-		$allowed_post_types = Options::get_allowed_post_types();
+		$post_type = \get_post_type( $post_id );
 		if (
 			$post_type !== 'attachment'
-			|| ! in_array( $post_type, $allowed_post_types, true )
+			|| ! LangInterface::is_post_type_translatable( $post_type )
 			|| ! isset( $_GET['ubb_source'] )
 			|| ! is_numeric( $_GET['ubb_source'] )
 		) {
 			return;
 		}
 
-		$src_post = get_post( \sanitize_text_field( $_GET['ubb_source'] ) );
-		if ( $src_post === null || ! in_array( $src_post->post_type, $allowed_post_types, true ) ) {
+		$src_post = \get_post( \sanitize_text_field( $_GET['ubb_source'] ) );
+		if (
+			$src_post === null
+			|| ! LangInterface::is_post_type_translatable( $src_post->post_type )
+		) {
 			return;
 		}
 

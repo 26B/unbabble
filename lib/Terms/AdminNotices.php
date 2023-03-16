@@ -45,7 +45,7 @@ class AdminNotices {
 		$term = get_term( $_GET['tag_ID'], $_GET['taxonomy'] );
 		if (
 			! $term instanceof WP_Term
-			|| ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true )
+			|| ! LangInterface::is_taxonomy_translatable( $term->taxonomy )
 		) {
 			return;
 		}
@@ -82,11 +82,11 @@ class AdminNotices {
 
 		$taxonomy = $_GET['taxonomy'];
 
-		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+		if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
 			return;
 		}
 
-		$allowed_languages  = implode( "','", Options::get()['allowed_languages'] );
+		$allowed_languages  = implode( "','", LangInterface::get_languages() );
 		$translations_table = ( new TermTable() )->get_table_name();
 		$bad_terms          = $wpdb->get_results(
 			$wpdb->prepare(

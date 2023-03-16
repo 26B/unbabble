@@ -35,9 +35,8 @@ class LinkTranslation {
 	 * @return void
 	 */
 	public function link_translations( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		if (
-			! in_array( $taxonomy, $allowed_taxonomies, true )
+			! LangInterface::is_taxonomy_translatable( $taxonomy )
 			|| ! isset( $_POST['ubb_link_translation'] )
 			|| ! is_numeric( $_POST['ubb_link_translation'] )
 		) {
@@ -47,7 +46,7 @@ class LinkTranslation {
 		$link_term = get_term( \sanitize_text_field( $_POST['ubb_link_translation'] ) );
 		if (
 			$link_term === null
-			|| ! in_array( $link_term->taxonomy, $allowed_taxonomies, true )
+			|| ! LangInterface::is_taxonomy_translatable( $link_term->taxonomy )
 			|| $link_term->taxonomy !== $taxonomy
 		) {
 			return;
@@ -82,7 +81,7 @@ class LinkTranslation {
 	public function unlink( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		if (
 			! $update
-			|| ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true )
+			|| ! LangInterface::is_taxonomy_translatable( $taxonomy )
 			|| ! isset( $_POST['ubb_link_translation'] )
 			|| $_POST['ubb_link_translation'] !== 'unlink'
 		) {

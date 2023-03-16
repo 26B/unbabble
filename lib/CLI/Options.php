@@ -22,6 +22,7 @@ class Options extends Command {
 		$ordered_options = [
 			'default_language'  => $options['default_language'],
 			'allowed_languages' => $options['allowed_languages'],
+			'hidden_languages'  => $options['hidden_languages'],
 			'router'            => $options['router'],
 			'router_options'    => $options['router_options'] ?? [],
 			'post_types'        => $options['post_types'],
@@ -49,6 +50,7 @@ class Options extends Command {
 				switch ( $option_name ) {
 					case 'allowed_languages':
 					case 'default_language':
+					case 'hidden_languages':
 						$sub_data[] = [ $value,  self::get_lang_info( $value, false ) ];
 						break;
 

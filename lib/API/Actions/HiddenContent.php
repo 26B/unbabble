@@ -45,9 +45,9 @@ class HiddenContent {
 		global $wpdb;
 		// TODO: Allow for only certain post_types.
 
-		$allowed_languages  = implode( "','", Options::get()['allowed_languages'] );
-		$allowed_post_types = implode( "','", Options::get_allowed_post_types() );
-		$translations_table = ( new PostTable() )->get_table_name();
+		$allowed_languages       = implode( "','", LangInterface::get_languages() );
+		$translatable_post_types = implode( "','", LangInterface::get_translatable_post_types() );
+		$translations_table      = ( new PostTable() )->get_table_name();
 
 		// TODO: We might only want to place a language in the ones that don't have language, not just on everything that's not allowed.
 		$bad_posts          = $wpdb->get_results(
@@ -58,11 +58,11 @@ class HiddenContent {
 				FROM {$translations_table} as PT
 				WHERE PT.locale IN ('{$allowed_languages}')
 			) AND post_status != 'auto-draft'
-			AND post_type IN ('{$allowed_post_types}')",
+			AND post_type IN ('{$translatable_post_types}')",
 			OBJECT
 		);
 
-		$default_lang       = Options::get()['default_language'];
+		$default_lang       = LangInterface::get_default_language();
 		$successful         = 0;
 		$success_post_type  = [];
 		$fail_post_type     = [];
@@ -92,10 +92,10 @@ class HiddenContent {
 		global $wpdb;
 		// TODO: Allow for only certain taxonomies.
 
-		$allowed_languages  = implode( "','", Options::get()['allowed_languages'] );
-		$allowed_taxonomies = implode( "','", Options::get_allowed_taxonomies() );
-		$translations_table = ( new TermTable() )->get_table_name();
-		$bad_terms          = $wpdb->get_results(
+		$allowed_languages       = implode( "','", LangInterface::get_languages() );
+		$translatable_taxonomies = implode( "','", LangInterface::get_translatable_taxonomies() );
+		$translations_table      = ( new TermTable() )->get_table_name();
+		$bad_terms               = $wpdb->get_results(
 			"SELECT *
 			FROM {$wpdb->terms} as T
 			INNER JOIN {$wpdb->term_taxonomy} as TT ON (T.term_id = TT.term_id)
@@ -103,11 +103,11 @@ class HiddenContent {
 				SELECT term_id
 				FROM {$translations_table} as TR
 				WHERE TR.locale IN ('{$allowed_languages}')
-			) AND TT.taxonomy IN ('{$allowed_taxonomies}')",
+			) AND TT.taxonomy IN ('{$translatable_taxonomies}')",
 			OBJECT
 		);
 
-		$default_lang      = Options::get()['default_language'];
+		$default_lang      = LangInterface::get_default_language();
 		$successful        = 0;
 		$success_taxonomy = [];
 		$fail_taxonomy    = [];

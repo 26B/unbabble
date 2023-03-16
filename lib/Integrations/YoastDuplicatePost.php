@@ -25,9 +25,10 @@ class YoastDuplicatePost {
 			return;
 		}
 
-		if ( $post_type === 'revision' || ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
+		if ( $post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return;
 		}
+
 		if ( ! ( $_POST['ubb_copy_new'] ?? false ) ) {
 			return;
 		}
@@ -37,7 +38,7 @@ class YoastDuplicatePost {
 		$lang_create = $_POST['ubb_create'] ?? '';
 		if (
 			empty( $lang_create )
-			|| ! in_array( $lang_create, Options::get()['allowed_languages'] )
+			|| ! LangInterface::is_language_allowed( $lang_create )
 			// TODO: check if post_id has this language already
 		) {
 			// TODO: What else to do when this happens.
@@ -126,7 +127,7 @@ class YoastDuplicatePost {
 
 	private function set_filters_for_meta( int $post_id, string $new_lang ) : void {
 		$default_meta = [];
-		if ( in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
+		if ( LangInterface::is_post_type_translatable( 'attachment' ) ) {
 			$default_meta['_thumbnail_id'] = 'post';
 		}
 
@@ -196,7 +197,7 @@ class YoastDuplicatePost {
 				}
 
 				// Keep same ID for non translatable post types.
-				if ( ! in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
+				if ( ! LangInterface::is_post_type_translatable( $post->post_type ) ) {
 					$new_meta_value[] = $meta_post_id;
 					continue;
 				}
@@ -216,7 +217,7 @@ class YoastDuplicatePost {
 			}
 
 			// Keep same ID for non translatable post types.
-			if ( ! in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
+			if ( ! LangInterface::is_post_type_translatable( $post->post_type ) ) {
 				return $meta_value;
 			}
 
@@ -251,13 +252,13 @@ class YoastDuplicatePost {
 
 			$new_meta_value = [];
 			foreach ( $meta_value as $meta_term_id ) {
-				$term = get_term( $meta_term_id );
+				$term = \get_term( $meta_term_id );
 				if ( ! $term instanceof WP_Term ) {
 					continue;
 				}
 
 				// Keep same ID for non translatable taxonomies.
-				if ( ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+				if ( ! LangInterface::is_taxonomy_translatable( $term->taxonomy ) ) {
 					$new_meta_value[] = $meta_term_id;
 					continue;
 				}
@@ -271,13 +272,13 @@ class YoastDuplicatePost {
 		}
 
 		if ( is_numeric( $meta_value ) ) {
-			$term = get_term( $meta_value );
+			$term = \get_term( $meta_value );
 			if ( ! $term instanceof WP_Term ) {
 				return $check;
 			}
 
 			// Keep same ID for non translatable taxonomies.
-			if ( ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+			if ( ! LangInterface::is_taxonomy_translatable( $term->taxonomy ) ) {
 				return $meta_value;
 			}
 
@@ -312,11 +313,10 @@ class YoastDuplicatePost {
 	}
 
 	private function set_translation_terms( int $new_post_id, int $post_id, string $new_lang ) : bool {
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
-		$og_terms           = wp_get_object_terms( $post_id, get_post_taxonomies( $post_id ) );
-		$new_terms          = [];
+		$og_terms  = wp_get_object_terms( $post_id, get_post_taxonomies( $post_id ) );
+		$new_terms = [];
 		foreach ( $og_terms as $term ) {
-			if ( ! in_array( $term->taxonomy, $allowed_taxonomies, true ) ) {
+			if ( ! LangInterface::is_taxonomy_translatable( $term->taxonomy ) ) {
 				$new_terms[ $term->taxonomy ][] = $term->term_id;
 				continue;
 			}

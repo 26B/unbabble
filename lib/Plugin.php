@@ -6,7 +6,6 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
-use TwentySixB\WP\Plugin\Unbabble\Language\Frontend;
 use WP_CLI;
 
 /**
@@ -147,7 +146,7 @@ class Plugin {
 			'lang_frontend' => Language\Frontend::class,
 			'lang_packages' => Language\LanguagePacks::class,
 
-			'db_options' => DB\Options::class,
+			'options' => Options::class,
 
 			// TODO: Filter the query for attaching an attachment.
 		];
@@ -156,7 +155,7 @@ class Plugin {
 
 		if ( ! Options::should_run_unbabble() ) {
 			\add_action( 'admin_notices', [ ( new Admin\Admin() ), 'idle_notice' ], PHP_INT_MAX );
-			$components = [ 'db_options' => DB\Options::class ];
+			$components = [ 'options' => Options::class ];
 		}
 
 		foreach ( $components as $component ) {

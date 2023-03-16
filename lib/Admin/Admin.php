@@ -2,8 +2,6 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
-use TwentySixB\WP\Plugin\Unbabble\Options;
-
 /**
  * General hooks for the back-office.
  *
@@ -26,7 +24,7 @@ class Admin {
 	}
 
 	/**
-	 * Add an admin notice when Unbabble is idling.
+	 * Prints the admin notice when Unbabble is idling.
 	 *
 	 * @since 0.0.9
 	 *
@@ -40,6 +38,69 @@ class Admin {
 		);
 		printf( '<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>', $message );
 	}
+
+	/**
+	 * Prints the admin notice when the Unbabble options failed to update via the filter.
+	 *
+	 * @since 0.0.10
+	 *
+	 * @return void
+	 */
+	public function options_update_failed_notice() : void {
+		$message = sprintf(
+			/* translators: %s: Code html with options name */
+			esc_html( __( 'Unbabble was not able to update the %s option value following an options value change via the filter.', 'unbabble' ) ),
+			'<code>ubb_options</code>'
+		);
+		printf( '<div class="notice notice-error"><p><b>Unbabble: </b>%s</p></div>', $message );
+	}
+
+	/**
+	 * Prints the admin notice when the Unbabble options where updated successfully.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @return void
+	 */
+	public function options_updated() : void {
+		?>
+		<div class="notice notice-success">
+			<p> <?php \_e( 'Unbabble options were updated.', 'unbabble' ); ?> </p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Prints the admin notice when the Unbabble options are invalid in a certain context.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @param string $context
+	 * @param array $errors
+	 * @return void
+	 */
+	public function invalid_options_notice( string $context, array $errors ) : void {
+		?>
+		<div class="notice notice-error">
+			<p>
+				<b>Unbabble - </b>
+				<?php printf( __( 'Error while %s:', 'unbabble' ), $context ); ?>
+				<br>
+				<?php /* TODO: Make collapsable lists */ ?>
+				<?php foreach ( $errors as $key => $messages ) : ?>
+					<p><code><?php print( $key ) ?></code></p>
+					<div style='margin-left:2em;'>
+						<?php foreach ( $messages as $message ) : ?>
+							<p> <?php print( '- ' . $message ) ?> </p>
+						<?php endforeach; ?>
+					</div>
+				<?php endforeach; ?>
+			</p>
+		</div>
+		<?php
+	}
+
+
 
 	/**
 	 * Enqueues admin scripts.

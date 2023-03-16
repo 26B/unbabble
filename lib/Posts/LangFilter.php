@@ -42,9 +42,10 @@ class LangFilter {
 
 		// TODO: Deal with untranslatable post types.
 
-		$current_lang       = esc_sql( LangInterface::get_current_language() );
-		$post_lang_table    = ( new PostTable() )->get_table_name();
-		$allowed_post_types = implode( "','", Options::get_allowed_post_types() );
+		$current_lang            = \esc_sql( LangInterface::get_current_language() );
+		$post_lang_table         = ( new PostTable() )->get_table_name();
+		$translatable_post_types = implode( "','", LangInterface::get_translatable_post_types() );
+
 		$where .= " AND (
 			{$wpdb->posts}.ID IN (
 				SELECT post_id
@@ -53,7 +54,7 @@ class LangFilter {
 				UNION
 				SELECT ID
 				FROM {$wpdb->posts}
-				WHERE post_type NOT IN ('{$allowed_post_types}')
+				WHERE post_type NOT IN ('{$translatable_post_types}')
 			)
 		)";
 
@@ -138,11 +139,18 @@ class LangFilter {
 		if ( empty( $post_type ) && ! empty( $query->get( 'pagename', null ) ) ) {
 			$post_type = 'page';
 		}
+		if ( is_array( $post_type ) ) {
+			if ( empty( $post_type ) ) {
+				$post_type = '';
+			} else if ( is_string( $post_type[0] ) ) {
+				$post_type = $post_type[0];
+			}
+		}
 
 		if (
 			! empty( $post_type )
 			&& $post_type !== 'any'
-			&& ! in_array( $post_type, Options::get_allowed_post_types(), true )
+			&& ! LangInterface::is_post_type_translatable( $post_type )
 		) {
 			return false;
 		}

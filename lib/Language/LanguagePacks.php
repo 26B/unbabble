@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Language;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -38,7 +39,7 @@ class LanguagePacks {
 			return;
 		}
 
-		$allowed_languages      = Options::get()['allowed_languages'];
+		$allowed_languages      = LangInterface::get_languages();
 		$installed_languages    = array_merge( [ 'en_US' ], \get_available_languages() );
 		$missing_language_packs = array_diff( $allowed_languages, $installed_languages );
 		if ( empty( $missing_language_packs ) ) {

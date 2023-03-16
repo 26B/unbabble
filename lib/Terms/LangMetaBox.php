@@ -34,8 +34,8 @@ class LangMetaBox {
 	 */
 	public function add_ubb_meta_box() : void {
 
-		// Filter for allowed taxonomies.
-		$taxonomies = array_intersect( \get_taxonomies(), Options::get_allowed_taxonomies() );
+		// Filter for translatable taxonomies.
+		$taxonomies = array_intersect( \get_taxonomies(), LangInterface::get_translatable_taxonomies() );
 
 		/**
 		 * Filters taxonomies that will have the language meta box.
@@ -62,8 +62,6 @@ class LangMetaBox {
 	 * @return void
 	 */
 	public function new_term_language_metabox() : void {
-		$options = Options::get();
-
 		printf(
 			'<div class="form-field term-language-wrap">
 				<label for="tag-language">%1$s</label>
@@ -71,7 +69,7 @@ class LangMetaBox {
 				<p>%3$s</p>
 			</div>',
 			esc_html__( 'Language', 'unbabble' ),
-			$this->print_language_select( 'ubb_lang', LangInterface::get_current_language(), $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
+			$this->print_language_select( 'ubb_lang', LangInterface::get_current_language(), LangInterface::get_languages(), 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' )
 		);
 
@@ -92,11 +90,9 @@ class LangMetaBox {
 	 * @return void
 	 */
 	public function edit_term_language_metabox( WP_Term $term ) : void {
-		$lang    = LangInterface::get_term_language( $term->term_id );
-		$options = Options::get();
-
+		$lang                = LangInterface::get_term_language( $term->term_id );
 		$translations        = LangInterface::get_term_translations( $term->term_id );
-		$available_languages = array_flip( $options['allowed_languages'] );
+		$available_languages = array_flip( LangInterface::get_languages() );
 
 		$query_args = $_GET;
 		unset( $query_args['lang'] );
@@ -105,7 +101,7 @@ class LangMetaBox {
 		$translation_to_show = [];
 		$seen_languages      = [];
 		foreach ( $translations as $translation_id => $translation_lang ) {
-			if ( ! in_array( $translation_lang, $options['allowed_languages'], true ) ) {
+			if ( ! LangInterface::is_language_allowed( $translation_lang ) ) {
 				continue;
 			}
 			/**
@@ -172,7 +168,7 @@ class LangMetaBox {
 				</td>
 			</tr>',
 			esc_html__( 'Language', 'unbabble' ),
-			$this->print_language_select( 'ubb_lang', $lang, $options['allowed_languages'], 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
+			$this->print_language_select( 'ubb_lang', $lang, LangInterface::get_languages(), 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' ),
 			esc_html__( 'Translations', 'unbabble' ),
 			$translations_string,
@@ -334,7 +330,7 @@ class LangMetaBox {
 	private function get_possible_links( WP_Term $term, string $term_lang ) : array {
 		global $wpdb;
 		$translations_table    = ( new TermTable() )->get_table_name();
-		$allowed_languages_str = implode( "','", Options::get()['allowed_languages'] );
+		$allowed_languages_str = implode( "','", LangInterface::get_languages() );
 
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(

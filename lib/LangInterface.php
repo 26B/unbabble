@@ -17,6 +17,67 @@ use WP_Term;
 class LangInterface {
 
 	/**
+	 * Returns an array of the available languages.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @return array
+	 */
+	public static function get_languages() : array {
+		$options           = Options::get();
+		$allowed_languages = $options['allowed_languages'];
+
+		// Remove hidden languages from allowed languages.
+		if (
+			isset( $options['hidden_languages'] )
+			&& is_array( $options['hidden_languages'] )
+			&& ! \is_admin()
+			&& ! \current_user_can( 'manage_options' )
+		) {
+			$allowed_languages = array_filter(
+				$allowed_languages,
+				fn ( $lang ) => ! in_array( $lang, $options['hidden_languages'], true )
+			);
+
+			// Validation should keep this from happening.
+			if ( empty( $allowed_languages ) ) {
+				$allowed_languages = [ $options['default_language'] ];
+			}
+		}
+
+		return $allowed_languages;
+	}
+
+	/**
+	 * Returns whether a language is allowed currently or not.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @param string $language
+	 * @return bool
+	 */
+	public static function is_language_allowed( string $language ) : bool {
+		return in_array( $language, self::get_languages(), true );
+	}
+
+	/**
+	 * Returns the default language.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @return string
+	 */
+	public static function get_default_language() : string {
+		$options   = Options::get();
+		$languages = self::get_languages();
+		// Validation should keep this from happening.
+		if ( ! in_array( $options['default_language'], $languages, true ) ) {
+			return $languages[ array_key_first( $languages ) ];
+		}
+		return $options['default_language'];
+	}
+
+	/**
 	 * Returns the current language code.
 	 *
 	 * @since 0.0.1
@@ -25,7 +86,6 @@ class LangInterface {
 	 */
 	public static function get_current_language() : string {
 		global $wp_query;
-		$options = Options::get();
 		if ( $wp_query !== null ) {
 			$lang = get_query_var( 'lang', null );
 		}
@@ -39,12 +99,11 @@ class LangInterface {
 		}
 
 		if ( ! isset( $lang ) ) {
-			$lang = $options['default_language'];
+			$lang = self::get_default_language();
+		} else if ( ! self::is_language_allowed( $lang ) ) {
+			$lang = self::get_default_language();
 		}
 
-		if ( ! in_array( $lang, $options['allowed_languages'] ) ) {
-			$lang = $options['default_language'];
-		}
 
 		/**
 		 * Filters the current language.
@@ -65,12 +124,23 @@ class LangInterface {
 	 * @return bool True if language is known and allowed and was set, false otherwise.
 	 */
 	public static function set_current_language( string $lang ) : bool {
-		$options = Options::get();
-		if ( ! in_array( $lang, $options['allowed_languages'], true ) ) {
+		if ( ! self::is_language_allowed( $lang ) ) {
 			return false;
 		}
-		set_query_var( 'lang', $lang );
+		\set_query_var( 'lang', $lang );
 		return true;
+	}
+
+	/**
+	 * Returns the translatable post types.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @return array Array of post type slugs.
+	 */
+	public static function get_translatable_post_types() : array {
+		$options = Options::get();
+		return is_array( $options['post_types'] ) ? $options['post_types'] : [];
 	}
 
 	/**
@@ -82,7 +152,7 @@ class LangInterface {
 	 * @return bool
 	 */
 	public static function is_post_type_translatable( string $post_type ) : bool {
-		return in_array( $post_type, Options::get_allowed_post_types(), true );
+		return in_array( $post_type, self::get_translatable_post_types(), true );
 	}
 
 	/**
@@ -101,7 +171,7 @@ class LangInterface {
 		global $wpdb;
 		$table_name = ( new PostTable() )->get_table_name();
 
-		if ( ! in_array( $language, Options::get()['allowed_languages'], true ) ) {
+		if ( ! self::is_language_allowed( $language ) ) {
 			return false;
 		}
 
@@ -163,7 +233,7 @@ class LangInterface {
 	 */
 	public static function set_post_source( int $post_id, string $source_id, bool $force = false ) : bool {
 		if ( $force ) {
-			if ( $source_id === LangInterface::get_post_source( $post_id ) ) {
+			if ( $source_id === self::get_post_source( $post_id ) ) {
 				return true;
 			}
 			$meta_id = update_post_meta( $post_id, 'ubb_source', $source_id );
@@ -202,10 +272,7 @@ class LangInterface {
 	public static function get_post_translation( int $post_id, string $lang ) : ?int {
 		global $wpdb;
 		$source_id = self::get_post_source( $post_id );
-		if (
-			$source_id === null
-			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
-		) {
+		if ( $source_id === null || ! self::is_language_allowed( $lang ) ) {
 			return null;
 		}
 
@@ -258,11 +325,10 @@ class LangInterface {
 			)
 		);
 
-		$languages = Options::get()['allowed_languages'];
 		$lang_list = [];
 		foreach ( $posts as $post ) {
 			$post_language = self::get_post_language( $post->post_id );
-			if ( ! in_array( $post_language, $languages, true ) ) {
+			if ( ! self::is_language_allowed( $post_language ) ) {
 				continue;
 			}
 			$lang_list[ $post->post_id ] = $post_language;
@@ -291,7 +357,7 @@ class LangInterface {
 		$old_lang = self::get_post_language( $post_id );
 		if (
 			empty( $lang )
-			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
+			|| ! self::is_language_allowed( $lang )
 			|| $lang === $old_lang
 		) {
 			return false;
@@ -322,12 +388,11 @@ class LangInterface {
 
 		// Filter needed since system still thinks its in the previous language.
 		add_filter( 'ubb_use_term_lang_filter', '__return_false' );
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		foreach ( $terms as $term ) {
-			if ( ! in_array( $term->taxonomy, $allowed_taxonomies, true ) ) {
+			if ( ! self::is_taxonomy_translatable( $term->taxonomy ) ) {
 				continue;
 			}
-			$term_translation = LangInterface::get_term_translation( $term->term_id, $lang );
+			$term_translation = self::get_term_translation( $term->term_id, $lang );
 
 			wp_remove_object_terms( $post_id, $term->term_id, $term->taxonomy );
 
@@ -343,7 +408,7 @@ class LangInterface {
 
 		// Update Meta.
 		$default_meta = [];
-		if ( in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
+		if ( self::is_post_type_translatable( 'attachment' ) ) {
 			$default_meta['_thumbnail_id'] = 'post';
 		}
 
@@ -424,6 +489,18 @@ class LangInterface {
 	}
 
 	/**
+	 * Returns the translatable taxonomies.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @return array Array of taxonomy slugs.
+	 */
+	public static function get_translatable_taxonomies() : array {
+		$options = Options::get();
+		return is_array( $options['taxonomies'] ) ? $options['taxonomies'] : [];
+	}
+
+	/**
 	 * Returns if a taxonomy is translatable.
 	 *
 	 * @since 0.0.3
@@ -432,7 +509,7 @@ class LangInterface {
 	 * @return bool
 	 */
 	public static function is_taxonomy_translatable( string $taxonomy ) : bool {
-		return in_array( $taxonomy, Options::get_allowed_taxonomies(), true );
+		return in_array( $taxonomy, self::get_translatable_taxonomies(), true );
 	}
 
 	/**
@@ -451,7 +528,7 @@ class LangInterface {
 		global $wpdb;
 		$table_name = ( new TermTable() )->get_table_name();
 
-		if ( ! in_array( $language, Options::get()['allowed_languages'], true ) ) {
+		if ( ! self::is_language_allowed( $language ) ) {
 			return false;
 		}
 
@@ -505,7 +582,7 @@ class LangInterface {
 	 */
 	public static function set_term_source( int $term_id, string $source_id, bool $force = false ) : bool {
 		if ( $force ) {
-			if ( $source_id === LangInterface::get_term_source( $term_id ) ) {
+			if ( $source_id === self::get_term_source( $term_id ) ) {
 				return true;
 			}
 			$meta_id = update_term_meta( $term_id, 'ubb_source', $source_id );
@@ -546,7 +623,7 @@ class LangInterface {
 		$source_id = self::get_term_source( $term_id );
 		if (
 			$source_id === null
-			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
+			|| ! self::is_language_allowed( $lang )
 		) {
 			return null;
 		}
@@ -598,11 +675,10 @@ class LangInterface {
 			)
 		);
 
-		$languages = Options::get()['allowed_languages'];
 		$lang_list = [];
 		foreach ( $terms as $term ) {
 			$term_language = self::get_term_language( $term->term_id );
-			if ( ! in_array( $term_language, $languages, true ) ) {
+			if ( ! self::is_language_allowed( $term_language ) ) {
 				continue;
 			}
 			$lang_list[ $term->term_id ] = $term_language;
@@ -626,7 +702,7 @@ class LangInterface {
 
 		if (
 			empty( $lang )
-			|| ! in_array( $lang, Options::get()['allowed_languages'], true )
+			|| ! self::is_language_allowed( $lang )
 			|| $lang === self::get_term_language( $term_id )
 		) {
 			return false;
@@ -731,7 +807,7 @@ class LangInterface {
 
 		// If language doesn't exist, or is the same as the current one, return the same url.
 		if (
-			! in_array( $lang, Options::get()['allowed_languages'] )
+			! self::is_language_allowed( $lang )
 			|| $lang === self::get_current_language()
 		) {
 			return ( $_SERVER['HTTPS'] ? 'https://' : 'http://' ) .
@@ -939,12 +1015,12 @@ class LangInterface {
 					}
 
 					// Keep same ID for non translatable post types.
-					if ( ! in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
+					if ( ! self::is_post_type_translatable( $post->post_type ) ) {
 						$new_meta_value[] = $object_id;
 						continue;
 					}
 
-					$meta_post_translation = LangInterface::get_post_translation( $object_id, $new_lang );
+					$meta_post_translation = self::get_post_translation( $object_id, $new_lang );
 					if ( $meta_post_translation === null ) {
 						continue;
 					}
@@ -956,12 +1032,12 @@ class LangInterface {
 					}
 
 					// Keep same ID for non translatable taxonomies.
-					if ( ! in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+					if ( ! self::is_taxonomy_translatable( $term->taxonomy ) ) {
 						$new_meta_value[] = $object_id;
 						continue;
 					}
 
-					$meta_term_translation = LangInterface::get_term_translation( $object_id, $new_lang );
+					$meta_term_translation = self::get_term_translation( $object_id, $new_lang );
 					if ( $meta_term_translation === null ) {
 						continue;
 					}
@@ -979,8 +1055,8 @@ class LangInterface {
 
 				// Keep same ID for non translatable post types.
 				$new_meta_value = $meta_value;
-				if ( in_array( $post->post_type, Options::get_allowed_post_types(), true ) ) {
-					$new_meta_value = LangInterface::get_post_translation( $meta_value, $new_lang );
+				if ( self::is_post_type_translatable( $post->post_type ) ) {
+					$new_meta_value = self::get_post_translation( $meta_value, $new_lang );
 					if ( $new_meta_value === null ) {
 						$new_meta_value = '';
 					}
@@ -994,8 +1070,8 @@ class LangInterface {
 
 				// Keep same ID for non translatable taxonomies.
 				$new_meta_value = $meta_value;
-				if ( in_array( $term->taxonomy, Options::get_allowed_taxonomies(), true ) ) {
-					$new_meta_value = LangInterface::get_term_translation( $meta_value, $new_lang );
+				if ( self::is_taxonomy_translatable( $term->taxonomy ) ) {
+					$new_meta_value = self::get_term_translation( $meta_value, $new_lang );
 					if ( $new_meta_value === null ) {
 						$new_meta_value = '';
 					}

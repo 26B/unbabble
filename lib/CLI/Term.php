@@ -74,8 +74,8 @@ class Term extends Command {
 		}
 
 		$target_language = $args[1];
-		if ( ! in_array( $target_language, Options::get()['allowed_languages'] ) ) {
-			$allowed_languages_str = implode( ', ', Options::get()['allowed_languages'] );
+		if ( ! LangInterface::is_language_allowed( $target_language ) ) {
+			$allowed_languages_str = implode( ', ', LangInterface::get_languages() );
 			WP_CLI::error( "Language {$target_language} is not currently allowed. Allowed languages are: {$allowed_languages_str}" );
 		}
 

@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -36,14 +37,13 @@ class LangCookie {
 		 * different languages.
 		 */
 		$lang_url = $_GET['lang'] ?? '';
-		$options  = Options::get();
 		$redirect = false;
 
 		/**
 		 * If lang in url is no longer allowed, then set cookie to default language and redirect to
 		 * current url with default language.
 		 */
-		if ( ! empty( $lang_url ) && ! in_array( $lang_url, $options['allowed_languages'], true ) ) {
+		if ( ! empty( $lang_url ) && ! LangInterface::is_language_allowed( $lang_url ) ) {
 			$lang_url = ''; // Force default language.
 			$redirect = true;
 		}
@@ -56,13 +56,13 @@ class LangCookie {
 		) {
 
 			// Don't set cookie when only one language is allowed.
-			if ( count( $options['allowed_languages'] ) < 2 ) {
+			if ( count( LangInterface::get_languages() ) < 2 ) {
 				return;
 			}
 
 			// Temporary expiration time. User Session default.
 			$expiration   = self::get_lang_expire_cookie();
-			$cookie_value = empty( $lang_url ) ? $options['default_language'] : $lang_url;
+			$cookie_value = empty( $lang_url ) ? LangInterface::get_default_language() : $lang_url;
 			setcookie( 'ubb_lang', $cookie_value, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 
 			// TODO: Need to be careful with redirect when this hook is called from admin-ajax/heartbeat.
@@ -81,11 +81,11 @@ class LangCookie {
 		 * update the cookie with the default language.
 		 */
 		$lang_cookie = $_COOKIE['ubb_lang'];
-		if ( ! in_array( $lang_cookie, $options['allowed_languages'], true ) ) {
+		if ( ! LangInterface::is_language_allowed( $lang_cookie ) ) {
 
 			// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
 			$expiration = self::get_lang_expire_cookie();
-			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
+			setcookie( 'ubb_lang', LangInterface::get_default_language(), $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
 	}
@@ -102,8 +102,7 @@ class LangCookie {
 	 * @return void
 	 */
 	public function set_lang_cookie_on_login( string $auth_cookie, int $expire, int $expiration ) : void {
-		$options = Options::get();
-		setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
+		setcookie( 'ubb_lang', LangInterface::get_default_language(), $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 		setcookie( 'ubb_lang_expire', $expiration, $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 	}
 
@@ -127,27 +126,26 @@ class LangCookie {
 	 * @return void
 	 */
 	public function set_lang_cookie_on_options_save() : void {
-		$options = Options::get();
 
 		// If cookie doesn't exist and there is more than one allowed language.
 		if ( ! isset( $_COOKIE['ubb_lang'] ) ) {
-			if ( count( $options['allowed_languages'] ) < 2 ) {
+			if ( count( LangInterface::get_languages() ) < 2 ) {
 				return;
 			}
 
 			// Temporary expiration time. User Session default.
 			$expiration = time() + 14 * DAY_IN_SECONDS;
-			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
+			setcookie( 'ubb_lang', LangInterface::get_default_language(), $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
 
 		// If cookie value was removed from allowed languages.
 		$lang_cookie = $_COOKIE['ubb_lang'];
-		if ( ! in_array( $lang_cookie, $options['allowed_languages'], true ) ) {
+		if ( ! LangInterface::is_language_allowed( $lang_cookie ) ) {
 
 			// Try to get cookie with expiration time. Otherwise use User Session default expiration time.
 			$expiration = self::get_lang_expire_cookie();
-			setcookie( 'ubb_lang', $options['default_language'], $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
+			setcookie( 'ubb_lang', LangInterface::get_default_language(), $expiration, '/', $_SERVER['HTTP_HOST'], is_ssl(), true );
 			return;
 		}
 	}
