@@ -164,7 +164,7 @@ class Options {
 	 *
 	 * @return array
 	 */
-	private static function defaults() : array {
+	public static function defaults() : array {
 		\add_filter( 'ubb_stop_switch_locale', '__return_true' );
 		$wp_locale = \get_locale();
 		\remove_filter( 'ubb_stop_switch_locale', '__return_true' );
