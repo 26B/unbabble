@@ -44,6 +44,10 @@ class Migrator {
 	 * @return void
 	 */
 	public function run( array $args, array $assoc_args ) : void {
+
+		// Don't hide any language during migration.
+		\add_filter( 'ubb_do_hidden_languages_filter', '__return_false' );
+
 		if ( ! $this->check_for_wpml_tables() ) {
 			WP_CLI::error( 'No WPML tables for migration.' );
 		}

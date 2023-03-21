@@ -27,22 +27,43 @@ class LangInterface {
 		$options           = Options::get();
 		$allowed_languages = $options['allowed_languages'];
 
-		// Remove hidden languages from allowed languages.
-		if (
-			isset( $options['hidden_languages'] )
-			&& is_array( $options['hidden_languages'] )
-			&& ! \is_admin()
-			&& ! \current_user_can( 'manage_options' )
-		) {
-			$allowed_languages = array_filter(
-				$allowed_languages,
-				fn ( $lang ) => ! in_array( $lang, $options['hidden_languages'], true )
-			);
+		// Don't filter languages on admin.
+		if ( \is_admin() ) {
+			return $allowed_languages;
+		}
 
-			// Validation should keep this from happening.
-			if ( empty( $allowed_languages ) ) {
-				$allowed_languages = [ $options['default_language'] ];
-			}
+		// Check if hidden languages is set.
+		if ( ! isset( $options['hidden_languages'] ) ) {
+			return $allowed_languages;
+		}
+
+		// Don't filter language when the user is a high level user.
+		if ( \current_user_can( 'manage_options' ) ) {
+			return $allowed_languages;
+		}
+
+		/**
+		 * Filters whether to filter the allowed languages with the languages set in hidden
+		 * languages.
+		 *
+		 * @since 0.0.12
+		 *
+		 * @param bool  $filter
+		 * @param array $options Array of Unbabble's options.
+		 */
+		if ( ! \apply_filters( 'ubb_do_hidden_languages_filter', true, $options ) ) {
+			return $allowed_languages;
+		}
+
+		// Remove hidden languages from allowed languages.
+		$allowed_languages = array_filter(
+			$allowed_languages,
+			fn ( $lang ) => ! in_array( $lang, $options['hidden_languages'], true )
+		);
+
+		// Validation should keep this from happening.
+		if ( empty( $allowed_languages ) ) {
+			$allowed_languages = [ $options['default_language'] ];
 		}
 
 		return $allowed_languages;
@@ -810,7 +831,7 @@ class LangInterface {
 			! self::is_language_allowed( $lang )
 			|| $lang === self::get_current_language()
 		) {
-			return ( $_SERVER['HTTPS'] ? 'https://' : 'http://' ) .
+			return ( ( $_SERVER['HTTPS'] ?? true ) ? 'https://' : 'http://' ) .
 				$_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		}
 
