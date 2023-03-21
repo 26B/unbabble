@@ -32,8 +32,14 @@ class LanguageSwitcher {
 	 * @return void
 	 */
 	public function add_switcher_backoffice_admin_bar( \WP_Admin_Bar $wp_admin_bar ) : void {
-		$current = LangInterface::get_current_language();
-		$langs   = [];
+		$current        = LangInterface::get_current_language();
+		$languages_info = Options::get_languages_info();
+		$current_label  = $current;
+		if ( isset( $languages_info[ $current ] ) ) {
+			$current_label = $languages_info[ $current ]['native_name'];
+		}
+
+		$langs = [];
 		foreach ( LangInterface::get_languages() as $allowed_lang ) {
 			// TODO: Better way of handling this.
 			if (
@@ -47,37 +53,46 @@ class LanguageSwitcher {
 				$url = $this->make_switch_post_url( $_REQUEST['post'], $allowed_lang );
 			}
 
-			$langs[] = sprintf(
-				'<li><a class="ab-item" style="min-width:36px" href="%1$s" %2$s>%3$s</a></li>',
-				$url,
-				\selected( $allowed_lang, $current, false ),
-				$allowed_lang
-			);
+			$lang_label = $allowed_lang;
+			if ( isset( $languages_info[ $allowed_lang ] ) ) {
+				$lang_label = $languages_info[ $allowed_lang ][ 'native_name' ];
+			}
+
+			// Put the current at the top.
+			if ( $allowed_lang === $current ) {
+				$langs = array_merge(
+					[ $lang_label => [ $allowed_lang, $url ] ],
+					$langs
+				);
+				continue;
+			}
+
+			$langs[ $lang_label ] = [ $allowed_lang, $url ];
 		}
 
-		$html = sprintf(
-			'<ul><li class="menupop">
-				%1$s
-				<div class="ab-sub-wrapper">
-				<ul class="ab-submenu">
-				%2$s
-				</ul>
-				</div>
-			</li></ul>',
-			$current,
-			implode( '', $langs )
-		);
-
 		$wp_admin_bar->add_node(
-			(object) [
-				'id'     => 'ubb_lang_switcher',
-				'title'  => $html,
-				'parent' => '',
-				'href'   => '',
-				'group'  => '',
-				'meta'   => [],
+			[
+				'id'    => 'ubb_lang_switcher',
+				'title' => $current_label,
 			]
 		);
+
+		foreach ( $langs as $lang_label => $lang_info ) {
+			list( $lang_code, $url ) = $lang_info;
+
+			$node = [
+				'parent' => 'ubb_lang_switcher',
+				'id'     => 'ubb_lang_switcher-' . $lang_code,
+				'title'  => $lang_label,
+				'href'   => $url,
+			];
+
+			if ( $lang_code === $current ) {
+				unset( $node['href'] );
+			}
+
+			$wp_admin_bar->add_node( $node );
+		}
 	}
 
 	/**
