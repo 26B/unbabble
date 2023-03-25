@@ -41,6 +41,12 @@ class LanguageSwitcher {
 
 		$langs = [];
 		foreach ( LangInterface::get_languages() as $allowed_lang ) {
+
+			// Don't show the current language in the list.
+			if ( $allowed_lang === $current ) {
+				continue;
+			}
+
 			// TODO: Better way of handling this.
 			if (
 				( ! isset( $_REQUEST['post'] ) || ! is_numeric( $_REQUEST['post'] ) )
@@ -56,15 +62,6 @@ class LanguageSwitcher {
 			$lang_label = $allowed_lang;
 			if ( isset( $languages_info[ $allowed_lang ] ) ) {
 				$lang_label = $languages_info[ $allowed_lang ][ 'native_name' ];
-			}
-
-			// Put the current at the top.
-			if ( $allowed_lang === $current ) {
-				$langs = array_merge(
-					[ $lang_label => [ $allowed_lang, $url ] ],
-					$langs
-				);
-				continue;
 			}
 
 			$langs[ $lang_label ] = [ $allowed_lang, $url ];
@@ -86,10 +83,6 @@ class LanguageSwitcher {
 				'title'  => $lang_label,
 				'href'   => $url,
 			];
-
-			if ( $lang_code === $current ) {
-				unset( $node['href'] );
-			}
 
 			$wp_admin_bar->add_node( $node );
 		}

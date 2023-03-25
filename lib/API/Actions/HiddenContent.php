@@ -43,22 +43,60 @@ class HiddenContent {
 
 	public function set_default_lang_on_hidden_posts( WP_REST_Request $request ) : WP_REST_Response {
 		global $wpdb;
-		// TODO: Allow for only certain post_types.
+		\add_filter( 'ubb_do_hidden_languages_filter', '__return_false' );
 
 		$allowed_languages       = implode( "','", LangInterface::get_languages() );
-		$translatable_post_types = implode( "','", LangInterface::get_translatable_post_types() );
+		$translatable_post_types = LangInterface::get_translatable_post_types();
 		$translations_table      = ( new PostTable() )->get_table_name();
 
-		// TODO: We might only want to place a language in the ones that don't have language, not just on everything that's not allowed.
-		$bad_posts          = $wpdb->get_results(
-			"SELECT *
-			FROM {$wpdb->posts} as P
-			WHERE ID NOT IN (
+		$post_types = $request->get_param( 'post-types' ) ?? $translatable_post_types;
+		if ( is_string( $post_types ) ) {
+			$post_types = array_filter(
+				explode( ',', $post_types ),
+				function ( $post_type ) use ( $translatable_post_types ) {
+					if ( ! is_string( $post_type ) ) {
+						return false;
+					}
+					if ( ! \post_type_exists( $post_type ) ) {
+						return false;
+					}
+					return in_array( $post_type, $translatable_post_types, true );
+				}
+			);
+		}
+		$post_types = implode( "','", $post_types );
+
+		$focus = $request->get_param( 'focus' ) ?? 'all';
+		if ( $focus === 'missing' ) {
+			$where_focus = "ID NOT IN (
+				SELECT post_id
+				FROM {$translations_table} as PT
+			)";
+
+		} else if ( $focus === 'unknown' ) {
+			$where_focus = "ID IN (
+				SELECT post_id
+				FROM {$translations_table} as PT
+				WHERE PT.locale NOT IN ('{$allowed_languages}')
+			)";
+
+		} else if ( $focus === 'all' ) {
+			$where_focus = $where_focus = "ID NOT IN (
 				SELECT post_id
 				FROM {$translations_table} as PT
 				WHERE PT.locale IN ('{$allowed_languages}')
-			) AND post_status != 'auto-draft'
-			AND post_type IN ('{$translatable_post_types}')",
+			)";
+		} else {
+			$response = new WP_REST_Response( '', 500 );
+			return $response;
+		}
+
+		$bad_posts          = $wpdb->get_results(
+			"SELECT *
+			FROM {$wpdb->posts} as P
+			WHERE post_status != 'auto-draft'
+			AND post_type IN ('{$post_types}')
+			AND {$where_focus}",
 			OBJECT
 		);
 
@@ -90,12 +128,55 @@ class HiddenContent {
 
 	public function set_default_lang_on_hidden_terms( WP_REST_Request $request ) : WP_REST_Response {
 		global $wpdb;
-		// TODO: Allow for only certain taxonomies.
+		\add_filter( 'ubb_do_hidden_languages_filter', '__return_false' );
 
 		$allowed_languages       = implode( "','", LangInterface::get_languages() );
-		$translatable_taxonomies = implode( "','", LangInterface::get_translatable_taxonomies() );
+		$translatable_taxonomies = LangInterface::get_translatable_taxonomies();
 		$translations_table      = ( new TermTable() )->get_table_name();
-		$bad_terms               = $wpdb->get_results(
+
+		$taxonomies = $request->get_param( 'taxonomies' ) ?? $translatable_taxonomies;
+		if ( is_string( $taxonomies ) ) {
+			$taxonomies = array_filter(
+				explode( ',', $taxonomies ),
+				function ( $taxonomy ) use ( $translatable_taxonomies ) {
+					if ( ! is_string( $taxonomy ) ) {
+						return false;
+					}
+					if ( ! \taxonomy_exists( $taxonomy ) ) {
+						return false;
+					}
+					return in_array( $taxonomy, $translatable_taxonomies, true );
+				}
+			);
+		}
+		$taxonomies = implode( "','", $taxonomies );
+
+		$focus = $request->get_param( 'focus' ) ?? 'açç';
+		if ( $focus === 'missing' ) {
+			$where_focus = "T.term_id NOT IN (
+				SELECT term_id
+				FROM {$translations_table} as PT
+			)";
+
+		} else if ( $focus === 'unknown' ) {
+			$where_focus = "T.term_id IN (
+				SELECT term_id
+				FROM {$translations_table} as PT
+				WHERE PT.locale NOT IN ('{$allowed_languages}')
+			)";
+
+		} else if ( $focus === 'all' ) {
+			$where_focus = $where_focus = "T.term_id NOT IN (
+				SELECT term_id
+				FROM {$translations_table} as PT
+				WHERE PT.locale IN ('{$allowed_languages}')
+			)";
+		} else {
+			$response = new WP_REST_Response( '', 500 );
+			return $response;
+		}
+
+		$bad_terms = $wpdb->get_results(
 			"SELECT *
 			FROM {$wpdb->terms} as T
 			INNER JOIN {$wpdb->term_taxonomy} as TT ON (T.term_id = TT.term_id)
@@ -103,7 +184,8 @@ class HiddenContent {
 				SELECT term_id
 				FROM {$translations_table} as TR
 				WHERE TR.locale IN ('{$allowed_languages}')
-			) AND TT.taxonomy IN ('{$translatable_taxonomies}')",
+			) AND TT.taxonomy IN ('{$taxonomies}')
+			AND {$where_focus}",
 			OBJECT
 		);
 

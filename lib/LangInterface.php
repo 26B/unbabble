@@ -121,6 +121,7 @@ class LangInterface {
 
 		if ( ! isset( $lang ) ) {
 			$lang = self::get_default_language();
+
 		} else if ( ! self::is_language_allowed( $lang ) ) {
 			$lang = self::get_default_language();
 		}
