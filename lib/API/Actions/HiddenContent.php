@@ -37,7 +37,6 @@ class HiddenContent {
 	}
 
 	public function permission_callback( \WP_REST_Request $wp_request ) : bool {
-		return true; // FIXME: remove this when the call to the action is possible via JS on the backoffice.
 		return is_user_logged_in() && current_user_can( 'manage_options' );
 	}
 
