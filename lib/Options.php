@@ -175,6 +175,7 @@ class Options {
 			'post_types'        => [],
 			'taxonomies'        => [],
 			'router'            => 'query_var',
+			'router_options'    => [],
 		];
 	}
 
