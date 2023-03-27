@@ -4,7 +4,7 @@
  * Plugin Name: Unbabble
  * Plugin URI:  https://github.com/26B/unbabble
  * Description: A new and simple i18n system for WordPress
- * Version:     0.0.11
+ * Version:     0.0.12
  * Author:      26B
  * Author URI:  https://26b.io/
  * License:     GPL-2.0+
@@ -40,6 +40,6 @@ if ( ! defined( 'WPINC' ) ) {
  * @since 0.0.1
  */
 \add_action( 'plugins_loaded', function () {
-	$plugin = new TwentySixB\WP\Plugin\Unbabble\Plugin( 'unbabble', '0.0.11' );
+	$plugin = new TwentySixB\WP\Plugin\Unbabble\Plugin( 'unbabble', '0.0.12' );
 	$plugin->run();
 } );

@@ -10,7 +10,7 @@ use WP_Mock;
 /**
  * Unit tests for LangInterface.
  *
- * @since 0.0.0
+ * @since 0.0.12
  */
 class LangInterfaceTest extends TestCase {
 
@@ -44,7 +44,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Tear down tests.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @return void
 	 */
@@ -55,7 +55,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Options used in the tests.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @return array
 	 */
@@ -74,7 +74,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Set up hooks for loading options.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @param array  $options
 	 * @param string $default_locale
@@ -95,7 +95,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_languages.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox get_languages - return expected filtered and unfiltered languages
 	 *
@@ -132,7 +132,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_language_allowed.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox is_language_allowed - returns as expected
 	 *
@@ -157,7 +157,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_default_language.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox get_default_language - returns as expected
 	 *
@@ -176,7 +176,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_current_language.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox set_current_language - functions as expected
 	 *
@@ -202,7 +202,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_translatable_post_types.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox get_translatable_post_types - returns as expected
 	 *
@@ -221,7 +221,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_post_type_translatable.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox is_post_type_translatable - returns as expected
 	 *
@@ -246,7 +246,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_translatable_taxonomies.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox get_translatable_taxonomies - returns as expected
 	 *
@@ -265,7 +265,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_taxonomy_translatable.
 	 *
-	 * @since 0.0.0
+	 * @since 0.0.12
 	 *
 	 * @testdox is_taxonomy_translatable - returns as expected
 	 *
