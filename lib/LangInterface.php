@@ -7,6 +7,7 @@ use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
+use WP_Query;
 use WP_Term;
 
 /**
@@ -837,7 +838,7 @@ class LangInterface {
 		}
 
 		// Try to translate posts archive url.
-		if ( $wp_the_query->is_posts_page ) {
+		if ( $wp_the_query instanceof WP_Query && $wp_the_query->is_posts_page ) {
 			add_filter( 'ubb_current_lang', $fn = fn () => $lang );
 			$page_for_posts = get_option( 'page_for_posts' );
 			$home_url       = home_url();
@@ -849,7 +850,7 @@ class LangInterface {
 		}
 
 		// Try to translate a post types archive url.
-		if ( $wp_the_query->is_post_type_archive() ) {
+		if ( $wp_the_query instanceof WP_Query && $wp_the_query->is_post_type_archive() ) {
 			add_filter( 'ubb_current_lang', $fn = fn () => $lang );
 			$archive_link = get_post_type_archive_link( $wp_the_query->query['post_type'] );
 			remove_filter( 'ubb_current_lang', $fn );
@@ -857,7 +858,10 @@ class LangInterface {
 		}
 
 		// Try to translate a taxonomies archive url.
-		if ( $wp_the_query->is_category() || $wp_the_query->is_tag() || $wp_the_query->is_tax() ) {
+		if (
+			$wp_the_query instanceof WP_Query
+			&& ( $wp_the_query->is_category() || $wp_the_query->is_tag() || $wp_the_query->is_tax() )
+		) {
 			$term_id = $wp_the_query->queried_object->term_id ?? null;
 			if ( $term_id === null ) {
 				add_filter( 'ubb_current_lang', $fn = fn () => $lang );
@@ -876,7 +880,7 @@ class LangInterface {
 		}
 
 		// Try to translate a singular post url.
-		if ( $wp_the_query->is_singular() ) {
+		if ( $wp_the_query instanceof WP_Query && $wp_the_query->is_singular() ) {
 			$post_id = $wp_the_query->queried_object->ID ?? null;
 			if ( $post_id === null ) {
 				add_filter( 'ubb_current_lang', $fn = fn () => $lang );
