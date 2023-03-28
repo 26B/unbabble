@@ -62,8 +62,6 @@ class RoutingResolver {
 		\add_filter( 'network_home_url', [ $this, 'network_home_url' ], 10, 3 );
 
 		\add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
-
-		\add_filter( 'site_url', [ $this, 'site_url' ], 10, 2 );
 	}
 
 	/**
@@ -245,23 +243,6 @@ class RoutingResolver {
 		$router = $this->get_current_router_object();
 		if ( $router !== null && method_exists( $router, 'admin_url' ) ) {
 			return $router->admin_url( $url );
-		}
-		return $url;
-	}
-
-	/**
-	 * Apply routing changes to hook `site_url`.
-	 *
-	 * @since 0.0.13
-	 *
-	 * @param string $lang
-	 * @param string $path
-	 * @return string
-	 */
-	public function site_url( string $url, string $path ) : string {
-		$router = $this->get_current_router_object();
-		if ( $router !== null && method_exists( $router, 'site_url' ) ) {
-			return $router->site_url( $url, $path );
 		}
 		return $url;
 	}
