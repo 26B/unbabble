@@ -463,6 +463,49 @@ class Directory {
 	}
 
 	/**
+	 * Adds directory to site_url.
+	 *
+	 * @since 0.0.13
+	 *
+	 * @param string $url
+	 * @param string $path
+	 * @return string
+	 */
+	public function site_url( string $url, string $path ) : string {
+
+		/**
+		 * Filters whether to change the site url or not, given the routing type and the current
+		 * language.
+		 *
+		 * @since 0.0.13
+		 * @param bool   $stop_url_change Whether to change the site url or not.
+		 * @param string $url             Site url.
+		 * @param string $path            Url path.
+		 */
+		if ( apply_filters( 'ubb_site_url', false, $url, $path ) ) {
+			return $url;
+		}
+
+		$curr_lang = LangInterface::get_current_language();
+		if ( $curr_lang === LangInterface::get_default_language() ) {
+			return $url;
+		}
+
+		$directory = $this->get_directory_name( $curr_lang );
+		$subpath = $path;
+		if ( str_starts_with( $path, '/' ) ) {
+			$subpath = substr( $path, 1 );
+		}
+
+		if ( empty( $subpath ) ) {
+			$new_url = trailingslashit( $url ) . trailingslashit( $directory );
+		} else {
+			$new_url = str_replace( "/{$subpath}", "/{$directory}/{$subpath}", trailingslashit( $url ) );
+		}
+		return $new_url;
+	}
+
+	/**
 	 * Get the directory name for a language.
 	 *
 	 * @since 0.0.1
