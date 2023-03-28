@@ -351,7 +351,7 @@ class LangInterface {
 		$lang_list = [];
 		foreach ( $posts as $post ) {
 			$post_language = self::get_post_language( $post->post_id );
-			if ( ! self::is_language_allowed( $post_language ) ) {
+			if ( ! $post_language || ! self::is_language_allowed( $post_language ) ) {
 				continue;
 			}
 			$lang_list[ $post->post_id ] = $post_language;
@@ -701,7 +701,7 @@ class LangInterface {
 		$lang_list = [];
 		foreach ( $terms as $term ) {
 			$term_language = self::get_term_language( $term->term_id );
-			if ( ! self::is_language_allowed( $term_language ) ) {
+			if ( ! $term_language || ! self::is_language_allowed( $term_language ) ) {
 				continue;
 			}
 			$lang_list[ $term->term_id ] = $term_language;
