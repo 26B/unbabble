@@ -150,7 +150,7 @@ class HiddenContent {
 		}
 		$taxonomies = implode( "','", $taxonomies );
 
-		$focus = $request->get_param( 'focus' ) ?? 'açç';
+		$focus = $request->get_param( 'focus' ) ?? 'all';
 		if ( $focus === 'missing' ) {
 			$where_focus = "T.term_id NOT IN (
 				SELECT term_id
