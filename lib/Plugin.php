@@ -176,9 +176,11 @@ class Plugin {
 
 	private function define_commands() : void {
 		$commands = [
-			CLI\Post::class    => 'ubb post',
-			CLI\Term::class    => 'ubb term',
-			CLI\Options::class => 'ubb options',
+			CLI\Post::class        => 'ubb post',
+			CLI\Term::class        => 'ubb term',
+			CLI\Options::class     => 'ubb options',
+			CLI\Hidden\Post::class => 'ubb post hidden',
+			CLI\Hidden\Term::class => 'ubb term hidden',
 		];
 		\add_action( 'init', function () use ( $commands ) {
 			foreach ( $commands as $cli_class => $command_name ) {

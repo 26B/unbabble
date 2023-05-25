@@ -3,7 +3,6 @@
 namespace TwentySixB\WP\Plugin\Unbabble\CLI;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_CLI;
 
 /**
@@ -252,7 +251,7 @@ class Post extends Command {
 		}
 
 		// Print post information.
-		self::log_color( '%4About post:%N' );
+		self::log_color( '%4' . __( 'About post', 'unbabble' ) .':%N' );
 		$this->format_lines_and_log( $lines, self::INDENT );
 	}
 
