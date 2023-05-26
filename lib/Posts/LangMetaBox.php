@@ -4,7 +4,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 
 /**
@@ -72,7 +71,7 @@ class LangMetaBox {
 	 * @return void
 	 */
 	public function add_ubb_meta_box_callback( \WP_Post $post ) : void {
-		$lang              = LangInterface::get_current_language();
+		$lang              = LangInterface::get_post_language( $post->ID );
 		$allowed_languages = LangInterface::get_languages();
 
 		$this->print_language_select( 'ubb_lang', $lang, $allowed_languages, 'ubb_language_metabox_nonce', 'ubb_language_metabox' );
@@ -149,7 +148,7 @@ class LangMetaBox {
 		unset( $available_languages[ $lang ] );
 
 		// Can't create more translations currently.
-		if ( ! empty( $available_languages ) ) {
+		if ( is_string( $lang ) && ! empty( $available_languages ) ) {
 			$available_languages = array_keys( $available_languages );
 
 			// Display language selector and button to create new translation.
@@ -166,23 +165,25 @@ class LangMetaBox {
 			);
 		}
 
-		$options = array_reduce(
-			$this->get_possible_links( $post, $lang ),
-			fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
-			! $translation_to_show ? '' : sprintf( "<option value='%s'>%s</option>\n", 'unlink', __( 'Unlink from translations', 'unbabble' ) )
-		);
+		if ( is_string( $lang ) ) {
+			$options = array_reduce(
+				$this->get_possible_links( $post, $lang ),
+				fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
+				! $translation_to_show ? '' : sprintf( "<option value='%s'>%s</option>\n", 'unlink', __( 'Unlink from translations', 'unbabble' ) )
+			);
 
-		printf(
-			'<hr><details>
-				<summary><b>Linking translation:</b></summary>
-				<label>%1$s</label>
-				<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation" placeholder="%2$s">
-				<datalist id="ubb_link_translations_list">%3$s</datalist>
-			</details>',
-			__( 'Linked to:', 'unbabble' ),
-			__( 'Unchanged', 'unbabble' ),
-			$options
-		);
+			printf(
+				'<hr><details>
+					<summary><b>Linking translation:</b></summary>
+					<label>%1$s</label>
+					<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation" placeholder="%2$s">
+					<datalist id="ubb_link_translations_list">%3$s</datalist>
+				</details>',
+				__( 'Linked to:', 'unbabble' ),
+				__( 'Unchanged', 'unbabble' ),
+				$options
+			);
+		}
 	}
 
 	/**
@@ -261,10 +262,9 @@ class LangMetaBox {
 					$text
 				);
 			},
-			array_keys( $options ),
-			$options
+			is_string( $selected ) ? array_keys( $options ) : array_merge( [ __( 'Select Language', 'unbabble' ) ], array_keys( $options ) ),
+			is_string( $selected ) ? $options : array_merge( [ '' ], $options )
 		);
-
 
 		if ( ! empty( $nonce_action ) && ! empty( $nonce_name ) ) {
 			\wp_nonce_field( $nonce_action, $nonce_name );

@@ -174,7 +174,7 @@ class LangMetaBox {
 			$translations_string,
 		);
 
-		if ( ! empty( $available_languages ) ) {
+		if ( is_string( $lang ) && ! empty( $available_languages ) ) {
 			printf(
 				'<tr class="form-field term-language-wrap-2">
 					<th scope="row"><label for="language">%1$s</label></th>
@@ -190,24 +190,26 @@ class LangMetaBox {
 		}
 
 		// Linking.
-		$options = array_reduce(
-			$this->get_possible_links( $term, $lang ),
-			fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
-			! $translation_to_show ? '' : sprintf( "<option value='%s'>%s</option>\n", 'unlink', __( 'Unlink from translations', 'unbabble' ) )
-		);
+		if ( is_string( $lang ) ) {
+			$options = array_reduce(
+				$this->get_possible_links( $term, $lang ),
+				fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
+				! $translation_to_show ? '' : sprintf( "<option value='%s'>%s</option>\n", 'unlink', __( 'Unlink from translations', 'unbabble' ) )
+			);
 
-		printf(
-			'<tr class="form-field term-language-wrap-3">
-			<th scope="row"><label for="language">%1$s</label></th>
-			<td>
-			<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation" placeholder="%2$s">
-			<datalist id="ubb_link_translations_list">%3$s</datalist>
-			</td>
-			</tr>',
-			esc_html__( 'Linked to:', 'unbabble' ),
-			__( 'Unchanged', 'unbabble' ),
-			$options
-		);
+			printf(
+				'<tr class="form-field term-language-wrap-3">
+				<th scope="row"><label for="language">%1$s</label></th>
+				<td>
+				<input list="ubb_link_translations_list" id="ubb_link_translation" name="ubb_link_translation" placeholder="%2$s">
+				<datalist id="ubb_link_translations_list">%3$s</datalist>
+				</td>
+				</tr>',
+				esc_html__( 'Linked to:', 'unbabble' ),
+				__( 'Unchanged', 'unbabble' ),
+				$options
+			);
+		}
 	}
 
 	/**
@@ -267,8 +269,8 @@ class LangMetaBox {
 					$text
 				);
 			},
-			array_keys( $options ),
-			$options
+			is_string( $selected ) ? array_keys( $options ) : array_merge( [ __( 'Select Language', 'unbabble' ) ], array_keys( $options ) ),
+			is_string( $selected ) ? $options : array_merge( [ '' ], $options )
 		);
 
 		if ( ! empty( $nonce_action ) && ! empty( $nonce_name ) ) {
