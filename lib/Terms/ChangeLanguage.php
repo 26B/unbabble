@@ -4,6 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use WP_Term;
 
 /**
  * Hooks related to changing a terms language.
@@ -30,8 +31,15 @@ class ChangeLanguage {
 	 * @return void
 	 */
 	public function change_language( int $term_id ) : void {
-		// TODO: Finish this.
-		return;
+		$term = get_term( $term_id );
+		if ( ! $term instanceof WP_Term ) {
+			return;
+		}
+
+		$taxonomy = $term->taxonomy;
+		if ( ( $_POST['taxonomy'] ?? '' ) !== $taxonomy || $term_id !== (int) $_POST['tag_ID'] ) {
+			return;
+		}
 
 		$ubb_lang = \sanitize_text_field( $_POST['ubb_lang'] ?? '' );
 
@@ -40,6 +48,36 @@ class ChangeLanguage {
 		// TODO: show admin notice about translation with that language already existing and needing to disconnect a previous one.
 		if ( $status === false ) {
 			// TODO:
+			return;
 		}
+
+		// Remove relations to posts that do not have the destination language.
+
+		add_filter( 'ubb_use_post_lang_filter', '__return_false' );
+		add_filter( 'ubb_use_term_lang_filter', '__return_false' );
+
+		$posts = get_posts(
+			[
+				'post_type'   => LangInterface::get_translatable_post_types(),
+				'numberposts' => -1,
+				'post_status' => array_keys( get_post_stati() ),
+				'tax_query'   => [
+					[
+						'taxonomy' => $taxonomy,
+						'field'    => 'term_id',
+						'terms'    => $term_id,
+					]
+				]
+			]
+		);
+
+		foreach ( $posts as $post ) {
+			if ( LangInterface::get_post_language( $post->ID ) !== $ubb_lang ) {
+				$status = wp_remove_object_terms( $post->ID, $term_id, $taxonomy );
+			}
+		}
+
+		remove_filter( 'ubb_use_post_lang_filter', '__return_false' );
+		remove_filter( 'ubb_use_term_lang_filter', '__return_false' );
 	}
 }
