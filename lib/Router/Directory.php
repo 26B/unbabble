@@ -183,6 +183,10 @@ class Directory {
 		}
 
 		$term_lang = LangInterface::get_term_language( $term->term_id );
+		if ( ! is_string( $term_lang ) ) {
+			return $termlink;
+		}
+
 		$site_url  = site_url();
 		$url_lang  = $this->current_lang_from_uri( '', str_replace( $site_url, '', $termlink ) );
 		if ( $url_lang === $term_lang ) {
@@ -195,7 +199,7 @@ class Directory {
 			$source_url = trailingslashit( $site_url ) . $this->get_directory_name( $url_lang );
 		}
 
-		// If it's not poluted and the language is the default language don't do anything to it.
+		// If it's not polluted and the language is the default language don't do anything to it.
 		if ( $term_lang === LangInterface::get_default_language() && $source_url === $site_url ) {
 			return $termlink;
 		}

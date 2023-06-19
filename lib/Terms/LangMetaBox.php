@@ -271,8 +271,8 @@ class LangMetaBox {
 					$text
 				);
 			},
-			array_keys( $options ),
-			$options
+			is_string( $selected ) ? array_keys( $options ) : array_merge( [ __( 'Select Language', 'unbabble' ) ], array_keys( $options ) ),
+			is_string( $selected ) ? $options : array_merge( [ '' ], $options )
 		);
 
 		if ( ! empty( $nonce_action ) && ! empty( $nonce_name ) ) {
