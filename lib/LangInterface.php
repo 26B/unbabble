@@ -335,14 +335,21 @@ class LangInterface {
 			return [];
 		}
 
+		$post_type = get_post( $post_id )->post_type ?? '';
+		if ( empty( $post_type ) ){
+			return [];
+		}
+
 		$posts = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT post_id
-				FROM {$wpdb->postmeta}
-				WHERE meta_key = 'ubb_source'
-				AND meta_value = %s
-				AND post_id != %s
-				ORDER BY post_id ASC",
+				"SELECT PM.post_id
+				FROM {$wpdb->postmeta} AS PM
+				INNER JOIN {$wpdb->posts} AS P ON (P.ID = PM.post_id AND P.post_type = %s)
+				WHERE PM.meta_key = 'ubb_source'
+				AND PM.meta_value = %s
+				AND PM.post_id != %s
+				ORDER BY PM.post_id ASC",
+				$post_type,
 				$source_id,
 				$post_id
 			)

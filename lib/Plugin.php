@@ -110,7 +110,6 @@ class Plugin {
 	 * @access private
 	 */
 	private function define_plugin_hooks() {
-
 		$components = [
 			'admin'             => Admin\Admin::class,
 			'lang_cookie'       => Admin\LangCookie::class,
