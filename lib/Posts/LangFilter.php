@@ -142,8 +142,8 @@ class LangFilter {
 		if ( is_array( $post_type ) ) {
 			if ( empty( $post_type ) ) {
 				$post_type = '';
-			} else if ( is_string( $post_type[0] ) ) {
-				$post_type = $post_type[0];
+			} else if ( is_string( current( $post_type ) ) ) {
+				$post_type = current( $post_type );
 			}
 		}
 
