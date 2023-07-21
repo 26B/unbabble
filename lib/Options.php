@@ -207,6 +207,39 @@ class Options {
 	}
 
 	/**
+	 * Get Unbabble options for a specific blog in a multisite installation.
+	 *
+	 * @param  int $blog_id
+	 * @return ?array
+	 */
+	public static function get_blog_options( int $blog_id ) : ?array {
+		global $wpdb;
+		if ( ! is_multisite() ) {
+			return null;
+		}
+
+		switch_to_blog( $blog_id );
+
+		$options = $wpdb->get_results(
+			"SELECT option_name, option_value
+				FROM {$wpdb->options}
+				WHERE option_name IN ('active_plugins','ubb_options')",
+			OBJECT_K
+		);
+
+		restore_current_blog();
+
+		$active_plugins = maybe_unserialize( $options['active_plugins']->option_value ?? [] );
+		$ubb_options    = maybe_unserialize( $options['ubb_options']->option_value ?? [] );
+
+		if ( ! in_array( 'unbabble/unbabble.php', $active_plugins, true ) ) {
+			return null;
+		}
+
+		return empty( $ubb_options ) ? null : $ubb_options;
+	}
+
+	/**
 	 * Returns the router type.
 	 *
 	 * @since 0.0.1
