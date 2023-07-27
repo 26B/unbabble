@@ -401,11 +401,13 @@ class Directory {
 			$subpath = substr( $path, 1 );
 		}
 
+		// TODO: test changes.
 		if ( empty( $subpath ) ) {
-			$new_url = trailingslashit( $url ) . trailingslashit( $directory );
+			$new_url = trailingslashit( $url ) . $directory;
 		} else {
-			$new_url = str_replace( "/{$subpath}", "/{$directory}/{$subpath}", trailingslashit( $url ) );
+			$new_url = str_replace( "/{$subpath}", "/{$directory}/{$subpath}", $url );
 		}
+
 		return $new_url;
 	}
 
