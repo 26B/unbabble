@@ -6,6 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Plugin;
 use TwentySixB\WP\Plugin\Unbabble\Posts\LinkTranslation;
+use WP_Post;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -55,6 +56,16 @@ class Post {
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'unlink_from_translations' ],
+				'permission_callback' => [ $this, 'permission_callback' ],
+			]
+		);
+
+		\register_rest_route(
+			$this->namespace,
+			'/edit/post/(?P<id>[0-9]+)/translation/link',
+			[
+				'methods'             => 'GET',
+				'callback'            => [ $this, 'get_possible_links' ],
 				'permission_callback' => [ $this, 'permission_callback' ],
 			]
 		);
@@ -130,5 +141,30 @@ class Post {
 		}
 
 		return new WP_REST_Response( null, 200 );
+	}
+
+	public function get_possible_links( \WP_REST_Request $request ) {
+		$post_id = $request['id'];
+
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof WP_Post ) {
+			return new WP_REST_Response( null, 404 );
+		}
+
+		if ( $post->post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post->post_type ) ) {
+			return null;
+		}
+
+		$language = LangInterface::get_post_language( $post_id );
+
+		$page = $request->get_param( 'page' );
+		if ( ! is_numeric( $page ) ) {
+			$page = 1;
+		}
+
+		$possible_links = ( new LinkTranslation() )->get_possible_links( $post, $language, $page );
+
+		return new WP_REST_Response( $possible_links, 200 );
 	}
 }

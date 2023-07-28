@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use WP_Error;
 use TwentySixB\WP\Plugin\Unbabble\Options;
@@ -116,5 +117,73 @@ class LinkTranslation {
 			return false;
 		}
 		return LangInterface::delete_post_source( $post_id );
+	}
+
+	public function get_possible_links( WP_Post $post, string $post_lang, int $page ) : array {
+		global $wpdb;
+		$translations_table    = ( new PostTable() )->get_table_name();
+		$allowed_languages_str = implode( "','", LangInterface::get_languages() );
+		$per_page              = 10;
+		if ( $page < 1 ) {
+			$page = 1;
+		}
+
+		$possible_sources = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT SQL_CALC_FOUND_ROWS
+				MIN(A.post_id) as post_id,
+				GROUP_CONCAT( CONCAT(A.post_id, 0x1F, locale, 0x1F, A.post_title) SEPARATOR 0x1D ) as group_info
+				FROM (
+					SELECT PT.post_id, P.post_title, locale, IFNULL(meta_value, PT.post_id) AS source
+					FROM {$translations_table} AS PT
+					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
+					INNER JOIN {$wpdb->posts} as P ON (PT.post_id = P.ID)
+					WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
+					AND PT.locale IN ('{$allowed_languages_str}')
+				) AS A
+				WHERE locale != %s
+				AND source NOT IN (
+					SELECT IFNULL(meta_value, PT.post_id) AS source
+					FROM {$translations_table} AS PT
+					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
+					WHERE locale = %s
+				) GROUP BY source
+				ORDER BY group_info
+				LIMIT %d
+				OFFSET %d",
+				$post->post_type,
+				$post_lang,
+				$post_lang,
+				$per_page,
+				$per_page * ( $page - 1 )
+			)
+		);
+
+		$options = [];
+		foreach ( $possible_sources as $source ) {
+			$source_data  = explode( chr( 0x1D ), $source->group_info );
+			$source_posts = [];
+			foreach ( $source_data as $post_info_str ) {
+				$post_info = explode( chr( 0x1F ), $post_info_str );
+				if ( count( $post_info ) !== 3 ) {
+					continue;
+				}
+				$source_posts[] = [ 'ID' => $post_info[0], 'lang' => $post_info[1], 'title' => $post_info[2] ];
+			}
+
+			$options[] = [
+				'source' => $source->post_id,
+				'posts'  => $source_posts,
+			];
+		}
+
+		$links_found = $wpdb->get_var( "SELECT FOUND_ROWS()" );
+		$pages       = ceil( $links_found / $per_page );
+
+		return [
+			'options' => $options,
+			'pages'   => $pages,
+			'page'    => $page,
+		];
 	}
 }
