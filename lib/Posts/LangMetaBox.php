@@ -184,6 +184,8 @@ class LangMetaBox {
 				$options
 			);
 		}
+
+		printf( '<hr><div id="ubb-language">New stuff here</div>' );
 	}
 
 	/**
