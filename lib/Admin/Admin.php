@@ -110,7 +110,13 @@ class Admin {
 	 * @return void
 	 */
 	public function enqueue_scripts() : void {
-		\wp_enqueue_script( 'ubb-admin', plugin_dir_url( dirname( __FILE__, 1 ) ) . 'src/scripts/ubb-admin.js', [], '0.0.6', true );
+		\wp_enqueue_script(
+			'frontend',
+			plugin_dir_url( dirname( __FILE__, 2 ) ) . 'build/index.js',
+			[ 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n' ],
+			'0.0.6',
+			true
+		);
 	}
 
 	/**
