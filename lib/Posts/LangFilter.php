@@ -5,7 +5,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 use stdClass;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Query;
 
 /**

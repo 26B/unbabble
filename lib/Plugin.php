@@ -170,6 +170,7 @@ class Plugin {
 		add_action( 'rest_api_init', function () {
 			$namespace = 'unbabble/v1';
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
+			( new API\Gutenberg\Post( $this, $namespace ) )->register();
 		} );
 	}
 
