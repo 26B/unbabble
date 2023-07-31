@@ -2183,14 +2183,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const CreateTranslations = _ref => {
-  var _untranslatedLangs$;
-
   let {
     untranslatedLangs,
     postId,
     refetchLangs
   } = _ref;
-  const [current, setCurrent] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)((_untranslatedLangs$ = untranslatedLangs[0]) === null || _untranslatedLangs$ === void 0 ? void 0 : _untranslatedLangs$.value);
+  const [current, setCurrent] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(untranslatedLangs[0]);
   const {
     mutate,
     data,
@@ -2363,7 +2361,7 @@ const ListTranslations = _ref2 => {
     translatedLangs,
     postId
   } = _ref2;
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", null, "Translations:")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, translatedLangs.map(language => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(LangRow, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", null, "Translations:")), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, translatedLangs.map(language => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(LangRow, {
     language: language,
     postId: postId,
     isDuplicate: translatedLangs.filter(_ref3 => {
@@ -2372,7 +2370,7 @@ const ListTranslations = _ref2 => {
       } = _ref3;
       return language.name === name || currentLang === name;
     })
-  })))));
+  })))), translatedLangs.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "No translations available."));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = ((0,_contexts_LangContext__WEBPACK_IMPORTED_MODULE_3__.withLangContext)(ListTranslations));

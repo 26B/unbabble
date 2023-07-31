@@ -8,7 +8,7 @@ import { withLangContext } from './contexts/LangContext'
 import getUBBSetting from '../services/settings'
 
 const CreateTranslations = ({ untranslatedLangs, postId, refetchLangs }) => {
-  const [current, setCurrent] = useState(untranslatedLangs[0]?.value)
+  const [current, setCurrent] = useState(untranslatedLangs[0])
   const { mutate, data, isLoading, isError } = useCopyPost(postId, current)
 
   const changeValue = (newValue) => setCurrent(newValue)

@@ -16,17 +16,20 @@ const LangRow = ({ language, postId, isDuplicate }) => {
 
 const ListTranslations = ({ currentLang, translatedLangs, postId }) => (<>
   <p><b>Translations:</b></p>
-  <table>
-    <tbody>
-      {translatedLangs.map(
-        (language) => <LangRow
-          language={language}
-          postId={postId}
-          isDuplicate={translatedLangs.filter( ({ name }) => language.name === name || currentLang === name )}
-          />
-      )}
-    </tbody>
-  </table>
+  {translatedLangs.length > 0 && (
+    <table>
+      <tbody>
+        {translatedLangs.map(
+          (language) => <LangRow
+            language={language}
+            postId={postId}
+            isDuplicate={translatedLangs.filter( ({ name }) => language.name === name || currentLang === name )}
+            />
+        )}
+      </tbody>
+    </table>
+  )}
+  {translatedLangs.length === 0 && <p>No translations available.</p>}
 </>)
 
 export default withLangContext(ListTranslations)
