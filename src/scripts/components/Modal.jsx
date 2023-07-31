@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom'
 
-const Modal = ({ isOpen, close }) => {
+const Modal = ({ isOpen, close, children }) => {
   if (!isOpen) {
     return null
   }
@@ -8,10 +8,10 @@ const Modal = ({ isOpen, close }) => {
   return createPortal(
     <div style={{ position: 'relative' }}>
       <div className="media-modal wp-core-ui" role="dialog">
-        <button type="button" onClick={close} class="media-modal-close"><span class="media-modal-icon"><span class="screen-reader-text">Fechar janela</span></span></button>
+        <button type="button" onClick={close} className="media-modal-close"><span className="media-modal-icon"><span className="screen-reader-text">Fechar janela</span></span></button>
         <div className="media-modal-content" role="document">
           <div className="media-frame mode-select wp-core-ui wpmf-treeview wpmf_hide_media_menu">
-            yoooo
+            {children}
           </div>
         </div>
       </div>

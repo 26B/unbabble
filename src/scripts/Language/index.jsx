@@ -40,13 +40,13 @@ const Language = () => {
       untranslatedLangs,
       refetchLangs: refetch,
     }}>
-      <UnlinkTranslations/>
-      <hr/>
-      <LinkTranslations/>
-      <hr/>
       <ListTranslations/>
       <hr/>
       <CreateTranslations/>
+      <hr/>
+      <UnlinkTranslations/>
+      <hr/>
+      <LinkTranslations/>
     </LangContext.Provider>
   )
 }

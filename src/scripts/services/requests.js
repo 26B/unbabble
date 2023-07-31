@@ -10,6 +10,15 @@ export const copyPost = (id, lang) => request({
 })
 
 export const unlinkPost = (id) => request({
-  method: 'post',
+  method: 'patch',
   url: `/edit/post/${id}/translation/unlink`
+})
+
+export const linkPost = (id, translationId) => request({
+  method: 'patch',
+  url: `/edit/post/${id}/translation/${translationId}/link`,
+})
+
+export const linkablePosts = (id) => request({
+  url: `/edit/post/${id}/translation/link`,
 })
