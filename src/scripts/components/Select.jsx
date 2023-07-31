@@ -4,7 +4,7 @@ const Select = ({ currentValue, changeValue, options }) => {
   return (
     <select onChange={onChange}>
       {options.map(
-        ({ name, value }) => <option value={value}>{name}</option>
+        ({ label, value }) => <option value={value}>{label}</option>
       )}
     </select>
   )
