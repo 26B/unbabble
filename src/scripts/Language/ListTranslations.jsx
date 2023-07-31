@@ -2,30 +2,28 @@ import { getQueryVar } from "../services/searchQuery"
 import getUBBSetting from "../services/settings"
 import { withLangContext } from "./contexts/LangContext"
 
-const LangRow = ({ language, postId }) => {
+const LangRow = ({ language, postId, isDuplicate }) => {
 
   console.log({ language })
-
-  const editUrlQuery = new URLSearchParams({
-    post: postId, // TODO: get post
-    action: 'edit',
-  })
-  const editUrl = `${getUBBSetting('admin_url', '')}post.php?${editUrlQuery.toString()}`
 
   return (<tr>
     <td>{language.name}</td>
     <td><a href={language.edit}>Edit</a></td>
     <td><a href={language.view}>View</a></td>
+    <td>{ isDuplicate && <b style={{color: "FireBrick"}}>Duplicate</b> }</td>
   </tr>)
 }
 
-// TODO:Handle duplicates
-const ListTranslations = ({ translatedLangs, postId }) => (<>
+const ListTranslations = ({ currentLang, translatedLangs, postId }) => (<>
   <p><b>Translations:</b></p>
   <table>
     <tbody>
       {translatedLangs.map(
-        (language) => <LangRow language={language} postId={postId}/>
+        (language) => <LangRow
+          language={language}
+          postId={postId}
+          isDuplicate={translatedLangs.filter( ({ name }) => language.name === name || currentLang === name )}
+          />
       )}
     </tbody>
   </table>

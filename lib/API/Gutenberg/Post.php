@@ -82,7 +82,7 @@ class Post {
 			return false;
 		}
 
-		return current_user_can( "edit_{$post_type}" );
+		return current_user_can( "edit_{$post_type}", $request['id'] );
 	}
 
 	public function post_information( \WP_REST_Request $request ) {
@@ -102,7 +102,7 @@ class Post {
 			foreach ( $translations as $translation_id => $language ) {
 				$data['translations'][ $language ] = [
 					'ID'   => $translation_id,
-					'edit' => get_edit_post_link( $translation_id),
+					'edit' => get_edit_post_link( $translation_id, '' ),
 					'view' => get_permalink( $translation_id ),
 				];
 			}
