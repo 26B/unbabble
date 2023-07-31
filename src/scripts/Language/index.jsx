@@ -43,8 +43,10 @@ const Language = () => {
       <ListTranslations/>
       <hr/>
       <CreateTranslations/>
-      <hr/>
-      <UnlinkTranslations/>
+      {translatedLangs.length > 0 && (<>
+        <hr/>
+        <UnlinkTranslations/>
+      </>)}
       <hr/>
       <LinkTranslations/>
     </LangContext.Provider>
