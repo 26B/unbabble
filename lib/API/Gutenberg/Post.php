@@ -2,12 +2,12 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\API\Gutenberg;
 
+use Throwable;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Plugin;
 use TwentySixB\WP\Plugin\Unbabble\Posts\LinkTranslation;
 use WP_Post;
-use WP_REST_Request;
 use WP_REST_Response;
 
 class Post {
@@ -71,100 +71,134 @@ class Post {
 		);
 	}
 
-	public function permission_callback( \WP_REST_Request $wp_request ) : bool {
-		return true; // FIXME: remove after testing.
-		return is_user_logged_in(); // TODO: rest of permissions
+	public function permission_callback( \WP_REST_Request $request ) : bool {
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+
+		$post_type = get_post_type( $request['id'] );
+
+		if ( $post_type === false ) {
+			return false;
+		}
+
+		return current_user_can( "edit_{$post_type}" );
 	}
 
-	// TODO: better name.
 	public function post_information( \WP_REST_Request $request ) {
-		$data    = [];
-		$post_id = $request['id'];
+		try {
+			$data    = [];
+			$post_id = $request['id'];
 
-		$post_type = get_post_type( $post_id );
-		if ( $post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post_type ) ) {
-			return new WP_REST_Response( $data, 403 );
+			$post_type = get_post_type( $post_id );
+			if ( $post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post_type ) ) {
+				return new WP_REST_Response( $data, 403 );
+			}
+
+			$data['language']     = LangInterface::get_post_language( $post_id );
+			$data['translations'] = [];
+
+			$translations         = LangInterface::get_post_translations( $post_id );
+			foreach ( $translations as $translation_id => $language ) {
+				$data['translations'][ $language ] = [
+					'ID'   => $translation_id,
+					'edit' => get_edit_post_link( $translation_id),
+					'view' => get_permalink( $translation_id ),
+				];
+			}
+			return new WP_REST_Response( $data, 200 );
+
+		} catch ( Throwable $e ) {
+			return new WP_REST_Response( null, 500 );
 		}
-
-		$data['language'] = LangInterface::get_post_language( $post_id );
-
-		$data['translations'] = [];
-		$translations = LangInterface::get_post_translations( $post_id );
-		foreach ( $translations as $translation_id => $language ) {
-			$data['translations'][ $language ] = [
-				'ID'   => $translation_id,
-				'edit' => get_edit_post_link( $translation_id),
-				'view' => get_permalink( $translation_id ),
-			];
-		}
-
-		return new WP_REST_Response( $data, 200 );
 	}
 
 	public function new_translation_copy( \WP_REST_Request $request ) {
-		// TODO: Add try catch around code.
-		// TODO: check if yoast duplicate is available.
-		$post_id = $request['id'];
+		try {
 
-		$new_post_id = ( new YoastDuplicatePost() )->copy( $post_id, $request['lang'] );
-		if ( ! is_int( $new_post_id ) || $new_post_id < 1 ) {
-			// TODO: error message
-			return new WP_REST_Response( null, 400 );
+			// Check if the Yoast's duplicate post plugin is active.
+			if ( ! is_plugin_active( 'duplicate-post/duplicate-post.php' ) ) {
+				return new WP_REST_Response( null, 404 );
+			}
+
+			$post_id = $request['id'];
+
+			$new_post_id = ( new YoastDuplicatePost() )->copy( $post_id, $request['lang'] );
+			if ( ! is_int( $new_post_id ) || $new_post_id < 1 ) {
+				// TODO: error message
+				return new WP_REST_Response( null, 400 );
+			}
+
+			$new_post_url = get_edit_post_link( $new_post_id, '' );
+			return new WP_REST_Response( null, 200, [ 'Location' => $new_post_url ] );
+
+		} catch ( Throwable $e ) {
+			return new WP_REST_Response( null, 500 );
 		}
-
-		$new_post_url = get_edit_post_link( $new_post_id, '' );
-		return new WP_REST_Response( null, 200, [ 'Location' => $new_post_url ] );
 	}
 
 	public function link_translations( \WP_REST_Request $request ) {
-		// TODO: Add try catch around code.
-		$post_id        = $request['id'];
-		$translation_id = $request['translation_id'];
+		try {
+			$post_id        = $request['id'];
+			$translation_id = $request['translation_id'];
 
-		$link = ( new LinkTranslation() )->link_translations( $post_id, $translation_id );
+			$link = ( new LinkTranslation() )->link_translations( $post_id, $translation_id );
 
-		if ( ! $link ) {
-			return new WP_REST_Response( null, 400 );
+			if ( ! $link ) {
+				return new WP_REST_Response( null, 400 );
+			}
+
+			return new WP_REST_Response( null, 200 );
+
+		} catch ( Throwable $e ) {
+			return new WP_REST_Response( null, 500 );
 		}
-
-		return new WP_REST_Response( null, 200 );
 	}
 
 	public function unlink_from_translations( \WP_REST_Request $request ) {
-		// TODO: Add try catch around code.
-		$post_id = $request['id'];
+		try {
+			$post_id = $request['id'];
 
-		$unlinked = ( new LinkTranslation() )->unlink( $post_id );
+			$unlinked = ( new LinkTranslation() )->unlink( $post_id );
 
-		if ( ! $unlinked ) {
-			return new WP_REST_Response( null, 400 );
+			if ( ! $unlinked ) {
+				return new WP_REST_Response( null, 400 );
+			}
+
+			return new WP_REST_Response( null, 200 );
+
+		} catch ( Throwable $e ) {
+			return new WP_REST_Response( null, 500 );
 		}
-
-		return new WP_REST_Response( null, 200 );
 	}
 
 	public function get_possible_links( \WP_REST_Request $request ) {
-		$post_id = $request['id'];
+		try {
+			$post_id = $request['id'];
 
-		$post = get_post( $post_id );
+			$post = get_post( $post_id );
 
-		if ( ! $post instanceof WP_Post ) {
-			return new WP_REST_Response( null, 404 );
+			if ( ! $post instanceof WP_Post ) {
+				return new WP_REST_Response( null, 404 );
+			}
+
+			if ( $post->post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post->post_type ) ) {
+				return null;
+			}
+
+			$language = LangInterface::get_post_language( $post_id );
+
+			$page = $request->get_param( 'page' );
+			if ( ! is_numeric( $page ) ) {
+				$page = 1;
+			}
+
+			$possible_links = ( new LinkTranslation() )->get_possible_links( $post, $language, $page );
+
+			return new WP_REST_Response( $possible_links, 200 );
+
+		} catch ( Throwable $e ) {
+			return new WP_REST_Response( null, 500 );
 		}
-
-		if ( $post->post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post->post_type ) ) {
-			return null;
-		}
-
-		$language = LangInterface::get_post_language( $post_id );
-
-		$page = $request->get_param( 'page' );
-		if ( ! is_numeric( $page ) ) {
-			$page = 1;
-		}
-
-		$possible_links = ( new LinkTranslation() )->get_possible_links( $post, $language, $page );
-
-		return new WP_REST_Response( $possible_links, 200 );
 	}
 }
