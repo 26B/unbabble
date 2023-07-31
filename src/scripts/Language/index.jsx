@@ -1,33 +1,53 @@
-import { useState } from 'react'
-
-import Modal from '../components/Modal'
 import CreateTranslations from './CreateTranslations'
-import Select from '../components/Select'
+import useEditPost from '../hooks/useEditPost'
+import { getQueryVar } from '../services/searchQuery'
+import getUBBSetting from '../services/settings'
+import LangContext from './contexts/LangContext'
+import ListTranslations from './ListTranslations'
+import UnlinkTranslations from './UnlinkTranslations'
+import LinkTranslations from './LinkTranslations'
 
 const Language = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [current, setCurrent] = useState(1)
+  const { data, refetch, isLoading, isError } = useEditPost(getQueryVar('post'))
 
-  const closeModal = () => setIsModalOpen(false)
-  const openModal = () => setIsModalOpen(true)
+  if (isLoading) {
+    return 'Loading...' // TODO: Add spinner
+  }
 
-  const options = [
-    { name: '1', value: 1 },
-    { name: '2', value: 2 },
-    { name: '3', value: 3 },
-    { name: '4', value: 4 },
-  ]
+  if (isError) {
+    return 'Error fetching post language data.'
+  }
 
-  const changeValue = (newValue) => setCurrent(newValue)
+  if (!data) {
+    return 'Post has no language data.'
+  }
+
+  const { language, translations } = data
+  const languages = getUBBSetting('languages', {})
+  const translatedLangs = Object.entries(translations)
+    .map(
+      ([name, data]) => ({ name, ...data})
+    )
+  const untranslatedLangs = languages
+    .filter(lang => lang !== language && ! Object.keys(translations).includes(lang))
 
   return (
-    <>
+    <LangContext.Provider value={{
+      currentLang: language,
+      postId: data.postId,
+      languages,
+      translatedLangs,
+      untranslatedLangs,
+      refetchLangs: refetch,
+    }}>
+      <UnlinkTranslations/>
       <hr/>
-      <CreateTranslations />
-      <Select changeValue={changeValue} currentValue={current} options={options}/>
-      <Modal isOpen={isModalOpen} close={closeModal}/>
-      <button onClick={openModal}>Open Modal</button>
-    </>
+      <LinkTranslations/>
+      <hr/>
+      <ListTranslations/>
+      <hr/>
+      <CreateTranslations/>
+    </LangContext.Provider>
   )
 }
 
