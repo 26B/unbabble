@@ -44,7 +44,7 @@ class Post {
 			$this->namespace,
 			'/edit/post/(?P<id>[0-9]+)/translation/(?P<translation_id>[0-9]+)/link',
 			[
-				'methods'             => 'POST',
+				'methods'             => 'PATCH',
 				'callback'            => [ $this, 'link_translations' ],
 				'permission_callback' => [ $this, 'permission_callback' ],
 			]
@@ -54,7 +54,7 @@ class Post {
 			$this->namespace,
 			'/edit/post/(?P<id>[0-9]+)/translation/unlink',
 			[
-				'methods'             => 'POST',
+				'methods'             => 'PATCH',
 				'callback'            => [ $this, 'unlink_from_translations' ],
 				'permission_callback' => [ $this, 'permission_callback' ],
 			]

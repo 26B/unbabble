@@ -116,7 +116,22 @@ class LinkTranslation {
 		if ( $post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return false;
 		}
-		return LangInterface::delete_post_source( $post_id );
+
+		$translations = LangInterface::get_post_translations( $post_id );
+
+		$delete_success = LangInterface::delete_post_source( $post_id );
+
+		if ( ! $delete_success ) {
+			return false;
+		}
+
+		// Clean up post source if there's a single other post for that source.
+		if ( count( $translations ) === 1 ) {
+			$other_post_id = array_keys( $translations )[0];
+			LangInterface::delete_post_source( $other_post_id );
+		}
+
+		return true;
 	}
 
 	public function get_possible_links( WP_Post $post, string $post_lang, int $page ) : array {
