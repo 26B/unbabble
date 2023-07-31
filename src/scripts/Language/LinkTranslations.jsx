@@ -37,8 +37,6 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
   const openModal = () => setIsModalOpen(true)
   const closeModal = () => setIsModalOpen(false)
 
-  console.log({ data })
-
   return (<>
     <Modal isOpen={isModalOpen} close={closeModal}>
       {isLoading && 'Loading...'}

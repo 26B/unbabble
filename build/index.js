@@ -2299,9 +2299,6 @@ const LinkTranslations = _ref3 => {
 
   const closeModal = () => setIsModalOpen(false);
 
-  console.log({
-    data
-  });
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Modal__WEBPACK_IMPORTED_MODULE_4__["default"], {
     isOpen: isModalOpen,
     close: closeModal
@@ -2327,23 +2324,15 @@ const LinkTranslations = _ref3 => {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _services_searchQuery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../services/searchQuery */ "./src/scripts/services/searchQuery.js");
-/* harmony import */ var _services_settings__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/settings */ "./src/scripts/services/settings.js");
-/* harmony import */ var _contexts_LangContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./contexts/LangContext */ "./src/scripts/Language/contexts/LangContext.jsx");
-
-
+/* harmony import */ var _contexts_LangContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./contexts/LangContext */ "./src/scripts/Language/contexts/LangContext.jsx");
 
 
 
 const LangRow = _ref => {
   let {
     language,
-    postId,
     isDuplicate
   } = _ref;
-  console.log({
-    language
-  });
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, language.name), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
     href: language.edit
   }, "Edit")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
@@ -2373,7 +2362,7 @@ const ListTranslations = _ref2 => {
   })))), translatedLangs.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "No translations available."));
 };
 
-/* harmony default export */ __webpack_exports__["default"] = ((0,_contexts_LangContext__WEBPACK_IMPORTED_MODULE_3__.withLangContext)(ListTranslations));
+/* harmony default export */ __webpack_exports__["default"] = ((0,_contexts_LangContext__WEBPACK_IMPORTED_MODULE_1__.withLangContext)(ListTranslations));
 
 /***/ }),
 

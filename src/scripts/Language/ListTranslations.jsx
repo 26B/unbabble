@@ -1,10 +1,6 @@
-import { getQueryVar } from "../services/searchQuery"
-import getUBBSetting from "../services/settings"
 import { withLangContext } from "./contexts/LangContext"
 
-const LangRow = ({ language, postId, isDuplicate }) => {
-
-  console.log({ language })
+const LangRow = ({ language, isDuplicate }) => {
 
   return (<tr>
     <td>{language.name}</td>
