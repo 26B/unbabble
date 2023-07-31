@@ -2,6 +2,9 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use TwentySixB\WP\Plugin\Unbabble\Plugin;
+
 /**
  * General hooks for the back-office.
  *
@@ -110,10 +113,32 @@ class Admin {
 	 * @return void
 	 */
 	public function enqueue_scripts() : void {
+		$data = [
+			'api_root'     => \esc_url_raw( \rest_url() ) . Plugin::API_V1,
+			'admin_url'    => \admin_url(),
+			'current_lang' => LangInterface::get_current_language(),
+			'default_lang' => LangInterface::get_default_language(),
+			'languages'    => LangInterface::get_languages(),
+		];
+
+		\wp_enqueue_script(
+			'vendor-js',
+			$this->base_uri . 'scripts/vendor.js',
+			[],
+			'0.0.6',
+			false
+		);
+
+		\wp_localize_script(
+			'vendor-js',
+			'UBB',
+			$data
+		);
+
 		\wp_enqueue_script(
 			'frontend',
 			plugin_dir_url( dirname( __FILE__, 2 ) ) . 'build/index.js',
-			[ 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n' ],
+			[ 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n', 'vendor-js' ],
 			'0.0.6',
 			true
 		);

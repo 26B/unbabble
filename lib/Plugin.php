@@ -21,6 +21,9 @@ use WP_CLI;
  */
 class Plugin {
 
+	// TODO: move to a more appropriate place.
+	const API_V1 = 'unbabble/v1';
+
 	/**
 	 * The unique identifier of this plugin.
 	 *
@@ -168,7 +171,7 @@ class Plugin {
 		}
 
 		add_action( 'rest_api_init', function () {
-			$namespace = 'unbabble/v1';
+			$namespace = self::API_V1;
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
 			( new API\Gutenberg\Post( $this, $namespace ) )->register();
 		} );

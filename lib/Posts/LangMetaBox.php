@@ -128,42 +128,7 @@ class LangMetaBox {
 			);
 		}
 
-		if ( $translation_to_show ) {
-			printf(
-				'<hr><p><b>Translations:</b></p>
-				<table>
-				<tr>
-					<th>Language</th>
-					<th>Actions</th>
-				</tr>
-				%s
-				</table>',
-				implode( '', $translation_to_show ),
-				$post->post_status === 'draft' ? 'id="save-post"' : ''
-			);
-		} else {
-			printf( '<hr><p><b>No Translations</b></p>' );
-		}
-
 		unset( $available_languages[ $lang ] );
-
-		// Can't create more translations currently.
-		if ( is_string( $lang ) && ! empty( $available_languages ) ) {
-			$available_languages = array_keys( $available_languages );
-
-			// Display language selector and button to create new translation.
-			// TODO: Only show `ubb_copy_new` input if duplicate-post is active. Add filter and move the input to an integration class.
-			printf(
-				'<hr><details>
-					<summary><b>Create Translation</b></summary>
-					<div>To: %1$s</div>
-					<input type="submit" %2$s name="ubb_redirect_new" value="Save and Create" class="button"/>
-					<input type="submit" %2$s name="ubb_copy_new" value="Save and Copy" class="button"/>
-				</details>',
-				$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
-				$post->post_status === 'draft' ? 'id="save-post" style="float:none"' : '',
-			);
-		}
 
 		if ( is_string( $lang ) ) {
 			$options = array_reduce(
