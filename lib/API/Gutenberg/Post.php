@@ -102,7 +102,7 @@ class Post {
 			foreach ( $translations as $translation_id => $language ) {
 				$data['translations'][ $language ] = [
 					'ID'   => $translation_id,
-					'edit' => get_edit_post_link( $translation_id),
+					'edit' => get_edit_post_link( $translation_id, '' ),
 					'view' => get_permalink( $translation_id ),
 				];
 			}

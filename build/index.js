@@ -2340,33 +2340,38 @@ __webpack_require__.r(__webpack_exports__);
 const LangRow = _ref => {
   let {
     language,
-    postId
+    postId,
+    isDuplicate
   } = _ref;
   console.log({
     language
   });
-  const editUrlQuery = new URLSearchParams({
-    post: postId,
-    // TODO: get post
-    action: 'edit'
-  });
-  const editUrl = `${(0,_services_settings__WEBPACK_IMPORTED_MODULE_2__["default"])('admin_url', '')}post.php?${editUrlQuery.toString()}`;
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, language.name), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
     href: language.edit
   }, "Edit")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
     href: language.view
-  }, "View")));
-}; // TODO:Handle duplicates
-
+  }, "View")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, isDuplicate && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", {
+    style: {
+      color: "FireBrick"
+    }
+  }, "Duplicate")));
+};
 
 const ListTranslations = _ref2 => {
   let {
+    currentLang,
     translatedLangs,
     postId
   } = _ref2;
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", null, "Translations:")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, translatedLangs.map(language => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(LangRow, {
     language: language,
-    postId: postId
+    postId: postId,
+    isDuplicate: translatedLangs.filter(_ref3 => {
+      let {
+        name
+      } = _ref3;
+      return language.name === name || currentLang === name;
+    })
   })))));
 };
 
@@ -2518,7 +2523,7 @@ const Language = () => {
       untranslatedLangs,
       refetchLangs: refetch
     }
-  }, Object.keys(translations).length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_ListTranslations__WEBPACK_IMPORTED_MODULE_6__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_CreateTranslations__WEBPACK_IMPORTED_MODULE_1__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_UnlinkTranslations__WEBPACK_IMPORTED_MODULE_7__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_LinkTranslations__WEBPACK_IMPORTED_MODULE_8__["default"], null));
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_ListTranslations__WEBPACK_IMPORTED_MODULE_6__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_CreateTranslations__WEBPACK_IMPORTED_MODULE_1__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_UnlinkTranslations__WEBPACK_IMPORTED_MODULE_7__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_LinkTranslations__WEBPACK_IMPORTED_MODULE_8__["default"], null));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (Language);
