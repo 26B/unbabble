@@ -2328,15 +2328,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const LangRow = _ref => {
+const TranslationRow = _ref => {
   let {
-    language,
+    translation,
     isDuplicate
   } = _ref;
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, language.name), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
-    href: language.edit
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, translation.language), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
+    href: translation.edit
   }, "Edit")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
-    href: language.view
+    href: translation.view
   }, "View")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, isDuplicate && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", {
     style: {
       color: "FireBrick"
@@ -2350,15 +2350,16 @@ const ListTranslations = _ref2 => {
     translatedLangs,
     postId
   } = _ref2;
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", null, "Translations:")), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, translatedLangs.map(language => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(LangRow, {
-    language: language,
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", null, "Translations:")), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, translatedLangs.map(translation => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(TranslationRow, {
+    translation: translation,
     postId: postId,
-    isDuplicate: translatedLangs.filter(_ref3 => {
+    isDuplicate: currentLang === translation.language || translatedLangs.filter(_ref3 => {
       let {
-        name
+        ID,
+        language
       } = _ref3;
-      return language.name === name || currentLang === name;
-    })
+      return translation.language === language && translation.ID !== ID;
+    }).length !== 0
   })))), translatedLangs.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "No translations available."));
 };
 
@@ -2450,14 +2451,17 @@ const withLangContext = WrappedComponent => props => (0,_wordpress_element__WEBP
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _CreateTranslations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CreateTranslations */ "./src/scripts/Language/CreateTranslations.jsx");
-/* harmony import */ var _hooks_useEditPost__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../hooks/useEditPost */ "./src/scripts/hooks/useEditPost.js");
-/* harmony import */ var _services_searchQuery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../services/searchQuery */ "./src/scripts/services/searchQuery.js");
-/* harmony import */ var _services_settings__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/settings */ "./src/scripts/services/settings.js");
-/* harmony import */ var _contexts_LangContext__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./contexts/LangContext */ "./src/scripts/Language/contexts/LangContext.jsx");
-/* harmony import */ var _ListTranslations__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ListTranslations */ "./src/scripts/Language/ListTranslations.jsx");
-/* harmony import */ var _UnlinkTranslations__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./UnlinkTranslations */ "./src/scripts/Language/UnlinkTranslations.jsx");
-/* harmony import */ var _LinkTranslations__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./LinkTranslations */ "./src/scripts/Language/LinkTranslations.jsx");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _CreateTranslations__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CreateTranslations */ "./src/scripts/Language/CreateTranslations.jsx");
+/* harmony import */ var _hooks_useEditPost__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../hooks/useEditPost */ "./src/scripts/hooks/useEditPost.js");
+/* harmony import */ var _services_searchQuery__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../services/searchQuery */ "./src/scripts/services/searchQuery.js");
+/* harmony import */ var _services_settings__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/settings */ "./src/scripts/services/settings.js");
+/* harmony import */ var _contexts_LangContext__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./contexts/LangContext */ "./src/scripts/Language/contexts/LangContext.jsx");
+/* harmony import */ var _ListTranslations__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./ListTranslations */ "./src/scripts/Language/ListTranslations.jsx");
+/* harmony import */ var _UnlinkTranslations__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./UnlinkTranslations */ "./src/scripts/Language/UnlinkTranslations.jsx");
+/* harmony import */ var _LinkTranslations__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./LinkTranslations */ "./src/scripts/Language/LinkTranslations.jsx");
+
 
 
 
@@ -2469,12 +2473,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const Language = () => {
+  const [postId, setPostId] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)((0,_services_searchQuery__WEBPACK_IMPORTED_MODULE_4__.getQueryVar)('post'));
   const {
     data,
     refetch,
     isLoading,
     isError
-  } = (0,_hooks_useEditPost__WEBPACK_IMPORTED_MODULE_2__["default"])((0,_services_searchQuery__WEBPACK_IMPORTED_MODULE_3__.getQueryVar)('post'));
+  } = (0,_hooks_useEditPost__WEBPACK_IMPORTED_MODULE_3__["default"])(postId);
+  const [isSavingMetaBoxes, setIsSavingMetaboxes] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(wp.data.select('core/edit-post').isSavingMetaBoxes());
+  wp.data.subscribe(() => {
+    setIsSavingMetaboxes(prev => {
+      const current = wp.data.select('core/edit-post').isSavingMetaBoxes();
+
+      if (prev && !current) {
+        setPostId(wp.data.select("core/editor").getCurrentPostId());
+      }
+
+      return current;
+    });
+  });
 
   if (isLoading) {
     return 'Loading...'; // TODO: Add spinner
@@ -2484,24 +2501,22 @@ const Language = () => {
     return 'Error fetching post language data.';
   }
 
-  if (!data) {
+  if (!data || !data.translations) {
     return 'Post has no language data.';
   }
 
   const {
     language,
-    translations
+    translations: translatedLangs
   } = data;
-  const languages = (0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('languages', {});
-  const translatedLangs = Object.entries(translations).map(_ref => {
-    let [name, data] = _ref;
-    return {
-      name,
-      ...data
-    };
-  });
-  const untranslatedLangs = languages.filter(lang => lang !== language && !Object.keys(translations).includes(lang));
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_contexts_LangContext__WEBPACK_IMPORTED_MODULE_5__["default"].Provider, {
+  const languages = (0,_services_settings__WEBPACK_IMPORTED_MODULE_5__["default"])('languages', {});
+  const untranslatedLangs = languages.filter(lang => lang !== language && !translatedLangs.map(_ref => {
+    let {
+      language
+    } = _ref;
+    return language;
+  }).includes(lang));
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_contexts_LangContext__WEBPACK_IMPORTED_MODULE_6__["default"].Provider, {
     value: {
       currentLang: language,
       postId: data.postId,
@@ -2510,7 +2525,7 @@ const Language = () => {
       untranslatedLangs,
       refetchLangs: refetch
     }
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_ListTranslations__WEBPACK_IMPORTED_MODULE_6__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_CreateTranslations__WEBPACK_IMPORTED_MODULE_1__["default"], null), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_UnlinkTranslations__WEBPACK_IMPORTED_MODULE_7__["default"], null)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_LinkTranslations__WEBPACK_IMPORTED_MODULE_8__["default"], null));
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_ListTranslations__WEBPACK_IMPORTED_MODULE_7__["default"], null), untranslatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_CreateTranslations__WEBPACK_IMPORTED_MODULE_2__["default"], null)), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_UnlinkTranslations__WEBPACK_IMPORTED_MODULE_8__["default"], null)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_LinkTranslations__WEBPACK_IMPORTED_MODULE_9__["default"], null));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (Language);

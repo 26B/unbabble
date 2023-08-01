@@ -1,11 +1,11 @@
 import { withLangContext } from "./contexts/LangContext"
 
-const LangRow = ({ language, isDuplicate }) => {
+const TranslationRow = ({ translation, isDuplicate }) => {
 
   return (<tr>
-    <td>{language.name}</td>
-    <td><a href={language.edit}>Edit</a></td>
-    <td><a href={language.view}>View</a></td>
+    <td>{translation.language}</td>
+    <td><a href={translation.edit}>Edit</a></td>
+    <td><a href={translation.view}>View</a></td>
     <td>{ isDuplicate && <b style={{color: "FireBrick"}}>Duplicate</b> }</td>
   </tr>)
 }
@@ -16,10 +16,10 @@ const ListTranslations = ({ currentLang, translatedLangs, postId }) => (<>
     <table>
       <tbody>
         {translatedLangs.map(
-          (language) => <LangRow
-            language={language}
+          (translation) => <TranslationRow
+            translation={translation}
             postId={postId}
-            isDuplicate={translatedLangs.filter( ({ name }) => language.name === name || currentLang === name )}
+            isDuplicate={ currentLang === translation.language || translatedLangs.filter( ({ ID, language }) => translation.language === language && translation.ID !== ID ).length !== 0 }
             />
         )}
       </tbody>

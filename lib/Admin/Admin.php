@@ -115,15 +115,17 @@ class Admin {
 	public function enqueue_scripts() : void {
 		$data = [
 			'api_root'     => \esc_url_raw( \rest_url() ) . Plugin::API_V1,
-			'admin_url'    => \admin_url(),
+			'admin_url'    => \remove_query_arg( 'lang', \admin_url() ),
 			'current_lang' => LangInterface::get_current_language(),
 			'default_lang' => LangInterface::get_default_language(),
 			'languages'    => LangInterface::get_languages(),
 		];
 
+		// FIXME:
+		$base_uri = get_template_directory_uri() . '/public/';
 		\wp_enqueue_script(
 			'vendor-js',
-			$this->base_uri . 'scripts/vendor.js',
+			$base_uri . 'scripts/vendor.js',
 			[],
 			'0.0.6',
 			false

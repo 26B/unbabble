@@ -71,10 +71,11 @@ class LangMetaBox {
 	 * @return void
 	 */
 	public function add_ubb_meta_box_callback( \WP_Post $post ) : void {
-		$lang              = LangInterface::get_post_language( $post->ID );
-		$allowed_languages = LangInterface::get_languages();
+		$lang                 = LangInterface::get_post_language( $post->ID );
+		$allowed_languages    = LangInterface::get_languages();
+		$translated_languages = array_unique( array_values( LangInterface::get_post_translations( $post->ID ) ) );
 
-		$this->print_language_select( 'ubb_lang', $lang, $allowed_languages, 'ubb_language_metabox_nonce', 'ubb_language_metabox' );
+		$this->print_language_select( 'ubb_lang', $lang, $allowed_languages, $translated_languages, 'ubb_language_metabox_nonce', 'ubb_language_metabox' );
 
 		if ( is_numeric( $_GET['ubb_source'] ?? '' ) ) {
 			printf(
@@ -134,6 +135,7 @@ class LangMetaBox {
 	 * @param  string $name
 	 * @param  $selected
 	 * @param  $options
+	 * @param  $disabled_options
 	 * @param  string $nonce_action
 	 * @param  string $nonce_name
 	 * @param  $echo
@@ -143,13 +145,14 @@ class LangMetaBox {
 		string $name,
 		$selected,
 		$options,
+		$disabled_options,
 		string $nonce_action,
 		string $nonce_name,
 		$echo = true
 	) : string {
 		$create_mode = is_numeric( $_GET['ubb_source'] ?? '' );
 		$langs       = array_map(
-			function ( $text, $lang ) use ( $selected, $create_mode ) {
+			function ( $text, $lang ) use ( $selected, $create_mode, $disabled_options ) {
 				if ( is_int( $text ) ) {
 					$text = $lang;
 				}
@@ -158,7 +161,7 @@ class LangMetaBox {
 					'<option value="%1$s" %2$s %3$s>%4$s</option>',
 					$lang,
 					$selected_str,
-					$create_mode && empty( $selected_str ) ? 'disabled' : '',
+					in_array( $lang, $disabled_options, true ) || ( $create_mode && empty( $selected_str ) ) ? 'disabled' : '',
 					$text
 				);
 			},

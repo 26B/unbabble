@@ -109,7 +109,7 @@ class YoastDuplicatePost {
 		$this->filter_post_meta = false;
 
 		// Set language in the custom post lang table.
-		if ( ! LangInterface::set_post_language( $new_post_id, $target_language ) ) {
+		if ( ! LangInterface::set_post_language( $new_post_id, $target_language, true ) ) {
 			error_log( print_r( 'CreateTranslation - language set failed', true ) );
 			wp_delete_post( $new_post_id, true );
 			// TODO: What else to do when this happens.

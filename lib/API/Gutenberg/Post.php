@@ -32,7 +32,7 @@ class Post {
 
 		\register_rest_route(
 			$this->namespace,
-			'/edit/post/(?P<id>[0-9]+)/translation/(?P<lang>[a-zA-Z_-]+)/copy',
+			'/edit/post/(?P<id>[0-9]+)/translation/(?P<translation_lang>[a-zA-Z_-]+)/copy',
 			[
 				'methods'             => 'POST',
 				'callback'            => [ $this, 'new_translation_copy' ],
@@ -100,12 +100,16 @@ class Post {
 
 			$translations         = LangInterface::get_post_translations( $post_id );
 			foreach ( $translations as $translation_id => $language ) {
-				$data['translations'][ $language ] = [
-					'ID'   => $translation_id,
-					'edit' => get_edit_post_link( $translation_id, '' ),
-					'view' => get_permalink( $translation_id ),
+				$data['translations'][] = [
+					'language' => $language,
+					'ID'       => $translation_id,
+					'edit'     => get_edit_post_link( $translation_id, '' ),
+					'view'     => get_permalink( $translation_id ),
 				];
 			}
+
+			usort( $data['translations'], fn( $trans_a, $trans_b ) => $trans_a['language'] <=> $trans_b['language'] );
+
 			return new WP_REST_Response( $data, 200 );
 
 		} catch ( Throwable $e ) {
@@ -123,14 +127,14 @@ class Post {
 
 			$post_id = $request['id'];
 
-			$new_post_id = ( new YoastDuplicatePost() )->copy( $post_id, $request['lang'] );
+			$new_post_id = ( new YoastDuplicatePost() )->copy( $post_id, $request['translation_lang'] );
 			if ( ! is_int( $new_post_id ) || $new_post_id < 1 ) {
 				// TODO: error message
 				return new WP_REST_Response( null, 400 );
 			}
 
 			$new_post_url = get_edit_post_link( $new_post_id, '' );
-			return new WP_REST_Response( null, 200, [ 'Location' => $new_post_url ] );
+			return new WP_REST_Response( [ 'copy_url' => $new_post_url ], 200 );
 
 		} catch ( Throwable $e ) {
 			return new WP_REST_Response( null, 500 );
