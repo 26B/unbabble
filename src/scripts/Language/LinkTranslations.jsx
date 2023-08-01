@@ -12,7 +12,7 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
   const onLink = () => mutate()
     .then(() => refetchLangs())
 
-  return (<div style={{ display: 'flex', flexWrap: 'wrap', border: '1px solid #e0e0e0', padding: '8px'}}>
+  return (<div style={{ display: 'flex', border: '1px solid #e0e0e0', padding: '8px'}}>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', alignContent: 'center' }}>
       <b style={{ gridColumn: '1 / 4' }}>{source}</b>
       {posts.map(
@@ -39,7 +39,7 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 
   return (<>
     <Modal isOpen={isModalOpen} close={closeModal}>
-      <div style={{ display: 'flex', padding: '52px', gap: '8px' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', padding: '52px', gap: '8px' }}>
         {isLoading && 'Loading...'}
         {isError && 'ERROR!!!'}
         {data?.options && data.options.map((option) => <LinkOption {...option} postId={postId} refetchLangs={refetchLangs}/>)}

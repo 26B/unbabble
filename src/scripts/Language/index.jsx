@@ -12,7 +12,7 @@ import LinkTranslations from './LinkTranslations'
 const Language = () => {
   const [postId, setPostId] = useState(getQueryVar('post'))
   const { data, refetch, isLoading, isError } = useEditPost(postId)
-  const [isSavingMetaBoxes, setIsSavingMetaboxes] = useState(wp.data.select( 'core/edit-post' ).isSavingMetaBoxes())
+  const [isSavingMetaBoxes, setIsSavingMetaboxes] = useState(wp?.data?.select( 'core/edit-post' )?.isSavingMetaBoxes() || false)
 
   wp.data.subscribe( () => {
     setIsSavingMetaboxes(

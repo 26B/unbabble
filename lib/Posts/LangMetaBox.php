@@ -84,7 +84,7 @@ class LangMetaBox {
 			);
 		}
 
-		printf( '<hr><div id="ubb-language">New stuff here</div>' );
+		printf( '<hr><div id="ubb-language"></div>' );
 	}
 
 	/**

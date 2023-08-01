@@ -2325,6 +2325,7 @@ const LinkTranslations = _ref3 => {
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
     style: {
       display: 'flex',
+      flexWrap: 'wrap',
       padding: '52px',
       gap: '8px'
     }
@@ -2506,6 +2507,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const Language = () => {
+  var _wp, _wp$data, _wp$data$select;
+
   const [postId, setPostId] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)((0,_services_searchQuery__WEBPACK_IMPORTED_MODULE_4__.getQueryVar)('post'));
   const {
     data,
@@ -2513,7 +2516,7 @@ const Language = () => {
     isLoading,
     isError
   } = (0,_hooks_useEditPost__WEBPACK_IMPORTED_MODULE_3__["default"])(postId);
-  const [isSavingMetaBoxes, setIsSavingMetaboxes] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(wp.data.select('core/edit-post').isSavingMetaBoxes());
+  const [isSavingMetaBoxes, setIsSavingMetaboxes] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(((_wp = wp) === null || _wp === void 0 ? void 0 : (_wp$data = _wp.data) === null || _wp$data === void 0 ? void 0 : (_wp$data$select = _wp$data.select('core/edit-post')) === null || _wp$data$select === void 0 ? void 0 : _wp$data$select.isSavingMetaBoxes()) || false);
   wp.data.subscribe(() => {
     setIsSavingMetaboxes(prev => {
       const current = wp.data.select('core/edit-post').isSavingMetaBoxes();
