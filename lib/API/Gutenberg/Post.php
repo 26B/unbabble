@@ -82,7 +82,12 @@ class Post {
 			return false;
 		}
 
-		return current_user_can( "edit_{$post_type}", $request['id'] );
+		$capability = get_post_type_object( $post_type )->cap->edit_post ?? null;
+		if ( empty( $capability ) ) {
+			return false;
+		}
+
+		return current_user_can( $capability, $request['id'] );
 	}
 
 	public function post_information( \WP_REST_Request $request ) {

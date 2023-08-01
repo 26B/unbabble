@@ -2308,7 +2308,8 @@ const LinkTranslations = _ref3 => {
     postId,
     refetchLangs
   } = _ref3;
-  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
+  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(true); // TODO: set back to false
+
   const {
     data,
     isLoading,
@@ -2324,7 +2325,7 @@ const LinkTranslations = _ref3 => {
     close: closeModal
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
     style: {
-      display: 'flex',
+      display: 'grid',
       flexWrap: 'wrap',
       padding: '52px',
       gap: '8px'
