@@ -2273,6 +2273,7 @@ const LinkOption = _ref => {
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
     style: {
       display: 'flex',
+      flexWrap: 'wrap',
       border: '1px solid #e0e0e0',
       padding: '8px'
     }
