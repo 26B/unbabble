@@ -12,22 +12,22 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
   const onLink = () => mutate()
     .then(() => refetchLangs())
 
-  return (<table>
-    <tbody>
-      <tr><b>{source}</b></tr>
+  return (<div style={{ display: 'flex', border: '1px solid #e0e0e0', padding: '8px'}}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', alignContent: 'center' }}>
+      <b style={{ gridColumn: '1 / 4' }}>{source}</b>
       {posts.map(
-        ({ title, ID, lang }) => (
-          <tr>
-            <td>{title}</td>
-            <td>{ID}</td>
-            <td>{lang}</td>
-          </tr>
-        )
+        ({ title, ID, lang }) => (<>
+          <span>{title}</span>
+          <span>{ID}</span>
+          <span>{lang}</span>
+        </>)
       )}
-      {!isSuccess && <tr><Button onClick={onLink} disabled={isLoading}>Link</Button></tr>}
-      {isSuccess && <tr>Success!!!</tr>}
-    </tbody>
-  </table>)
+    </div>
+    <Button onClick={onLink} disabled={isLoading || isSuccess} style={{ height: 'min-content', margin: 'auto 0 auto 32px'}}>
+      {!isSuccess && 'Link'}
+      {isSuccess && 'Linked'}
+    </Button>
+  </div>)
 }
 
 const LinkTranslations = ({ postId, refetchLangs }) => {
@@ -39,9 +39,11 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 
   return (<>
     <Modal isOpen={isModalOpen} close={closeModal}>
-      {isLoading && 'Loading...'}
-      {isError && 'ERROR!!!'}
-      {data?.options && data.options.map((option) => <LinkOption {...option} postId={postId} refetchLangs={refetchLangs}/>)}
+      <div style={{ display: 'flex', padding: '52px', gap: '8px' }}>
+        {isLoading && 'Loading...'}
+        {isError && 'ERROR!!!'}
+        {data?.options && data.options.map((option) => <LinkOption {...option} postId={postId} refetchLangs={refetchLangs}/>)}
+      </div>
     </Modal>
     <Button onClick={openModal}>Link translations</Button>
   </>)

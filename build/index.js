@@ -2270,17 +2270,37 @@ const LinkOption = _ref => {
 
   const onLink = () => mutate().then(() => refetchLangs());
 
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tbody", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("b", null, source)), posts.map(_ref2 => {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+    style: {
+      display: 'flex',
+      border: '1px solid #e0e0e0',
+      padding: '8px'
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      alignContent: 'center'
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("b", {
+    style: {
+      gridColumn: '1 / 4'
+    }
+  }, source), posts.map(_ref2 => {
     let {
       title,
       ID,
       lang
     } = _ref2;
-    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("td", null, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("td", null, ID), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("td", null, lang));
-  }), !isSuccess && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("span", null, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("span", null, ID), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("span", null, lang));
+  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
     onClick: onLink,
-    disabled: isLoading
-  }, "Link")), isSuccess && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, "Success!!!")));
+    disabled: isLoading || isSuccess,
+    style: {
+      height: 'min-content',
+      margin: 'auto 0 auto 32px'
+    }
+  }, !isSuccess && 'Link', isSuccess && 'Linked'));
 };
 
 const LinkTranslations = _ref3 => {
@@ -2302,10 +2322,16 @@ const LinkTranslations = _ref3 => {
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Modal__WEBPACK_IMPORTED_MODULE_4__["default"], {
     isOpen: isModalOpen,
     close: closeModal
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+    style: {
+      display: 'flex',
+      padding: '52px',
+      gap: '8px'
+    }
   }, isLoading && 'Loading...', isError && 'ERROR!!!', (data === null || data === void 0 ? void 0 : data.options) && data.options.map(option => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(LinkOption, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, option, {
     postId: postId,
     refetchLangs: refetchLangs
-  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  }))))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
     onClick: openModal
   }, "Link translations"));
 };
