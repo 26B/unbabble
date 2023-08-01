@@ -9,6 +9,7 @@ const useEditPost = (postId) => {
 
   const fetch = () => {
     setIsLoading(true)
+    setIsError(false)
     return editPost(postId)
       .then(({ data }) => setData(data))
       .catch(() => setIsError(true))

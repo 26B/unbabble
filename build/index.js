@@ -2270,17 +2270,37 @@ const LinkOption = _ref => {
 
   const onLink = () => mutate().then(() => refetchLangs());
 
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tbody", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("b", null, source)), posts.map(_ref2 => {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+    style: {
+      display: 'flex',
+      border: '1px solid #e0e0e0',
+      padding: '8px'
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 1fr)',
+      alignContent: 'center'
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("b", {
+    style: {
+      gridColumn: '1 / 4'
+    }
+  }, source), posts.map(_ref2 => {
     let {
       title,
       ID,
       lang
     } = _ref2;
-    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("td", null, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("td", null, ID), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("td", null, lang));
-  }), !isSuccess && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("span", null, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("span", null, ID), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("span", null, lang));
+  })), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
     onClick: onLink,
-    disabled: isLoading
-  }, "Link")), isSuccess && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("tr", null, "Success!!!")));
+    disabled: isLoading || isSuccess,
+    style: {
+      height: 'min-content',
+      margin: 'auto 0 auto 32px'
+    }
+  }, !isSuccess && 'Link', isSuccess && 'Linked'));
 };
 
 const LinkTranslations = _ref3 => {
@@ -2302,10 +2322,16 @@ const LinkTranslations = _ref3 => {
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Modal__WEBPACK_IMPORTED_MODULE_4__["default"], {
     isOpen: isModalOpen,
     close: closeModal
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+    style: {
+      display: 'flex',
+      padding: '52px',
+      gap: '8px'
+    }
   }, isLoading && 'Loading...', isError && 'ERROR!!!', (data === null || data === void 0 ? void 0 : data.options) && data.options.map(option => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(LinkOption, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, option, {
     postId: postId,
     refetchLangs: refetchLangs
-  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
+  }))))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_components_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
     onClick: openModal
   }, "Link translations"));
 };
@@ -2333,15 +2359,15 @@ const TranslationRow = _ref => {
     translation,
     isDuplicate
   } = _ref;
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tr", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, translation.language), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, translation.language), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
     href: translation.edit
-  }, "Edit")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
+  }, "Edit"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
     href: translation.view
-  }, "View")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("td", null, isDuplicate && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", {
+  }, "View"), isDuplicate && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", {
     style: {
       color: "FireBrick"
     }
-  }, "Duplicate")));
+  }, "Duplicate"));
 };
 
 const ListTranslations = _ref2 => {
@@ -2350,7 +2376,14 @@ const ListTranslations = _ref2 => {
     translatedLangs,
     postId
   } = _ref2;
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", null, "Translations:")), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("table", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("tbody", null, translatedLangs.map(translation => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(TranslationRow, {
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", null, "Translations:")), translatedLangs.length > 0 && translatedLangs.map(translation => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr 1fr 2fr',
+      marginBottom: '4px',
+      justifyItems: 'left'
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(TranslationRow, {
     translation: translation,
     postId: postId,
     isDuplicate: currentLang === translation.language || translatedLangs.filter(_ref3 => {
@@ -2360,7 +2393,7 @@ const ListTranslations = _ref2 => {
       } = _ref3;
       return translation.language === language && translation.ID !== ID;
     }).length !== 0
-  })))), translatedLangs.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "No translations available."));
+  }))), translatedLangs.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "No translations available."));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = ((0,_contexts_LangContext__WEBPACK_IMPORTED_MODULE_1__.withLangContext)(ListTranslations));
@@ -2580,7 +2613,12 @@ const Collapse = _ref => {
     children,
     title
   } = _ref;
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("details", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("summary", null, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, children));
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("details", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("summary", null, title), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "components-panel__row",
+    style: {
+      marginTop: '1em'
+    }
+  }, children));
 };
 
 /* harmony default export */ __webpack_exports__["default"] = (Collapse);
@@ -2742,6 +2780,7 @@ const useEditPost = postId => {
 
   const fetch = () => {
     setIsLoading(true);
+    setIsError(false);
     return (0,_services_requests__WEBPACK_IMPORTED_MODULE_1__.editPost)(postId).then(_ref => {
       let {
         data

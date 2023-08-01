@@ -1,7 +1,7 @@
 const Collapse = ({ children, title }) => (
   <details>
     <summary>{title}</summary>
-    <div>{children}</div>
+    <div className="components-panel__row" style={{ marginTop: '1em' }}>{children}</div>
   </details>
 )
 
