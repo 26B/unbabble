@@ -2308,7 +2308,7 @@ const LinkTranslations = _ref3 => {
     postId,
     refetchLangs
   } = _ref3;
-  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(true); // TODO: set back to false
+  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false); // TODO: set back to false
 
   const {
     data,
