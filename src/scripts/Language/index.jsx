@@ -61,11 +61,13 @@ const Language = () => {
       </>)}
       <hr/>
       <Collapse title="Linking">
-        <LinkTranslations/>
-        {translatedLangs.length > 0 && (<>
-          <hr/>
-          <UnlinkTranslations/>
-        </>)}
+        <div style={{ overflow: 'wrap' }}>
+          <LinkTranslations/>
+          {translatedLangs.length > 0 && (<>
+            <div style={{ paddingTop: '10px' }} />
+            <UnlinkTranslations/>
+          </>)}
+        </div>
       </Collapse>
     </LangContext.Provider>
   )

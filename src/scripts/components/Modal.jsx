@@ -1,5 +1,7 @@
 import { createPortal } from 'react-dom'
 
+// TODO: remove me.
+
 const Modal = ({ isOpen, close, children }) => {
   if (!isOpen) {
     return null

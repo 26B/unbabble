@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
+import { Button, SelectControl } from '@wordpress/components';
+
 import Collapse from '../components/Collapse'
-import Select from '../components/Select'
-import Button from '../components/Button'
 import useCopyPost from '../hooks/useCopyPost'
 import { withLangContext } from './contexts/LangContext'
 import getUBBSetting from '../services/settings'
@@ -24,9 +24,10 @@ const CreateTranslations = ({ untranslatedLangs, postId, refetchLangs }) => {
 
   return (
     <Collapse title="Create Translations">
-      <Select changeValue={changeValue} currentValue={current} options={untranslatedLangs.map(lang => ({ label: lang, value: lang }))}/>
-      <a className='button' href={createUrl}>Create</a>
-      <Button disabled={isLoading} onClick={onSubmitCopy}>Copy</Button>
+      <SelectControl onChange={changeValue} value={current} options={untranslatedLangs.map(lang => ({ label: lang, value: lang }))}/>
+      <Button variant='secondary' isSmall href={createUrl}>Create</Button>
+      {/* TODO: Only show if yoast duplicate post is active. */}
+      <Button variant='secondary' isSmall disabled={isLoading} onClick={onSubmitCopy}>Copy</Button>
       {isError && 'ERROR!!!!'}
       {data && JSON.stringify(data)}
     </Collapse>

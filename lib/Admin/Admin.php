@@ -137,13 +137,24 @@ class Admin {
 			$data
 		);
 
+		$assets = include dirname( __FILE__, 3 ) . '/build/index.asset.php';
+
 		\wp_enqueue_script(
 			'frontend',
 			plugin_dir_url( dirname( __FILE__, 2 ) ) . 'build/index.js',
-			[ 'wp-blocks', 'wp-element', 'wp-components', 'wp-i18n', 'vendor-js' ],
-			'0.0.6',
+			$assets['dependencies'],
+			$assets['version'],
 			true
 		);
+
+		if ( ! $this->is_block_editor() ) {
+			\wp_enqueue_style(
+				'frontend-style',
+				plugin_dir_url( dirname( __FILE__, 2 ) ) . 'build/style-index.css',
+				[],
+				$assets['version']
+			);
+		}
 	}
 
 	/**
@@ -158,5 +169,15 @@ class Admin {
 		$query_vars[] = 'lang';
 		$query_vars[] = 'ubb_source';
 		return $query_vars;
+	}
+
+	private function is_block_editor() : bool {
+		if ( function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+			if ( $screen && method_exists( $screen, 'is_block_editor' ) ) {
+				return $screen->is_block_editor();
+			}
+		}
+		return false;
 	}
 }

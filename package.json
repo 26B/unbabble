@@ -37,5 +37,8 @@
   "homepage": "https://github.com/26B/unbabble#readme",
   "devDependencies": {
     "@wordpress/scripts": "^22.5.0"
+  },
+  "dependencies": {
+    "@wordpress/components": "^19.10.0"
   }
 }

@@ -8,6 +8,12 @@ const useEditPost = (postId) => {
   const [isError, setIsError] = useState(false)
 
   const fetch = () => {
+    if ( isNaN( postId ) ) {
+      setIsLoading(false)
+      setIsError(false)
+      setData([]);
+      return;
+    }
     setIsLoading(true)
     setIsError(false)
     return editPost(postId)
