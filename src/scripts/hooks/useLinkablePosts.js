@@ -2,20 +2,22 @@ import { useState, useEffect } from 'react'
 
 import { linkablePosts } from "../services/requests"
 
-const useLinkablePosts = (postId) => {
+const useLinkablePosts = (postId, page) => {
   const [data, setData] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
 
-  useEffect(() => {
+  const fetch = async (page) => {
     setIsLoading(true)
-    linkablePosts(postId)
+    return linkablePosts(postId, page)
       .then(({ data }) => setData(data))
       .catch(() => setIsError(true))
       .then(() => setIsLoading(false))
-  }, [postId])
+  }
 
-  return { data, isLoading, isError }
+  useEffect(() => { fetch(page) }, [postId, page])
+
+  return { data, refetch: fetch, isLoading, isError }
 }
 
 export default useLinkablePosts

@@ -19,6 +19,6 @@ export const linkPost = (id, translationId) => request({
   url: `/edit/post/${id}/translation/${translationId}/link`,
 })
 
-export const linkablePosts = (id) => request({
-  url: `/edit/post/${id}/translation/link`,
+export const linkablePosts = (id, page) => request({
+  url: `/edit/post/${id}/translation/link?page=${page}`,
 })

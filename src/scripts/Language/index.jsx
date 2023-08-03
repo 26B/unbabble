@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import Collapse from '../components/Collapse'
 import CreateTranslations from './CreateTranslations'
 import useEditPost from '../hooks/useEditPost'
 import { getQueryVar } from '../services/searchQuery'
@@ -58,12 +59,14 @@ const Language = () => {
         <hr/>
         <CreateTranslations/>
       </>)}
-      {translatedLangs.length > 0 && (<>
-        <hr/>
-        <UnlinkTranslations/>
-      </>)}
       <hr/>
-      <LinkTranslations/>
+      <Collapse title="Linking">
+        <LinkTranslations/>
+        {translatedLangs.length > 0 && (<>
+          <hr/>
+          <UnlinkTranslations/>
+        </>)}
+      </Collapse>
     </LangContext.Provider>
   )
 }
