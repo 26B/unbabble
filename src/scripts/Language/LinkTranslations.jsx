@@ -85,7 +85,7 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
         </div>
       </Modal>
     ) }
-    <Button variant='secondary' isSmall onClick={openModal}>Link translations</Button>
+      <Button style={{ boxSizing: 'border-box' }} variant='secondary' onClick={openModal}>Link translations</Button>
   </>)
 }
 

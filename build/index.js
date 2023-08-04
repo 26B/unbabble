@@ -2239,12 +2239,16 @@ const CreateTranslations = _ref => {
       value: lang
     }))
   }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    style: {
+      boxSizing: 'border-box'
+    },
     variant: "secondary",
-    isSmall: true,
     href: createUrl
   }, "Create"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    style: {
+      boxSizing: 'border-box'
+    },
     variant: "secondary",
-    isSmall: true,
     disabled: isLoading,
     onClick: onSubmitCopy
   }, "Copy"), isError && 'ERROR!!!!', data && JSON.stringify(data));
@@ -2424,8 +2428,10 @@ const LinkTranslations = _ref3 => {
     variant: "secondary",
     onClick: nextPage
   }, "Next Page"))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+    style: {
+      boxSizing: 'border-box'
+    },
     variant: "secondary",
-    isSmall: true,
     onClick: openModal
   }, "Link translations"));
 };
@@ -2535,8 +2541,10 @@ const UnlinkTranslations = _ref => {
   const onClick = () => mutate().then(() => refetchLangs());
 
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+    style: {
+      boxSizing: 'border-box'
+    },
     variant: "secondary",
-    isSmall: true,
     isDestructive: true,
     onClick: openModal,
     disabled: isLoading

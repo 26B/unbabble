@@ -25,9 +25,9 @@ const CreateTranslations = ({ untranslatedLangs, postId, refetchLangs }) => {
   return (
     <Collapse title="Create Translations">
       <SelectControl onChange={changeValue} value={current} options={untranslatedLangs.map(lang => ({ label: lang, value: lang }))}/>
-      <Button variant='secondary' isSmall href={createUrl}>Create</Button>
+      <Button style={{ boxSizing: 'border-box' }} variant='secondary' href={createUrl}>Create</Button>
       {/* TODO: Only show if yoast duplicate post is active. */}
-      <Button variant='secondary' isSmall disabled={isLoading} onClick={onSubmitCopy}>Copy</Button>
+      <Button style={{ boxSizing: 'border-box' }} variant='secondary' disabled={isLoading} onClick={onSubmitCopy}>Copy</Button>
       {isError && 'ERROR!!!!'}
       {data && JSON.stringify(data)}
     </Collapse>

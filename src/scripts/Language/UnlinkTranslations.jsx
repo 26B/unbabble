@@ -14,7 +14,7 @@ const UnlinkTranslations = ({ postId, refetchLangs }) => {
     .then(() => refetchLangs())
 
   return (<>
-    <Button variant='secondary' isSmall isDestructive onClick={openModal} disabled={isLoading}>Unlink from translations</Button>
+    <Button style={{ boxSizing: 'border-box' }} variant='secondary' isDestructive onClick={openModal} disabled={isLoading}>Unlink from translations</Button>
     { isOpen &&
       <Modal title='Unlink from translations' onRequestClose={closeModal} >
         <div>
