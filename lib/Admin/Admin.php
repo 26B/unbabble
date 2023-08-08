@@ -3,7 +3,10 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use TwentySixB\WP\Plugin\Unbabble\Options;
 use TwentySixB\WP\Plugin\Unbabble\Plugin;
+use WP_Query;
+use WP_Screen;
 
 /**
  * General hooks for the back-office.
@@ -114,11 +117,12 @@ class Admin {
 	 */
 	public function enqueue_scripts() : void {
 		$data = [
-			'api_root'     => \esc_url_raw( \rest_url() ) . Plugin::API_V1,
-			'admin_url'    => \remove_query_arg( 'lang', \admin_url() ),
-			'current_lang' => LangInterface::get_current_language(),
-			'default_lang' => LangInterface::get_default_language(),
-			'languages'    => LangInterface::get_languages(),
+			'api_root'      => \esc_url_raw( \rest_url() ) . Plugin::API_V1,
+			'admin_url'     => \remove_query_arg( 'lang', \admin_url() ),
+			'current_lang'  => LangInterface::get_current_language(),
+			'default_lang'  => LangInterface::get_default_language(),
+			'languages'     => LangInterface::get_languages(),
+			'languagesInfo' => Options::get_languages_info(),
 		];
 
 		// FIXME:
@@ -147,13 +151,8 @@ class Admin {
 			true
 		);
 
-		if ( ! $this->is_block_editor() ) {
-			\wp_enqueue_style(
-				'frontend-style',
-				plugin_dir_url( dirname( __FILE__, 2 ) ) . 'build/style-index.css',
-				[],
-				$assets['version']
-			);
+		if ( ! self::is_block_editor() ) {
+			\wp_enqueue_style( 'wp-components' );
 		}
 	}
 
@@ -171,13 +170,15 @@ class Admin {
 		return $query_vars;
 	}
 
-	private function is_block_editor() : bool {
-		if ( function_exists( 'get_current_screen' ) ) {
+	public static function is_block_editor( WP_Screen $screen = null ) : bool {
+		if ( $screen === null && function_exists( 'get_current_screen' ) ) {
 			$screen = get_current_screen();
-			if ( $screen && method_exists( $screen, 'is_block_editor' ) ) {
-				return $screen->is_block_editor();
-			}
 		}
+
+		if ( $screen instanceof WP_Screen && method_exists( $screen, 'is_block_editor' ) ) {
+			return $screen->is_block_editor();
+		}
+
 		return false;
 	}
 }

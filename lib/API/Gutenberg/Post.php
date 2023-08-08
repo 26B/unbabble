@@ -32,6 +32,16 @@ class Post {
 
 		\register_rest_route(
 			$this->namespace,
+			'/edit/post/(?P<id>[0-9]+)/language/(?P<change_lang>[a-zA-Z_-]+)',
+			[
+				'methods'             => 'PATCH',
+				'callback'            => [ $this, 'change_post_language' ],
+				'permission_callback' => [ $this, 'permission_callback' ],
+			]
+		);
+
+		\register_rest_route(
+			$this->namespace,
 			'/edit/post/(?P<id>[0-9]+)/translation/(?P<translation_lang>[a-zA-Z_-]+)/copy',
 			[
 				'methods'             => 'POST',
@@ -116,6 +126,22 @@ class Post {
 			usort( $data['translations'], fn( $trans_a, $trans_b ) => $trans_a['language'] <=> $trans_b['language'] );
 
 			return new WP_REST_Response( $data, 200 );
+
+		} catch ( Throwable $e ) {
+			return new WP_REST_Response( null, 500 );
+		}
+	}
+
+	public function change_post_language( \WP_REST_Request $request ) {
+		try {
+			$post_id      = $request['id'];
+			$new_language = $request['change_lang'];
+
+			if ( ! LangInterface::change_post_language( $post_id, $new_language ) ) {
+				return new WP_REST_Response( null, 400 );
+			}
+
+			return new WP_REST_Response( null, 200 );
 
 		} catch ( Throwable $e ) {
 			return new WP_REST_Response( null, 500 );

@@ -258,7 +258,6 @@ class Options {
 				continue;
 			}
 
-
 			// Shouldn't happen.
 			if ( ! isset( $wp_translations[ $ubb_lang ] ) ) {
 				$new_lang_info[ $ubb_lang ] = [ 'locale' => $ubb_lang ];

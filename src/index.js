@@ -1,8 +1,19 @@
-import '../node_modules/@wordpress/components/build-style/style.css';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { registerPlugin } from '@wordpress/plugins';
+import LanguagePanel from './scripts/LanguagePanel';
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+// Support for classic editor.
+window.addEventListener('load', () => {
+	const rootEl = document.getElementById('ubb-language');
 
-import Language from './scripts/Language'
+	if (rootEl) {
+		ReactDOM.render(<LanguagePanel isClassic />, rootEl);
+	}
+});
 
-ReactDOM.render(<Language/>, document.getElementById('ubb-language'))
+// Add panel in the new block editor.
+registerPlugin('ubb-language-panel', {
+	render: LanguagePanel,
+	icon: 'airplane',
+});
