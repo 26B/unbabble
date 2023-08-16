@@ -44,6 +44,7 @@ const Language = () => {
 			<>
 				<input
 					hidden
+					readOnly
 					id='ubb_lang'
 					name="ubb_lang"
 					value={getUBBSetting('current_lang', '')}
