@@ -2221,7 +2221,12 @@ const Language = () => {
 
 
   if (!data || !data.translations) {
-    return 'Post has no language data.';
+    return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+      hidden: true,
+      id: "ubb_lang",
+      name: "ubb_lang",
+      value: (0,_services_settings__WEBPACK_IMPORTED_MODULE_5__["default"])('current_lang', '')
+    }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, "Post has no language data."));
   }
 
   const {

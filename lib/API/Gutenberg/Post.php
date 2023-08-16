@@ -110,7 +110,12 @@ class Post {
 				return new WP_REST_Response( $data, 403 );
 			}
 
-			$data['language']     = LangInterface::get_post_language( $post_id );
+			$data['language'] = LangInterface::get_post_language( $post_id );
+			if ( empty( $data['language'] ) ) {
+				// TODO: Show this in backoffice.
+				$data['language'] = LangInterface::get_current_language();
+			}
+
 			$data['translations'] = [];
 
 			$translations         = LangInterface::get_post_translations( $post_id );

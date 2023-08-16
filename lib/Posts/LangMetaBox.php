@@ -29,10 +29,13 @@ class LangMetaBox {
 
 				// Post meta box.
 				\add_action( 'add_meta_boxes', [ $this, 'add_ubb_meta_box' ] );
-				\add_action( 'save_post', [ $this, 'save_post_language' ], PHP_INT_MAX - 10 );
 			},
 			PHP_INT_MAX
 		);
+
+		// TODO: Move somewhere else.
+		// FIXME: better solution for initial post language
+		\add_action( 'save_post', [ $this, 'save_post_language' ], PHP_INT_MAX - 10 );
 	}
 
 	/**
@@ -112,9 +115,9 @@ class LangMetaBox {
 			return;
 		}
 
-		if ( ! $this->verify_nonce( 'ubb_language_metabox', 'ubb_language_metabox_nonce' ) ) {
-			return;
-		}
+		// if ( ! $this->verify_nonce( 'ubb_language_metabox', 'ubb_language_metabox_nonce' ) ) {
+		// 	return;
+		// }
 
 		if (
 			get_post_type( $post_id ) === 'revision'

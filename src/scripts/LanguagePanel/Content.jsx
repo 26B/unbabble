@@ -40,7 +40,17 @@ const Language = () => {
 	// TODO: If ubb_source is present, show info about being linked to post X on create.
 
 	if (!data || !data.translations) {
-		return 'Post has no language data.';
+		return (
+			<>
+				<input
+					hidden
+					id='ubb_lang'
+					name="ubb_lang"
+					value={getUBBSetting('current_lang', '')}
+				/>
+				<span>Post has no language data.</span>
+			</>
+		);
 	}
 
 	const { language, translations: translatedLangs } = data;
