@@ -156,8 +156,9 @@ class Directory {
 	 */
 	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
 		// When attachments are attached to a post, their url already has the lang from the post permalink.
-		$lang = $this->current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
-		if ( ! empty( $lang ) ) {
+		$link_lang = $this->current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
+		$post_lang = LangInterface::get_post_language( $post_id );
+		if ( ! empty( $lang ) && $link_lang === $post_lang ) {
 			return $link;
 		}
 
