@@ -97,28 +97,32 @@ class Directory {
 			return $post_link;
 		}
 
-		$site_url = site_url();
-		$url_lang = $this->current_lang_from_uri( '', str_replace( $site_url, '', $post_link ) );
+		// Get site's frontend url without language. Cannot use site_url due to cases where the WordPress installation is not in the root.
+		add_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+		$home_url = home_url();
+		remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+
+		$url_lang = $this->current_lang_from_uri( '', str_replace( $home_url, '', $post_link ) );
 		if ( $url_lang === $post_lang ) {
 			return $post_link;
 		}
 
 		// The source url might be poluted by the home_url language addition.
-		$source_url = $site_url;
+		$source_url = $home_url;
 		if ( ! empty( $url_lang ) && $url_lang !== $post_lang ) {
-			$source_url = trailingslashit( $site_url ) . $this->get_directory_name( $url_lang );
+			$source_url = trailingslashit( $home_url ) . $this->get_directory_name( $url_lang );
 		}
 
 		// If it's not poluted and the language is the default language don't do anything to it.
-		if ( $post_lang === LangInterface::get_default_language() && $source_url === $site_url ) {
+		if ( $post_lang === LangInterface::get_default_language() && $source_url === $home_url ) {
 			return $post_link;
 		}
 
 		// If not default language, set the directory to the post language.
-		$target_url = $site_url;
+		$target_url = $home_url;
 		if ( $post_lang !== LangInterface::get_default_language() ) {
 			$directory  = $this->get_directory_name( $post_lang );
-			$target_url = trailingslashit( $site_url ) . $directory;
+			$target_url = trailingslashit( $home_url ) . $directory;
 		}
 
 		return str_replace( $source_url, $target_url, $post_link );
@@ -187,28 +191,32 @@ class Directory {
 			return $termlink;
 		}
 
-		$site_url  = site_url();
-		$url_lang  = $this->current_lang_from_uri( '', str_replace( $site_url, '', $termlink ) );
+		// Get site's frontend url without language. Cannot use site_url due to cases where the WordPress installation is not in the root.
+		add_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+		$home_url = home_url();
+		remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+
+		$url_lang  = $this->current_lang_from_uri( '', str_replace( $home_url, '', $termlink ) );
 		if ( $url_lang === $term_lang ) {
 			return $termlink;
 		}
 
 		// The source url might be poluted by the home_url language addition.
-		$source_url = $site_url;
+		$source_url = $home_url;
 		if ( ! empty( $url_lang ) && $url_lang !== $term_lang ) {
-			$source_url = trailingslashit( $site_url ) . $this->get_directory_name( $url_lang );
+			$source_url = trailingslashit( $home_url ) . $this->get_directory_name( $url_lang );
 		}
 
 		// If it's not polluted and the language is the default language don't do anything to it.
-		if ( $term_lang === LangInterface::get_default_language() && $source_url === $site_url ) {
+		if ( $term_lang === LangInterface::get_default_language() && $source_url === $home_url ) {
 			return $termlink;
 		}
 
 		// If not default language, set the directory to the term language.
-		$target_url = $site_url;
+		$target_url = $home_url;
 		if ( $term_lang !== LangInterface::get_default_language() ) {
 			$directory  = $this->get_directory_name( $term_lang );
-			$target_url = trailingslashit( $site_url ) . $directory;
+			$target_url = trailingslashit( $home_url ) . $directory;
 		}
 
 		return str_replace( $source_url, $target_url, $termlink );
@@ -260,19 +268,24 @@ class Directory {
 		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $link;
 		}
-		$site_url = site_url();
-		$url_lang = $this->current_lang_from_uri( '', str_replace( $site_url, '', $link ) );
+
+		// Get site's frontend url without language. Cannot use site_url due to cases where the WordPress installation is not in the root.
+		add_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+		$home_url = home_url();
+		remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+
+		$url_lang = $this->current_lang_from_uri( '', str_replace( $home_url, '', $link ) );
 		if ( $url_lang === $curr_lang ) {
 			return $link;
 		}
 
-		$source_url = trailingslashit( $site_url ) . $this->get_directory_name( $url_lang );
+		$source_url = trailingslashit( $home_url ) . $this->get_directory_name( $url_lang );
 
 		// If not default language, set the directory to the post language.
-		$target_url = $site_url;
+		$target_url = $home_url;
 		if ( $curr_lang !== LangInterface::get_default_language() ) {
 			$directory  = $this->get_directory_name( $curr_lang );
-			$target_url = trailingslashit( trailingslashit( $site_url ) . $directory );
+			$target_url = trailingslashit( trailingslashit( $home_url ) . $directory );
 		}
 
 		return str_replace( $source_url, $target_url, $link );

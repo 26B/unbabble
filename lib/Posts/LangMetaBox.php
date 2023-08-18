@@ -128,6 +128,10 @@ class LangMetaBox {
 
 		// TODO: Check the user's permissions.
 
+		if ( ! isset( $_POST['ubb_lang'] ) ) {
+			return;
+		}
+
 		// Sanitize the user input.
 		$lang = \sanitize_text_field( $_POST['ubb_lang'] );
 

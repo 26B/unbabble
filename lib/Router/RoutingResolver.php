@@ -206,6 +206,12 @@ class RoutingResolver {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path ) : string {
+
+		// TODO: add docs.
+		if ( ! apply_filters( 'ubb_apply_lang_to_home_url', true, $url, $path ) ) {
+			return $url;
+		}
+
 		$router = $this->get_current_router_object();
 		if ( $router !== null && method_exists( $router, 'home_url' ) ) {
 			return $router->home_url( $url, $path );
