@@ -18,7 +18,8 @@ class Header {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		\add_filter( 'rest_pre_dispatch', [ $this, 'accept_language_header' ], 2, 3 );
+		// TODO: Problems with Rest calls from block editor.
+		// \add_filter( 'rest_pre_dispatch', [ $this, 'accept_language_header' ], 2, 3 );
 	}
 
 	/**
