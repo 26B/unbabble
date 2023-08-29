@@ -2,6 +2,12 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use TwentySixB\WP\Plugin\Unbabble\Options;
+use TwentySixB\WP\Plugin\Unbabble\Plugin;
+use WP_Query;
+use WP_Screen;
+
 /**
  * General hooks for the back-office.
  *
@@ -110,7 +116,44 @@ class Admin {
 	 * @return void
 	 */
 	public function enqueue_scripts() : void {
-		\wp_enqueue_script( 'ubb-admin', plugin_dir_url( dirname( __FILE__, 1 ) ) . 'src/scripts/ubb-admin.js', [], '0.0.6', true );
+		$data = [
+			'api_root'      => \esc_url_raw( \rest_url() ) . Plugin::API_V1,
+			'admin_url'     => \remove_query_arg( 'lang', \admin_url() ),
+			'current_lang'  => LangInterface::get_current_language(),
+			'default_lang'  => LangInterface::get_default_language(),
+			'languages'     => LangInterface::get_languages(),
+			'languagesInfo' => Options::get_languages_info(),
+		];
+
+		// FIXME:
+		$base_uri = get_template_directory_uri() . '/public/';
+		\wp_enqueue_script(
+			'vendor-js',
+			$base_uri . 'scripts/vendor.js',
+			[],
+			'0.0.6',
+			false
+		);
+
+		\wp_localize_script(
+			'vendor-js',
+			'UBB',
+			$data
+		);
+
+		$assets = include dirname( __FILE__, 3 ) . '/build/index.asset.php';
+
+		\wp_enqueue_script(
+			'frontend',
+			plugin_dir_url( dirname( __FILE__, 2 ) ) . 'build/index.js',
+			$assets['dependencies'],
+			$assets['version'],
+			true
+		);
+
+		if ( ! self::is_block_editor() ) {
+			\wp_enqueue_style( 'wp-components' );
+		}
 	}
 
 	/**
@@ -125,5 +168,17 @@ class Admin {
 		$query_vars[] = 'lang';
 		$query_vars[] = 'ubb_source';
 		return $query_vars;
+	}
+
+	public static function is_block_editor( WP_Screen $screen = null ) : bool {
+		if ( $screen === null && function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+		}
+
+		if ( $screen instanceof WP_Screen && method_exists( $screen, 'is_block_editor' ) ) {
+			return $screen->is_block_editor();
+		}
+
+		return false;
 	}
 }

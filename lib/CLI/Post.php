@@ -206,8 +206,16 @@ class Post extends Command {
 
 		$this->print_post_linked_to( $post_id, true );
 
+		$translations = LangInterface::get_post_translations( $post_id );
+
 		if ( ! LangInterface::delete_post_source( $post_id ) ) {
 			WP_CLI::error( "Failed to unlink post {$post_id}." );
+		}
+
+		// Clean up post source if there's a single other post for that source.
+		if ( count( $translations ) === 1 ) {
+			$other_post_id = array_keys( $translations )[0];
+			LangInterface::delete_post_source( $other_post_id );
 		}
 
 		WP_CLI::success( "Post {$post_id} unlinked." );
