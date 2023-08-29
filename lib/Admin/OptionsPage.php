@@ -14,10 +14,14 @@ class OptionsPage {
 	 */
 	public function register() {
 
-		// Only show options page on debug mode for now.
-		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+		// Show options page on debug mode or for admins.
+		if (
+			! \current_user_can( 'manage_options' )
+			&& ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG )
+		) {
 			return;
 		}
+
 		\add_action( 'admin_menu', [ $this, 'add_options_page' ] );
 		\add_action( 'admin_init', [ $this, 'add_options_to_page' ] );
 	}
