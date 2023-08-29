@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, Modal } from '@wordpress/components';
-import { withLangContext } from './contexts/LangContext';
-import useUnlinkPost from '../hooks/useUnlinkPost';
+import { withLangContext } from '../../contexts/LangContext';
+import useUnlinkPost from '../../hooks/useUnlinkPost';
 
 const UnlinkTranslations = ({ postId, refetchLangs }) => {
 	const { mutate, isLoading } = useUnlinkPost(postId); // TODO: Loading and error

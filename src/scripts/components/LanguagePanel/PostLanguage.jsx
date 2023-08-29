@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { withLangContext } from './contexts/LangContext';
+import { withLangContext } from '../../contexts/LangContext';
 import {
 	PanelRow,
 	Button,
@@ -8,7 +8,7 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import useChangeLanguagePost from '../hooks/useChangeLanguagePost';
+import useChangeLanguagePost from '../../hooks/useChangeLanguagePost';
 
 const PostLanguage = ({
 	postLanguage,

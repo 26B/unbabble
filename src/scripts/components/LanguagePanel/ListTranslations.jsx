@@ -1,4 +1,4 @@
-import { withLangContext } from './contexts/LangContext';
+import { withLangContext } from '../../contexts/LangContext';
 import { Flex, PanelRow, Tooltip } from '@wordpress/components';
 
 const TranslationRow = ({ translation, isDuplicate, languagesInfo }) => {

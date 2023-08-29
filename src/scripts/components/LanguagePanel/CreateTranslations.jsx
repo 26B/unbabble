@@ -8,9 +8,9 @@ import {
 	Modal,
 } from '@wordpress/components';
 
-import useCopyPost from '../hooks/useCopyPost';
-import { withLangContext } from './contexts/LangContext';
-import getUBBSetting from '../services/settings';
+import useCopyPost from '../../hooks/useCopyPost';
+import { withLangContext } from '../../contexts/LangContext';
+import getUBBSetting from '../../services/settings';
 
 const CreateTranslations = ({
 	untranslatedLangs,

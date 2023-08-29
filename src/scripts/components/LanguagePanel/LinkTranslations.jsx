@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 import { Button, Notice, Modal } from '@wordpress/components';
 
-import Collapse from '../components/Collapse';
-import useLinkablePosts from '../hooks/useLinkablePosts';
-import { withLangContext } from './contexts/LangContext';
-import useLinkPost from '../hooks/useLinkPost';
+import Collapse from '../Collapse';
+import useLinkablePosts from '../../hooks/useLinkablePosts';
+import { withLangContext } from '../../contexts/LangContext';
+import useLinkPost from '../../hooks/useLinkPost';
 
 const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 	const { mutate, isLoading, isSuccess, isError } = useLinkPost(

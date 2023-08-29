@@ -1,10 +1,10 @@
 import { useState } from 'react';
 
 import CreateTranslations from './CreateTranslations';
-import useEditPost from '../hooks/useEditPost';
-import { getQueryVar } from '../services/searchQuery';
-import getUBBSetting from '../services/settings';
-import LangContext from './contexts/LangContext';
+import useEditPost from '../../hooks/useEditPost';
+import { getQueryVar } from '../../services/searchQuery';
+import getUBBSetting from '../../services/settings';
+import LangContext from '../../contexts/LangContext';
 import PostLanguage from './PostLanguage';
 import ListTranslations from './ListTranslations';
 import UnlinkTranslations from './UnlinkTranslations';
