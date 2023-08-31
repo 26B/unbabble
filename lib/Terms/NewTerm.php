@@ -49,6 +49,7 @@ class NewTerm {
 				&& str_starts_with( $_POST['action'] ?? '' , 'add-' )
 			)
 			&& ! ( defined( 'REST_REQUEST' ) && REST_REQUEST )
+			&& $_POST['action'] !== 'editpost'
 		) {
 			return;
 		}
