@@ -6,6 +6,7 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\Relevanssi;
 use WP_CLI;
 
 /**
@@ -196,11 +197,23 @@ class Plugin {
 
 	private function define_integrations() : void {
 		$this->define_integration_migrators();
-		$integrations = [
+		$admin_integrations = [
 			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
 			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
 		];
-		\add_action( 'admin_init', function() use ( $integrations ) {
+		$integrations = [
+			Relevanssi::class => 'relevanssi/relevanssi.php',
+		];
+
+		\add_action( 'admin_init', function() use ( $admin_integrations ) {
+			foreach ( $admin_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'init', function() use ( $integrations ) {
 			foreach ( $integrations as $integration_class => $plugin_name ) {
 				if ( \is_plugin_active( $plugin_name ) ) {
 					( new $integration_class() )->register();
