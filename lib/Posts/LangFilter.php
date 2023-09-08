@@ -168,6 +168,10 @@ class LangFilter {
 			return false;
 		}
 
+		if ( ! ( $query->query_vars['ubb_lang_filter'] ?? true ) ) {
+			return false;
+		}
+
 		/**
 		 * Filters whether posts should be filtered by their language.
 		 *
