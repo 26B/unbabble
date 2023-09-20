@@ -33,3 +33,10 @@ export const linkablePosts = (id, page) =>
 	request({
 		url: `/edit/post/${id}/translation/link?page=${page}`,
 	});
+
+export const submitOptions = (data) =>
+	request({
+		method: 'post',
+		url: `/options`,
+		data,
+	});

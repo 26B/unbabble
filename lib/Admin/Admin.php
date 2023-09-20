@@ -116,6 +116,20 @@ class Admin {
 	 * @return void
 	 */
 	public function enqueue_scripts() : void {
+		$wp_languages = array_merge(
+			[ [ 'code' => 'en_US', 'label' => 'English (USA) (en_US)' ] ],
+			array_values(
+				array_map(
+					fn ( $translation ) => [
+						'code'  => $translation['language'],
+						'label' => sprintf( '%s (%s) ', $translation['english_name'], $translation['language'] ),
+					],
+					\wp_get_available_translations()
+				)
+			)
+		);
+		usort( $wp_languages, fn ($a, $b) => $a['label'] <=> $b['label'] );
+
 		$data = [
 			'api_root'      => \esc_url_raw( \rest_url() ) . Plugin::API_V1,
 			'admin_url'     => \remove_query_arg( 'lang', \admin_url() ),
@@ -123,6 +137,10 @@ class Admin {
 			'default_lang'  => LangInterface::get_default_language(),
 			'languages'     => LangInterface::get_languages(),
 			'languagesInfo' => Options::get_languages_info(),
+			'options'       => Options::get(),
+			'wpLanguages'   => $wp_languages,
+			'wpPostTypes'   => array_values( get_post_types() ),
+			'wpTaxonomies'  => array_values( get_taxonomies() ),
 		];
 
 		// FIXME:
