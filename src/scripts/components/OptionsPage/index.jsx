@@ -4,7 +4,7 @@ import Languages from './Languages.jsx';
 import Routing from './Routing.jsx';
 import Types from './Types.jsx';
 
-import { Flex, Button } from '@wordpress/components';
+import { Flex, Button, Notice } from '@wordpress/components';
 import getUBBSetting from '../../services/settings';
 
 import { submitOptions } from '../../services/requests';
@@ -38,14 +38,20 @@ const OptionsPage = ({}) => {
 		getUBBSetting('options', [])?.taxonomies
 	);
 
+	const [notice, setNotice] = useState(null);
+
 	const submit = () => {
+		setNotice('');
 		submitOptions({
 			languages,
 			defaultLanguage,
 			routing,
 			postTypes,
 			taxonomies,
-		});
+		})
+			.then(() => setNotice('success'))
+			.catch((error) => setNotice(error.response.data.errors))
+			.then(() => window.scrollTo(0, 0));
 	};
 
 	return (
@@ -60,6 +66,16 @@ const OptionsPage = ({}) => {
 						Save
 					</Button>
 				</Flex>
+				{notice === 'success' && (
+					<Notice status="success" onRemove={() => setNotice('')}>
+						Options have been updated.
+					</Notice>
+				)}
+				{notice !== null && typeof notice === 'object' && (
+					<Notice status="error" onRemove={() => setNotice('')}>
+						An error has occured while trying to update.
+					</Notice>
+				)}
 				<Languages
 					languages={languages}
 					setLanguages={setLanguages}

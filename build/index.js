@@ -3477,14 +3477,16 @@ const OptionsPage = _ref => {
   });
   const [postTypes, setPostTypes] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)((0,_services_settings__WEBPACK_IMPORTED_MODULE_6__["default"])('options', [])?.post_types);
   const [taxonomies, setTaxonomies] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)((0,_services_settings__WEBPACK_IMPORTED_MODULE_6__["default"])('options', [])?.taxonomies);
+  const [notice, setNotice] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null);
   const submit = () => {
+    setNotice('');
     (0,_services_requests__WEBPACK_IMPORTED_MODULE_7__.submitOptions)({
       languages,
       defaultLanguage,
       routing,
       postTypes,
       taxonomies
-    });
+    }).then(() => setNotice('success')).catch(error => setNotice(error.response.data.errors)).then(() => window.scrollTo(0, 0));
   };
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("form", {
     action: "options.php",
@@ -3498,7 +3500,13 @@ const OptionsPage = _ref => {
   }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h1", null, "Unbabble Settings"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.Button, {
     className: "button button-primary",
     onClick: submit
-  }, "Save")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_Languages_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
+  }, "Save")), notice === 'success' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.Notice, {
+    status: "success",
+    onRemove: () => setNotice('')
+  }, "Options have been updated."), notice !== null && typeof notice === 'object' && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_5__.Notice, {
+    status: "error",
+    onRemove: () => setNotice('')
+  }, "An error has occured while trying to update."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_Languages_jsx__WEBPACK_IMPORTED_MODULE_2__["default"], {
     languages: languages,
     setLanguages: setLanguages,
     defaultLanguage: defaultLanguage,
