@@ -45,6 +45,19 @@ class QueryVar {
 	}
 
 	/**
+	 * Applies language to the page's link given it's language.
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string $page_link
+	 * @param WP_Post|int|mixed $page
+	 * @return string
+	 */
+	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+		return $this->apply_lang_to_post_url( $page_link, $page );
+	}
+
+	/**
 	 * Applies language to the custom post's link given it's language.
 	 *
 	 * @since 0.0.1

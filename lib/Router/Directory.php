@@ -69,6 +69,35 @@ class Directory {
 	}
 
 	/**
+	 * Applies language to the page's link given it's language.
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string $page_link
+	 * @param WP_Post|int|mixed $page
+	 * @return string
+	 */
+	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+		if ( $page instanceof WP_Post ) {
+			$page_id = $page->ID;
+		} else if ( is_int( $page ) ) {
+			$page_id = $page;
+		} else {
+			return $page_link;
+		}
+
+		if (
+			'page' === get_option( 'show_on_front' )
+			&& get_option( 'page_on_front' ) == $page_id
+			&& $page_link === home_url( '/' )
+		) {
+			return $page_link;
+		}
+
+		return $this->apply_lang_to_post_url( $page_link, $page );
+	}
+
+	/**
 	 * Applies language to the post's link given it's language.
 	 *
 	 * @since 0.0.1

@@ -38,7 +38,7 @@ class RoutingResolver {
 
 		if ( in_array( 'page', $translatable_post_types, true ) ) {
 			// Page permalink.
-			\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+			\add_filter( 'page_link', [ $this, 'apply_lang_to_page_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'attachment', $translatable_post_types, true ) ) {
@@ -92,6 +92,23 @@ class RoutingResolver {
 			return $router->apply_lang_to_post_url( $post_link, $post );
 		}
 		return $post_link;
+	}
+
+	/**
+	 * Apply routing changes to hook `apply_lang_to_page_url`.
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string $page_link
+	 * @param WP_Post|int|mixed $page
+	 * @return string
+	 */
+	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+		$router = $this->get_current_router_object();
+		if ( $router !== null && method_exists( $router, 'apply_lang_to_page_url' ) ) {
+			return $router->apply_lang_to_page_url( $page_link, $page );
+		}
+		return $page_link;
 	}
 
 	/**
