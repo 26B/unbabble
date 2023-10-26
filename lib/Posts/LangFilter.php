@@ -152,6 +152,8 @@ class LangFilter {
 				$post_type = '';
 			} else if ( is_string( current( $post_type ) ) ) {
 				$post_type = current( $post_type );
+			} else {
+				return false;
 			}
 		}
 
