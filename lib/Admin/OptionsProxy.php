@@ -5,6 +5,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 
 /**
+ * Proxy system for options relating to specific languages.
  *
  * @since 0.0.0
  */
