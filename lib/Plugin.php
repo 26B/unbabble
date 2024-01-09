@@ -121,6 +121,7 @@ class Plugin {
 			'language_switcher' => Admin\LanguageSwitcher::class,
 			'redirector'        => Admin\Redirector::class,
 			'customize'         => Admin\Customize::class,
+			'options_proxy'     => Admin\OptionsProxy::class,
 
 			'api_header'     => API\Header::class,
 			'api_query_vars' => API\QueryVar::class,
