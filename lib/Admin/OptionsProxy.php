@@ -37,23 +37,21 @@ class OptionsProxy {
 	 *
 	 * @since 0.0.0
 	 *
-	 * @param mixed  $pre_option
-	 * @param string $option
+	 * @param mixed  $option
+	 * @param string $proxied_option
 	 * @return mixed
 	 */
-	public function pre_get_option_proxy( $pre_option, string $option ) {
-		$proxied_options = apply_filters( 'ubb_proxy_options', [] );
-
-		if ( ! is_array( $proxied_options ) || ! in_array( $option, $proxied_options, true ) ) {
-			return $pre_option;
+	public function pre_get_option_proxy( $option, string $proxied_option ) {
+		if ( ! $this->is_option_proxiable( $proxied_option ) ) {
+			return $option;
 		}
 
 		$curr_lang = LangInterface::get_current_language();
 
-		$proxy_name = $this->get_proxy_option_name( $option, $curr_lang );
+		$proxy_name = $this->get_proxy_option_name( $proxied_option, $curr_lang );
 
 		$value = get_option( $proxy_name, null );
-		return $value === null ? $pre_option : $value;
+		return $value === null ? $option : $value;
 	}
 
 	/**
@@ -70,9 +68,7 @@ class OptionsProxy {
 	 * @return mixed
 	 */
 	public function pre_update_option_proxy( $value, string $option, $old_value ) {
-		$proxied_options = apply_filters( 'ubb_proxy_options', [] );
-
-		if ( ! is_array( $proxied_options ) || ! in_array( $option, $proxied_options, true ) ) {
+		if ( ! $this->is_option_proxiable( $option ) ) {
 			return $value;
 		}
 
@@ -89,5 +85,10 @@ class OptionsProxy {
 
 		// Return old value so the value does not get updated.
 		return $old_value;
+	}
+
+	public function is_option_proxiable( string $option ) : bool {
+		$proxied_options = apply_filters( 'ubb_proxy_options', [] );
+		return is_array( $proxied_options ) && in_array( $option, $proxied_options, true );
 	}
 }
