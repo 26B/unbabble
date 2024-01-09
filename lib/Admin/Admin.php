@@ -131,7 +131,7 @@ class Admin {
 		usort( $wp_languages, fn ($a, $b) => $a['label'] <=> $b['label'] );
 
 		$data = [
-			'api_root'      => \esc_url_raw( \rest_url() ) . Plugin::API_V1,
+			'api_root'      => \esc_url_raw( \rest_url( Plugin::API_V1 ) ),
 			'admin_url'     => \remove_query_arg( 'lang', \admin_url() ),
 			'current_lang'  => LangInterface::get_current_language(),
 			'default_lang'  => LangInterface::get_default_language(),

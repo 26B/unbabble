@@ -46,6 +46,8 @@ abstract class Table {
 	 *
 	 * @since 0.0.1
 	 *
+	 * TODO: We should check if table exists on every plugin load.
+	 *
 	 * @return bool Success for creating the table. False if the table already exists.
 	 */
 	public function create_table() : bool {

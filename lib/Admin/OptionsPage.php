@@ -27,7 +27,35 @@ class OptionsPage {
 	}
 
 	public function add_options_page() {
-		\add_options_page( 'Unbabble', 'Unbabble', 'manage_options', 'unbabble', [ $this, 'page_output' ], null );
+		\add_menu_page(
+			'Unbabble',
+			'Unbabble',
+			'manage_options',
+			'unbabble_options',
+			[ $this, 'options_page_output' ],
+			'dashicons-translation',
+			100
+		);
+
+		\add_submenu_page(
+			'unbabble_options',
+			'Settings',
+			'Settings',
+			'manage_options',
+			'unbabble_options',
+			[ $this, 'options_page_output' ],
+			101
+		);
+
+		\add_submenu_page(
+			'unbabble_options',
+			'Actions',
+			'Actions',
+			'manage_options',
+			'unbabble_actions',
+			[ $this, 'actions_page_output' ],
+			101
+		);
 	}
 
 	public function add_options_to_page() {
@@ -48,7 +76,7 @@ class OptionsPage {
 		// TODO: Field for directory names.
 	}
 
-	public function page_output() {
+	public function options_page_output() {
 		?>
 		<div id="ubb-options-page"></div>
 		<?php
