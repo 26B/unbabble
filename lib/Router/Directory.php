@@ -285,43 +285,6 @@ class Directory {
 	}
 
 	/**
-	 * Applies the language to a post type's archvie link.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param string $link
-	 * @param string $post_type
-	 * @return string
-	 */
-	public function post_type_archive_link( string $link, string $post_type ) : string {
-		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === LangInterface::get_default_language() ) {
-			return $link;
-		}
-
-		// Get site's frontend url without language. Cannot use site_url due to cases where the WordPress installation is not in the root.
-		add_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
-		$home_url = home_url();
-		remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
-
-		$url_lang = $this->current_lang_from_uri( '', str_replace( $home_url, '', $link ) );
-		if ( $url_lang === $curr_lang ) {
-			return $link;
-		}
-
-		$source_url = trailingslashit( $home_url ) . $this->get_directory_name( $url_lang );
-
-		// If not default language, set the directory to the post language.
-		$target_url = $home_url;
-		if ( $curr_lang !== LangInterface::get_default_language() ) {
-			$directory  = $this->get_directory_name( $curr_lang );
-			$target_url = trailingslashit( trailingslashit( $home_url ) . $directory );
-		}
-
-		return str_replace( $source_url, $target_url, $link );
-	}
-
-	/**
 	 * Stop redirect to 404 if the found post's language is not the same as the current language.
 	 *
 	 * TODO: improve this explanation
