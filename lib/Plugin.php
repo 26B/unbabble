@@ -7,6 +7,7 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\Relevanssi;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastSEO;
 use WP_CLI;
 
 /**
@@ -204,6 +205,7 @@ class Plugin {
 		];
 		$integrations = [
 			Relevanssi::class => 'relevanssi/relevanssi.php',
+			YoastSEO::class => 'wordpress-seo/wp-seo.php',
 		];
 
 		\add_action( 'admin_init', function() use ( $admin_integrations ) {
