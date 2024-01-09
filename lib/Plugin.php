@@ -177,6 +177,7 @@ class Plugin {
 			$namespace = self::API_V1;
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
 			( new API\Gutenberg\Post( $this, $namespace ) )->register();
+			( new API\Options( $this, $namespace ) )->register();
 		} );
 	}
 

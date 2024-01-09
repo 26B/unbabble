@@ -62,6 +62,8 @@ class RoutingResolver {
 		\add_filter( 'network_home_url', [ $this, 'network_home_url' ], 10, 3 );
 
 		\add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
+
+		\add_filter( 'rest_url', [ $this, 'rest_url' ], 10, 4 );
 	}
 
 	/**
@@ -266,6 +268,31 @@ class RoutingResolver {
 		$router = $this->get_current_router_object();
 		if ( $router !== null && method_exists( $router, 'admin_url' ) ) {
 			return $router->admin_url( $url );
+		}
+		return $url;
+	}
+
+	/**
+	 * Apply routing changes to hook `rest_url`.
+	 *
+	 * @since 0.0.3
+	 *
+	 * @param string $url     REST URL.
+	 * @param string $path    REST route.
+	 * @param mixed  $blog_id Blog ID.
+	 * @param string $scheme  Sanitization scheme.
+	 * @return string
+	 */
+	public function rest_url( string $url, string $path, $blog_id, string $scheme ) : string {
+
+		// TODO: add docs.
+		if ( ! apply_filters( 'ubb_apply_lang_to_rest_url', true, $url, $path, $blog_id, $scheme ) ) {
+			return $url;
+		}
+
+		$router = $this->get_current_router_object();
+		if ( $router !== null && method_exists( $router, 'rest_url' ) ) {
+			return $router->rest_url( $url, $path, $blog_id, $scheme );
 		}
 		return $url;
 	}
