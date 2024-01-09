@@ -300,7 +300,14 @@ class LangInterface {
 		}
 
 		$post_lang_table = ( new PostTable() )->get_table_name();
-		return $wpdb->get_var(
+
+		$transient_key = sprintf( 'ubb_%s_%s_post_translation', $post_id, $lang );
+		$translation   = \get_transient( $transient_key );
+		if ( $translation !== false ) {
+			return empty( $translation ) ? null : $translation;
+		}
+
+		$translation = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT post_id
 				FROM {$wpdb->postmeta}
@@ -313,6 +320,13 @@ class LangInterface {
 				$lang
 			)
 		);
+
+		// Only save transient if query went right.
+		if ( ! is_null( $translation ) ) {
+			\set_transient( $transient_key, $translation, 30 );
+		}
+
+		return empty( $translation ) ? null : $translation;
 	}
 
 	/**
@@ -355,6 +369,10 @@ class LangInterface {
 			)
 		);
 
+		if ( ! is_array( $posts ) ) {
+			return [];
+		}
+
 		$lang_list = [];
 		foreach ( $posts as $post ) {
 			$post_language = self::get_post_language( $post->post_id );
@@ -363,6 +381,7 @@ class LangInterface {
 			}
 			$lang_list[ $post->post_id ] = $post_language;
 		}
+
 		return $lang_list;
 	}
 
