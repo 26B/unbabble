@@ -945,7 +945,8 @@ class LangInterface {
 		/**
 		 * Filters a new source id.
 		 *
-		 * Return a non-empty and string value to bypass uuid generation.
+		 * Return a non-empty and string value to bypass uuid generation. Uuid's are not checked
+		 * to see if they already exist in the database.
 		 *
 		 * @since 0.0.4
 		 *
@@ -958,17 +959,6 @@ class LangInterface {
 			$uuid = Uuid::uuid7()->toString();
 		}
 
-		$table = $type === 'post' ? $wpdb->postmeta : $wpdb->termmeta;
-		$count = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT count(*) FROM $table
-				WHERE meta_key = 'ubb_source' AND meta_value = %s",
-				$uuid
-			)
-		);
-		if ( 0 !== (int) $count ) {
-			return self::get_new_source_id( $type );
-		}
 		return $uuid;
 	}
 
