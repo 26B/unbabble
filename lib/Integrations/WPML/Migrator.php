@@ -187,34 +187,41 @@ class Migrator {
 		}
 
 		$count = count( $data );
-		foreach ( $data as $i => $trid ) {
-			printf( "\r%s(%1.02f%%)", $i, ( 100 * $i/$count ) );
 
-			$group = $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT element_type as type, element_id as object_id, language_code as lang
-					FROM {$wpdb->prefix}icl_translations as icl
-					INNER JOIN {$wpdb->prefix}posts as P ON (icl.element_id = P.ID)
-					WHERE trid = %s AND element_type LIKE 'post_%'
-					UNION
-					SELECT element_type as type, element_id as object_id, language_code as lang
-					FROM {$wpdb->prefix}icl_translations as icl
-					INNER JOIN {$wpdb->prefix}terms as T ON (icl.element_id = T.term_id)
-					WHERE trid = %s AND element_type LIKE 'tax_%'",
-					$trid,
-					$trid
-				),
-				ARRAY_A
-			);
+		$trids = implode( ',', $data );
+
+		$groups = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT trid, GROUP_CONCAT( element_type ) as types, GROUP_CONCAT( element_id ) as object_ids, GROUP_CONCAT( language_code ) as langs
+				FROM {$wpdb->prefix}icl_translations as icl
+				INNER JOIN {$wpdb->prefix}posts as P ON (icl.element_id = P.ID)
+				WHERE trid IN ($trids) AND element_type LIKE 'post_%'
+				GROUP BY trid
+				UNION
+				SELECT trid, GROUP_CONCAT( element_type ) as types, GROUP_CONCAT( element_id ) as object_ids, GROUP_CONCAT( language_code ) as langs
+				FROM {$wpdb->prefix}icl_translations as icl
+				INNER JOIN {$wpdb->prefix}terms as T ON (icl.element_id = T.term_id)
+				WHERE trid IN ($trids) AND element_type LIKE 'tax_%'
+				GROUP BY trid",
+			),
+			ARRAY_A
+		);
+
+		foreach ( $groups as $i => $group ) {
+			printf( "\r%s(%1.02f%%)", $i, ( 100 * $i/$count ) );
 
 			// Shouldn't happen.
 			if ( empty( $group ) ) {
-				update_option( 'ubb_wpml_migrate_offset', $trid );
 				continue;
 			}
 
-			// Assuming all of the group is the same type.
-			$type = $this->get_content_type( $group[0]['type'] );
+			$trid       = $group['trid'];
+			$types      = explode( ',', $group['types'] );
+			$object_ids = explode( ',', $group['object_ids'] );
+			$langs      = explode( ',', $group['langs'] );
+
+			// Assuming all types are the same.
+			$type = $this->get_content_type( $types[0] );
 			if ( empty( $type ) ) {
 				update_option( 'ubb_wpml_migrate_offset', $trid );
 				continue;
@@ -226,18 +233,20 @@ class Migrator {
 				$source_id = LangInterface::get_new_term_source_id();
 			}
 
-			foreach ( $group as $row ) {
-				$lang = $this->get_locale( $row['lang'] );
+			for( $index = 0; $index < count( $object_ids ); $index++ ) {
+				$lang = $this->get_locale( $langs[ $index ] );
 				if ( empty( $lang ) ) {
 					continue;
 				}
+
 				if ( $type === 'post' ) {
 					// TODO: should we force it?
-					LangInterface::set_post_language( $row['object_id'], $lang, true );
-					LangInterface::set_post_source( $row['object_id'], $source_id, true );
+					LangInterface::set_post_language( $object_ids[ $index ], $lang, true );
+					LangInterface::set_post_source( $object_ids[ $index ], $source_id, true );
+
 				} else {
-					LangInterface::set_term_language( $row['object_id'], $lang, true );
-					LangInterface::set_term_source( $row['object_id'], $source_id, true );
+					LangInterface::set_term_language( $object_ids[ $index ], $lang, true );
+					LangInterface::set_term_source( $object_ids[ $index ], $source_id, true );
 				}
 			}
 
