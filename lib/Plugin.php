@@ -57,6 +57,31 @@ class Plugin {
 	}
 
 	/**
+	 * Initialize the plugin.
+	 *
+	 * Dependencies and hooks that need to be added as early as possible.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @return void
+	 */
+	public function init() : void {
+		$components = [
+			'router_resolver'  => Router\RoutingResolver::class,
+			'router_routing'   => Router\Routing::class,
+			'locale'           => Language\Locale::class,
+		];
+
+		if ( ! Options::should_run_unbabble() ) {
+			$components = [];
+		}
+
+		foreach ( $components as $component ) {
+			( new $component() )->register();
+		}
+	}
+
+	/**
 	 * Run the loader to execute all the hooks with WordPress.
 	 *
 	 * Load the dependencies, define the locale, and set the hooks for the
@@ -145,10 +170,6 @@ class Plugin {
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
 
-			'router_resolver'  => Router\RoutingResolver::class,
-			'router_routing'   => Router\Routing::class,
-
-			'lang_frontend' => Language\Frontend::class,
 			'lang_packages' => Language\LanguagePacks::class,
 
 			'options' => Options::class,

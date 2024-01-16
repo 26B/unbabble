@@ -3,14 +3,13 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Language;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
- * Hooks related to the language of frontend.
+ * Hooks related to the locale.
  *
  * @since 0.0.1
  */
-class Frontend {
+class Locale {
 
 	/**
 	 * Register hooks.
@@ -23,7 +22,7 @@ class Frontend {
 	}
 
 	/**
-	 * Switch the locale for the frontend.
+	 * Switch the locale.
 	 *
 	 * Necessary for loading the correct translations of the themes and plugins.
 	 *
@@ -36,6 +35,7 @@ class Frontend {
 		if ( is_admin() ) {
 			return $locale;
 		}
+
 		if ( apply_filters( 'ubb_stop_switch_locale', false, $locale ) ) {
 			return $locale;
 		}

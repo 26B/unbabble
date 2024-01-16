@@ -39,7 +39,7 @@ class LangInterface {
 		}
 
 		// Don't filter language when the user is a high level user.
-		if ( \current_user_can( 'manage_options' ) ) {
+		if ( function_exists( 'wp_get_current_user' ) && \current_user_can( 'manage_options' ) ) {
 			return $allowed_languages;
 		}
 
