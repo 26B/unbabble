@@ -67,9 +67,8 @@ class Plugin {
 	 */
 	public function init() : void {
 		$components = [
-			'router_resolver'  => Router\RoutingResolver::class,
-			'router_routing'   => Router\Routing::class,
-			'locale'           => Language\Locale::class,
+			'router_resolver' => Router\RoutingResolver::class,
+			'locale'          => Language\Locale::class,
 		];
 
 		if ( ! Options::should_run_unbabble() ) {
@@ -77,7 +76,7 @@ class Plugin {
 		}
 
 		foreach ( $components as $component ) {
-			( new $component() )->register();
+			( new $component() )->init();
 		}
 	}
 
@@ -170,9 +169,13 @@ class Plugin {
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
 
+			'locale'        => Language\Locale::class,
 			'lang_packages' => Language\LanguagePacks::class,
 
 			'options' => Options::class,
+
+			'router_routing'   => Router\Routing::class,
+			'router_resolver'  => Router\RoutingResolver::class,
 
 			// TODO: Filter the query for attaching an attachment.
 		];
@@ -185,7 +188,9 @@ class Plugin {
 		}
 
 		foreach ( $components as $component ) {
-			( new $component() )->register();
+			if ( method_exists( $component, 'register' ) ) {
+				( new $component() )->register();
+			}
 		}
 	}
 

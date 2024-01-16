@@ -22,9 +22,6 @@ class RoutingResolver {
 	 */
 	public function register() {
 		if ( ! is_admin() ) {
-			// Needs to be done as early as possible.
-			$this->init();
-
 			\add_filter( 'pre_get_posts', [ $this, 'homepage_default_lang_redirect' ], 1 );
 		}
 

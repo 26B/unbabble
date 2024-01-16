@@ -12,11 +12,11 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 class Locale {
 
 	/**
-	 * Register hooks.
+	 * Initialize hooks.
 	 *
-	 * @since 0.0.1
+	 * @since 0.2.3
 	 */
-	public function register() {
+	public function init() {
 		\add_filter( 'locale', [ $this, 'switch_locale'] );
 		\add_action( 'admin_bar_menu', [ $this, 'set_admin_bar_language'], PHP_INT_MIN );
 	}
