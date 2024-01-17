@@ -12,7 +12,7 @@
     "php": ">=8.0",
     "26b/diqa-formatter": "^1.2",
     "ramsey/uuid": "^4.6",
-    "wp-cli/wp-cli": "^2.7"
+    "wp-cli/wp-cli": "2.9.0"
   },
   "require-dev": {
     "10up/wp_mock": "dev-trunk",
