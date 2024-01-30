@@ -293,40 +293,12 @@ class LangInterface {
 	 *              is not known/allowed.
 	 */
 	public static function get_post_translation( int $post_id, string $lang ) : ?int {
-		global $wpdb;
-		$source_id = self::get_post_source( $post_id );
-		if ( $source_id === null || ! self::is_language_allowed( $lang ) ) {
+		if ( ! self::is_language_allowed( $lang ) ) {
 			return null;
 		}
-
-		$post_lang_table = ( new PostTable() )->get_table_name();
-
-		$transient_key = sprintf( 'ubb_%s_%s_post_translation', $post_id, $lang );
-		$translation   = \get_transient( $transient_key );
-		if ( $translation !== false ) {
-			return empty( $translation ) ? null : $translation;
-		}
-
-		$translation = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT post_id
-				FROM {$wpdb->postmeta}
-				WHERE meta_key = 'ubb_source'
-				AND meta_value = %s
-				AND post_id IN ( SELECT post_id FROM {$post_lang_table} WHERE locale = %s )
-				ORDER BY post_id ASC
-				LIMIT 1",
-				$source_id,
-				$lang
-			)
-		);
-
-		// Only save transient if query went right.
-		if ( ! is_null( $translation ) ) {
-			\set_transient( $transient_key, $translation, 30 );
-		}
-
-		return empty( $translation ) ? null : $translation;
+		$translations = self::get_post_translations( $post_id );
+		$translation  = array_search( $lang, $translations, true );
+		return is_int( $translation ) ? $translation : null;
 	}
 
 	/**
@@ -343,7 +315,6 @@ class LangInterface {
 	 * }
 	 */
 	public static function get_post_translations( int $post_id ) : array {
-		global $wpdb;
 		$source_id = self::get_post_source( $post_id );
 		if ( $source_id === null ) {
 			return [];
@@ -354,35 +325,11 @@ class LangInterface {
 			return [];
 		}
 
-		$posts = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT PM.post_id
-				FROM {$wpdb->postmeta} AS PM
-				INNER JOIN {$wpdb->posts} AS P ON (P.ID = PM.post_id AND P.post_type = %s)
-				WHERE PM.meta_key = 'ubb_source'
-				AND PM.meta_value = %s
-				AND PM.post_id != %s
-				ORDER BY PM.post_id ASC",
-				$post_type,
-				$source_id,
-				$post_id
-			)
-		);
+		$posts = self::get_posts_for_source( $source_id );
 
-		if ( ! is_array( $posts ) ) {
-			return [];
-		}
+		unset( $posts[ $post_id ] );
 
-		$lang_list = [];
-		foreach ( $posts as $post ) {
-			$post_language = self::get_post_language( $post->post_id );
-			if ( ! $post_language || ! self::is_language_allowed( $post_language ) ) {
-				continue;
-			}
-			$lang_list[ $post->post_id ] = $post_language;
-		}
-
-		return $lang_list;
+		return $posts;
 	}
 
 	/**
@@ -493,10 +440,16 @@ class LangInterface {
 	 * @since 0.0.1
 	 *
 	 * @param string $source_id The source ID to get translations map.
-	 * @return array Array of post IDs.
+	 * @return array Array of post IDs and their languages.
 	 */
 	public static function get_posts_for_source( string $source_id ) : array {
 		global $wpdb;
+		$transient_key = sprintf( 'ubb_%s_source_posts', $source_id );
+		$posts         = \get_transient( $transient_key );
+		if ( $posts !== false ) {
+			return is_array( $posts ) ? $posts : [];
+		}
+
 		$posts = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT post_id as ID
@@ -506,10 +459,34 @@ class LangInterface {
 				$source_id,
 			)
 		);
+
 		if ( $posts === null ) {
+			\set_transient( $transient_key, [], 30 );
 			return [];
 		}
-		return array_map( fn ( $post ) => $post->ID, $posts );
+
+		$table_name = ( new PostTable() )->get_table_name();
+
+		$ids_str    = implode( ',', array_map( fn ( $post ) => $post->ID, $posts ) );
+		$post_langs = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT post_id, locale
+				FROM {$table_name}
+				WHERE post_id IN ({$ids_str})"
+			)
+		);
+
+		$lang_list = [];
+		foreach ( $post_langs as $data ) {
+			if ( ! self::is_language_allowed( $data->locale ) ) {
+				continue;
+			}
+			$lang_list[ $data->post_id ] = $data->locale;
+		}
+
+		\set_transient( $transient_key, $lang_list, 30 );
+
+		return $lang_list;
 	}
 
 	/**
@@ -668,28 +645,12 @@ class LangInterface {
 	 *              is not known/allowed.
 	 */
 	public static function get_term_translation( int $term_id, string $lang ) : ?int {
-		global $wpdb;
-		$source_id = self::get_term_source( $term_id );
-		if (
-			$source_id === null
-			|| ! self::is_language_allowed( $lang )
-		) {
+		if ( ! self::is_language_allowed( $lang ) ) {
 			return null;
 		}
-
-		$term_lang_table = ( new TermTable() )->get_table_name();
-		return $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT term_id
-				FROM {$wpdb->termmeta}
-				WHERE meta_key = 'ubb_source'
-				AND meta_value = %s
-				AND term_id IN ( SELECT term_id FROM {$term_lang_table} WHERE locale = %s )
-				LIMIT 1",
-				$source_id,
-				$lang
-			)
-		);
+		$translations = self::get_term_translations( $term_id );
+		$translation  = array_search( $lang, $translations, true );
+		return is_int( $translation ) ? $translation : null;
 	}
 
 	/**
@@ -706,33 +667,16 @@ class LangInterface {
 	 * }
 	 */
 	public static function get_term_translations( int $term_id ) : array {
-		global $wpdb;
 		$source_id = self::get_term_source( $term_id );
 		if ( $source_id === null ) {
 			return [];
 		}
 
-		$terms = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT term_id
-				FROM {$wpdb->termmeta}
-				WHERE meta_key = 'ubb_source'
-				AND meta_value = %s
-				AND term_id != %s",
-				$source_id,
-				$term_id
-			)
-		);
+		$terms = self::get_terms_for_source( $source_id );
 
-		$lang_list = [];
-		foreach ( $terms as $term ) {
-			$term_language = self::get_term_language( $term->term_id );
-			if ( ! $term_language || ! self::is_language_allowed( $term_language ) ) {
-				continue;
-			}
-			$lang_list[ $term->term_id ] = $term_language;
-		}
-		return $lang_list;
+		unset( $terms[ $term_id ] );
+
+		return $terms;
 	}
 
 	/**
@@ -782,23 +726,53 @@ class LangInterface {
 	 * @since 0.0.1
 	 *
 	 * @param string $source_id The source ID to get translations map.
-	 * @return array Array of term IDs.
+	 * @return array Array of term IDs and their languages.
 	 */
 	public static function get_terms_for_source( string $source_id ) : array {
 		global $wpdb;
+		$transient_key = sprintf( 'ubb_%s_source_terms', $source_id );
+		$terms         = \get_transient( $transient_key );
+		if ( $terms !== false ) {
+			return is_array( $terms ) ? $terms : [];
+		}
+
 		$terms = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT term_id
+				"SELECT term_id as term_id
 				FROM {$wpdb->termmeta}
 				WHERE meta_key = 'ubb_source'
 				AND meta_value = %s",
 				$source_id,
 			)
 		);
+
 		if ( $terms === null ) {
+			\set_transient( $transient_key, [], 30 );
 			return [];
 		}
-		return array_map( fn ( $term ) => $term->term_id, $terms );
+
+		$table_name = ( new TermTable() )->get_table_name();
+
+		$ids_str    = implode( ',', array_map( fn ( $term ) => $term->term_id, $terms ) );
+		$term_langs = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT term_id, locale
+				FROM {$table_name}
+				WHERE term_id IN ({$ids_str})"
+			)
+		);
+
+		$lang_list = [];
+		foreach ( $term_langs as $data ) {
+			if ( ! self::is_language_allowed( $data->locale ) ) {
+				continue;
+			}
+			$lang_list[ $data->term_id ] = $data->locale;
+		}
+
+		\set_transient( $transient_key, $lang_list, 30 );
+
+		return $lang_list;
 	}
 
 	/**

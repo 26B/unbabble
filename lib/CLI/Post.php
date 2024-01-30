@@ -383,7 +383,7 @@ class Post extends Command {
 	 * @return array
 	 */
 	private function get_posts_for_source( string $post_source, ?int $ignored_post_id = null ) : array {
-		$source_posts = LangInterface::get_posts_for_source( $post_source );
+		$source_posts = array_keys( LangInterface::get_posts_for_source( $post_source ) );
 		if ( $ignored_post_id === null ) {
 			return $source_posts;
 		}
@@ -403,8 +403,8 @@ class Post extends Command {
 		$post_A_source = LangInterface::get_post_source( $post_A_id );
 		$post_B_source = LangInterface::get_post_source( $post_B_id );
 
-		$A_sources = $post_A_source === null ? [ $post_A_id ] : LangInterface::get_posts_for_source( $post_A_source );
-		$B_sources = $post_B_source === null ? [ $post_B_id ] : LangInterface::get_posts_for_source( $post_B_source );
+		$A_sources = $post_A_source === null ? [ $post_A_id ] : array_keys( LangInterface::get_posts_for_source( $post_A_source ) );
+		$B_sources = $post_B_source === null ? [ $post_B_id ] : array_keys( LangInterface::get_posts_for_source( $post_B_source ) );
 
 		$A_languages = array_map( fn( $post_id ) => LangInterface::get_post_language( $post_id ), $A_sources );
 		$B_languages = array_map( fn( $post_id ) => LangInterface::get_post_language( $post_id ), $B_sources );
