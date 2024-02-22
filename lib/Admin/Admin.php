@@ -116,6 +116,10 @@ class Admin {
 	 * @return void
 	 */
 	public function enqueue_scripts() : void {
+		if ( ! function_exists( 'wp_get_available_translations' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+		}
+
 		$wp_languages = array_merge(
 			[ [ 'code' => 'en_US', 'label' => 'English (USA) (en_US)' ] ],
 			array_values(
