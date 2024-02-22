@@ -491,7 +491,7 @@ class LangInterface {
 			)
 		);
 
-		if ( $posts === null ) {
+		if ( $posts === null || empty( $posts ) ) {
 			\set_transient( $transient_key, [], 30 );
 			return [];
 		}
