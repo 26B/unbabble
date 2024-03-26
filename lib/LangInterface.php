@@ -215,7 +215,13 @@ class LangInterface {
 				'locale'  => $language,
 			],
 		);
-		return is_int( $inserted );
+
+		if ( is_int( $inserted ) ) {
+			\delete_transient( sprintf( 'ubb_%s_post_language', $post_id ) );
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -232,13 +238,23 @@ class LangInterface {
 			return self::get_current_language();
 		}
 
+		$transient_key = sprintf( 'ubb_%s_post_language', $post_id );
+		$post_lang     = \get_transient( $transient_key );
+		if ( $post_lang !== false ) {
+			return is_string( $post_lang ) ? $post_lang : null;
+		}
+
 		$table_name = ( new PostTable() )->get_table_name();
-		return $wpdb->get_var(
+		$post_lang = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT locale FROM {$table_name} WHERE post_id = %s LIMIT 1",
 				$post_id
 			)
 		);
+
+		\set_transient( $transient_key, $post_lang, 30 );
+
+		return $post_lang;
 	}
 
 	/**
@@ -260,9 +276,15 @@ class LangInterface {
 				return true;
 			}
 			$meta_id = update_post_meta( $post_id, 'ubb_source', $source_id );
+
+			if ( (bool) $meta_id ) {
+				\delete_transient( sprintf( 'ubb_%s_source_posts', $source_id ) );
+			}
+
 		} else {
 			$meta_id = add_post_meta( $post_id, 'ubb_source', $source_id, true );
 		}
+
 		return (bool) $meta_id;
 	}
 
@@ -275,10 +297,17 @@ class LangInterface {
 	 * @return ?string String if the source is found, null otherwise.
 	 */
 	public static function get_post_source( int $post_id ) : ?string {
-		$source_id = get_post_meta( $post_id, 'ubb_source', true );;
-		if ( empty( $source_id ) ) {
-			return null;
+		$transient_key = sprintf( 'ubb_%s_post_source', $post_id );
+		$source_id     = \get_transient( $transient_key );
+		if ( $source_id !== false ) {
+			return is_string( $source_id ) ? $source_id: null;
 		}
+
+		$source_id = get_post_meta( $post_id, 'ubb_source', true );
+		$source_id = empty( $source_id ) ? null : $source_id;
+
+		\set_transient( $transient_key, $source_id, 30 );
+
 		return $source_id;
 	}
 
@@ -380,6 +409,8 @@ class LangInterface {
 			return false;
 		}
 
+		\delete_transient( sprintf( 'ubb_%s_post_language', $post_id ) );
+
 		// Update Terms.
 
 		// Filter needed since system still thinks its in the previous language.
@@ -460,7 +491,7 @@ class LangInterface {
 			)
 		);
 
-		if ( $posts === null ) {
+		if ( $posts === null || empty( $posts ) ) {
 			\set_transient( $transient_key, [], 30 );
 			return [];
 		}
@@ -572,7 +603,13 @@ class LangInterface {
 				'locale'  => $language,
 			]
 		);
-		return is_int( $inserted );
+
+		if ( is_int( $inserted ) ) {
+			\delete_transient( sprintf( 'ubb_%s_term_language', $term_id ) );
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -583,14 +620,23 @@ class LangInterface {
 	 */
 	public static function get_term_language( int $term_id ) : ?string {
 		global $wpdb;
+		$transient_key = sprintf( 'ubb_%s_term_language', $term_id );
+		$term_lang     = \get_transient( $transient_key );
+		if ( $term_lang !== false ) {
+			return is_string( $term_lang ) ? $term_lang : null;
+		}
+
 		$table_name = ( new TermTable() )->get_table_name();
-		return $wpdb->get_var(
+		$term_lang  = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT * FROM {$table_name} WHERE term_id = %s LIMIT 1",
 				$term_id
 			),
 			1
 		);
+
+		\set_transient( $transient_key, $term_lang, 30 );
+		return $term_lang;
 	}
 
 	/**
@@ -612,6 +658,10 @@ class LangInterface {
 				return true;
 			}
 			$meta_id = update_term_meta( $term_id, 'ubb_source', $source_id );
+
+			if ( (bool) $meta_id ) {
+				\delete_transient( sprintf( 'ubb_%s_source_terms', $source_id ) );
+			}
 		} else {
 			$meta_id = add_term_meta( $term_id, 'ubb_source', $source_id, true );
 		}
@@ -627,10 +677,17 @@ class LangInterface {
 	 * @return ?string String if the source is found, null otherwise.
 	 */
 	public static function get_term_source( int $term_id ) : ?string {
-		$source_id = get_term_meta( $term_id, 'ubb_source', true );;
-		if ( empty( $source_id ) ) {
-			return null;
+		$transient_key = sprintf( 'ubb_%s_term_source', $term_id );
+		$source_id     = \get_transient( $transient_key );
+		if ( $source_id !== false ) {
+			return is_string( $source_id ) ? $source_id: null;
 		}
+
+		$source_id = get_term_meta( $term_id, 'ubb_source', true );
+		$source_id = empty( $source_id ) ? null : $source_id;
+
+		\set_transient( $transient_key, $source_id, 30 );
+
 		return $source_id;
 	}
 
@@ -715,6 +772,8 @@ class LangInterface {
 		if ( $rows_updated === false ) {
 			return false;
 		}
+
+		\delete_transient( sprintf( 'ubb_%s_term_language', $term_id ) );
 
 		// TODO: Update posts?
 		return true;
