@@ -5,6 +5,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use TwentySixB\WP\Plugin\Unbabble\Plugin;
+use WP_Post;
 use WP_Query;
 use WP_Screen;
 
@@ -146,6 +147,15 @@ class Admin {
 			'wpPostTypes'   => array_values( get_post_types() ),
 			'wpTaxonomies'  => array_values( get_taxonomies() ),
 		];
+
+		// Information to show when a post's translation is being created.
+		if ( $_GET['ubb_source'] ?? '' ) {
+			$source_post = get_post( $_GET['ubb_source'] );
+			if ( $source_post instanceof WP_Post ) {
+				$data['source_title']    = $source_post->post_title;
+				$data['source_edit_url'] = get_edit_post_link( $source_post->ID );
+			}
+		}
 
 		// FIXME:
 		$base_uri = get_template_directory_uri() . '/public/';

@@ -24,9 +24,9 @@ const useEditPost = (postId) => {
 
 	useEffect(() => {
 		fetch();
-	}, [postId]);
+	}, []);
 
-	return { data: { ...data, postId }, refetch: fetch, isLoading, isError };
+	return { data: { ...data, postId }, refetch: fetch, isLoading, isError, setIsLoading, setIsError };
 };
 
 export default useEditPost;

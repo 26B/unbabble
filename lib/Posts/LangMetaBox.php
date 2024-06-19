@@ -85,6 +85,7 @@ class LangMetaBox {
 	 */
 	public function add_ubb_meta_box_callback( \WP_Post $post ) : void {
 		if ( is_numeric( $_GET['ubb_source'] ?? '' ) ) {
+			error_log( print_r( 'ADD HIDDEN', true ) );
 			printf(
 				'<input type="hidden" id="ubb_source" name="ubb_source" value="%s">',
 				esc_sql( $_GET['ubb_source'] )
