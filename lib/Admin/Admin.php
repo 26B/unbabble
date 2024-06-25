@@ -5,6 +5,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use TwentySixB\WP\Plugin\Unbabble\Plugin;
+use WP_Post;
 use WP_Query;
 use WP_Screen;
 
@@ -120,6 +121,10 @@ class Admin {
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 		}
 
+		if ( ! $this->should_enqueue_scripts() ) {
+			return;
+		}
+
 		$wp_languages = array_merge(
 			[ [ 'code' => 'en_US', 'label' => 'English (USA) (en_US)' ] ],
 			array_values(
@@ -146,6 +151,15 @@ class Admin {
 			'wpPostTypes'   => array_values( get_post_types() ),
 			'wpTaxonomies'  => array_values( get_taxonomies() ),
 		];
+
+		// Information to show when a post's translation is being created.
+		if ( $_GET['ubb_source'] ?? '' ) {
+			$source_post = get_post( $_GET['ubb_source'] );
+			if ( $source_post instanceof WP_Post ) {
+				$data['source_title']    = $source_post->post_title;
+				$data['source_edit_url'] = get_edit_post_link( $source_post->ID );
+			}
+		}
 
 		// FIXME:
 		$base_uri = get_template_directory_uri() . '/public/';
@@ -202,5 +216,34 @@ class Admin {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if the scripts should be enqueued.
+	 *
+	 * Stop enqueuing scripts if the current screen is for an untranslatable post type.
+	 *
+	 * @since 0.3.2
+	 *
+	 * @return bool
+	 */
+	private function should_enqueue_scripts() : bool {
+		if ( function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+		}
+
+		if (
+			! $screen instanceof WP_Screen
+			|| $screen->base !== 'post'
+		) {
+			return true;
+		}
+
+		$post_type = get_post_type();
+		if ( ! $post_type ) {
+			return true;
+		}
+
+		return LangInterface::is_post_type_translatable( get_post_type() );
 	}
 }
