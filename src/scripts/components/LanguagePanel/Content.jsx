@@ -52,15 +52,16 @@ const Language = () => {
 			// Try to link the post to the source post.
 			linkPost(wp.data.select('core/editor').getCurrentPostId(), sourceToLink)
 				.then(() => {
-
 					// Refetch data to update the interface.
 					refetch();
 				})
 				.catch(() => {
-
 					// Set error to show the user that something went wrong.
-					setIsLoading(false);
 					setIsError(true);
+				})
+				.then(() => {
+					// Set loading to false to allow the user to interact with the interface.
+					setIsLoading(false);
 				});
 
 			// Reset sourceToLink to prevent linking the post multiple times.
