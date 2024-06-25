@@ -121,6 +121,10 @@ class Admin {
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 		}
 
+		if ( ! $this->should_enqueue_scripts() ) {
+			return;
+		}
+
 		$wp_languages = array_merge(
 			[ [ 'code' => 'en_US', 'label' => 'English (USA) (en_US)' ] ],
 			array_values(
@@ -212,5 +216,34 @@ class Admin {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if the scripts should be enqueued.
+	 *
+	 * Stop enqueuing scripts if the current screen is for an untranslatable post type.
+	 *
+	 * @since 0.3.2
+	 *
+	 * @return bool
+	 */
+	private function should_enqueue_scripts() : bool {
+		if ( function_exists( 'get_current_screen' ) ) {
+			$screen = get_current_screen();
+		}
+
+		if (
+			! $screen instanceof WP_Screen
+			|| $screen->base !== 'post'
+		) {
+			return true;
+		}
+
+		$post_type = get_post_type();
+		if ( ! $post_type ) {
+			return true;
+		}
+
+		return LangInterface::is_post_type_translatable( get_post_type() );
 	}
 }
