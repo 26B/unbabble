@@ -285,8 +285,8 @@ class LangInterface {
 			// Delete transient for post translations.
 			\delete_transient( sprintf( 'ubb_%s_source_posts', $source_id ) );
 
-			// Delete transient for post source.
-			\delete_transient( sprintf( 'ubb_%s_post_source', $post_id ) );
+			// Update transient for post source.
+			\set_transient( sprintf( 'ubb_%s_post_source', $post_id ), $source_id, 30 );
 		}
 
 		return (bool) $meta_id;
@@ -682,8 +682,8 @@ class LangInterface {
 			// Delete transient for term translations.
 			\delete_transient( sprintf( 'ubb_%s_source_terms', $source_id ) );
 
-			// Delete transient for term source.
-			\delete_transient( sprintf( 'ubb_%s_term_source', $term_id ) );
+			// Update transient for term source.
+			\set_transient( sprintf( 'ubb_%s_term_source', $term_id ), $source_id, 30 );
 		}
 
 		return (bool) $meta_id;
