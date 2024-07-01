@@ -111,12 +111,13 @@ const Language = () => {
 	}
 
 	const { language, translations: translatedLangs } = data;
+	const currentLang = getUBBSetting('current_lang', '');
 	const languages = getUBBSetting('languages', {});
 	const languagesInfo = getUBBSetting('languagesInfo', {});
 
 	const untranslatedLangs = languages.filter(
 		(lang) =>
-			lang !== language &&
+			(language === null || lang !== language) &&
 			!translatedLangs
 				.map((translatedLang) => translatedLang.language)
 				.includes(lang)
@@ -125,7 +126,7 @@ const Language = () => {
 	return (
 		<LangContext.Provider
 			value={{
-				currentLang: language,
+				currentLang,
 				postId: data.postId,
 				postLanguage: data.language,
 				languages,

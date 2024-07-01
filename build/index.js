@@ -2355,7 +2355,9 @@ const Language = () => {
     if (!sourceToLink) {
       return;
     }
-    const unsubscribe = wp.data.subscribe(() => {
+
+    // Save the unsubscribe function to be able to unsubscribe later.
+    unsubscribeLinking = wp.data.subscribe(() => {
       // Don't run if sourceToLink is not set.
       if (!sourceToLink) {
         return;
@@ -2377,18 +2379,17 @@ const Language = () => {
         refetch();
       }).catch(() => {
         // Set error to show the user that something went wrong.
-        setIsLoading(false);
         setIsError(true);
+      }).then(() => {
+        // Set loading to false to allow the user to interact with the interface.
+        setIsLoading(false);
       });
 
       // Reset sourceToLink to prevent linking the post multiple times.
       sourceToLink = null;
       unsubscribeLinking();
     });
-
-    // Save the unsubscribe function to be able to unsubscribe later.
-    unsubscribeLinking = unsubscribe;
-    return unsubscribe;
+    return unsubscribeLinking;
   }, []);
   if (isLoading) {
     return 'Loading...'; // TODO: Add spinner
@@ -2418,12 +2419,13 @@ const Language = () => {
     language,
     translations: translatedLangs
   } = data;
+  const currentLang = (0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('current_lang', '');
   const languages = (0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('languages', {});
   const languagesInfo = (0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('languagesInfo', {});
-  const untranslatedLangs = languages.filter(lang => lang !== language && !translatedLangs.map(translatedLang => translatedLang.language).includes(lang));
+  const untranslatedLangs = languages.filter(lang => (language === null || lang !== language) && !translatedLangs.map(translatedLang => translatedLang.language).includes(lang));
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_contexts_LangContext__WEBPACK_IMPORTED_MODULE_5__["default"].Provider, {
     value: {
-      currentLang: language,
+      currentLang,
       postId: data.postId,
       postLanguage: data.language,
       languages,
@@ -2853,7 +2855,7 @@ const PostLanguage = _ref => {
     postId
   } = _ref;
   const [isEditOpen, setIsEditOpen] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-  const [editLanguage, setEditLanguage] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(currentLang);
+  const [editLanguage, setEditLanguage] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(postLanguage);
   const {
     mutate,
     isLoading,
@@ -2872,14 +2874,21 @@ const PostLanguage = _ref => {
     return 'Loading...'; // TODO: Add spinner
   }
 
-  const languageOptions = languages.map(lang => {
+  let languageOptions = languages.map(lang => {
     return {
       label: `${languagesInfo[lang].native_name} (${lang})`,
       value: lang,
-      disabled: lang !== currentLang && translatedLangs.find(translatedLang => translatedLang.language === lang) !== undefined
+      disabled: (postLanguage === null || lang !== postLanguage) && translatedLangs.find(translatedLang => translatedLang.language === lang) !== undefined
     };
   });
-  const langLabel = `${languagesInfo[currentLang].native_name} (${currentLang})`;
+  if (postLanguage === null) {
+    languageOptions = [{
+      label: 'Select a language',
+      value: '',
+      disabled: false
+    }, ...languageOptions];
+  }
+  const langLabel = postLanguage === null ? 'Select a language' : `${languagesInfo[postLanguage].native_name} (${postLanguage})`;
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, null, !isEditOpen && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     style: {
       display: 'grid',
@@ -2905,7 +2914,7 @@ const PostLanguage = _ref => {
     style: {
       width: '100%'
     },
-    value: editLanguage,
+    value: editLanguage === null ? '' : editLanguage,
     options: languageOptions,
     onChange: newEditLanguage => setEditLanguage(newEditLanguage),
     __nextHasNoMarginBottom: true

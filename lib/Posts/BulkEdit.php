@@ -118,6 +118,10 @@ class BulkEdit {
 		$languages        = LangInterface::get_languages();
 		$current_language = LangInterface::get_current_language();
 
+		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
+			$current_language = null;
+		}
+
 		// TODO: Deal with no languages, etc
 		?>
 		<fieldset class="inline-edit-col-right">
@@ -130,10 +134,13 @@ class BulkEdit {
 					<label class="inline-edit-status alignleft">
 						<span class="title">Language</span>
 						<select name="ubb_lang">
+							<?php if ( $current_language === null ) : ?>
+								<option value="" selected><?php esc_html_e( 'Select a language', 'unbabble' ); ?></option>
+							<?php endif; ?>
 							<?php foreach ( $languages as $lang ): ?>
 								<?php
 								$label = $languages_info[$lang]['native_name'] ?? null;
-								$selected = $lang === $current_language;
+								$selected = $current_language !== null && $lang === $current_language;
 								?>
 
 								<?php if ( ! empty( $label ) ) : ?>
@@ -195,7 +202,13 @@ class BulkEdit {
 		}
 
 		// Change the language.
-		$success = LangInterface::change_post_language( $post_id, $language );
+		$post_lang = LangInterface::get_post_language( $post_id );
+		if ( $post_lang === null ) {
+			$success = LangInterface::set_post_language( $post_id, $language );
+
+		} else {
+			$success = LangInterface::change_post_language( $post_id, $language );
+		}
 
 		// If failed, increment the fail count to show in update message.
 		if ( ! $success ) {

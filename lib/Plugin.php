@@ -161,6 +161,7 @@ class Plugin {
 			'posts_language_metabox'   => Posts\LangMetaBox::class,
 			'posts_admin_notices'      => Posts\AdminNotices::class,
 			'posts_bulk_edit'          => Posts\BulkEdit::class,
+			'posts_edit_filter'        => Posts\EditFilters::class,
 
 			'terms_language_metabox'   => Terms\LangMetaBox::class,
 			'terms_create_translation' => Terms\CreateTranslation::class,

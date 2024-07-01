@@ -20,7 +20,7 @@ const PostLanguage = ({
 	postId,
 }) => {
 	const [isEditOpen, setIsEditOpen] = useState(false);
-	const [editLanguage, setEditLanguage] = useState(currentLang);
+	const [editLanguage, setEditLanguage] = useState(postLanguage);
 	const { mutate, isLoading, isError } = useChangeLanguagePost(postId);
 
 	const openEdit = () => setIsEditOpen(true);
@@ -38,19 +38,33 @@ const PostLanguage = ({
 		return 'Loading...'; // TODO: Add spinner
 	}
 
-	const languageOptions = languages.map((lang) => {
+	let languageOptions = languages.map((lang) => {
 		return {
 			label: `${languagesInfo[lang].native_name} (${lang})`,
 			value: lang,
 			disabled:
-				lang !== currentLang &&
+				(postLanguage === null || lang !== postLanguage) &&
 				translatedLangs.find(
 					(translatedLang) => translatedLang.language === lang
 				) !== undefined,
 		};
 	});
 
-	const langLabel = `${languagesInfo[currentLang].native_name} (${currentLang})`;
+	if (postLanguage === null) {
+		languageOptions = [
+			{
+				label: 'Select a language',
+				value: '',
+				disabled: false,
+			},
+			...languageOptions,
+		];
+	}
+
+	const langLabel =
+		postLanguage === null
+			? 'Select a language'
+			: `${languagesInfo[postLanguage].native_name} (${postLanguage})`;
 
 	return (
 		<PanelRow>
@@ -78,7 +92,9 @@ const PostLanguage = ({
 						<Flex direction="column" align="stretch">
 							<SelectControl
 								style={{ width: '100%' }}
-								value={editLanguage}
+								value={
+									editLanguage === null ? '' : editLanguage
+								}
 								options={languageOptions}
 								onChange={(newEditLanguage) =>
 									setEditLanguage(newEditLanguage)

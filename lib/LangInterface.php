@@ -241,7 +241,7 @@ class LangInterface {
 		$transient_key = sprintf( 'ubb_%s_post_language', $post_id );
 		$post_lang     = \get_transient( $transient_key );
 		if ( $post_lang !== false ) {
-			return is_string( $post_lang ) ? $post_lang : null;
+			return ( is_string( $post_lang ) && ! empty( $post_lang ) ) ? $post_lang : null;
 		}
 
 		$table_name = ( new PostTable() )->get_table_name();
@@ -251,6 +251,11 @@ class LangInterface {
 				$post_id
 			)
 		);
+
+		// Make sure $post_lang is null if get_var returns empty string.
+		if ( empty( $post_lang ) ) {
+			$post_lang = null;
+		}
 
 		\set_transient( $transient_key, $post_lang, 30 );
 
