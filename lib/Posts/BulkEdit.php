@@ -241,7 +241,7 @@ class BulkEdit {
 
 		// Attach language failure string to the bulk update message.
 		$bulk_messages[ $post_type ]['updated'] .= sprintf(
-			_n( ' %d post failed to update language.', ' %d posts failed to update language.', $failed ),
+			_n( ' %d post failed to update language.', ' %d posts failed to update language.', $failed, 'unbabble' ),
 			$failed,
 			$current_post_type
 		);
