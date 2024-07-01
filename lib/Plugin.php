@@ -160,6 +160,7 @@ class Plugin {
 			'posts_change_language'    => Posts\ChangeLanguage::class,
 			'posts_language_metabox'   => Posts\LangMetaBox::class,
 			'posts_admin_notices'      => Posts\AdminNotices::class,
+			'posts_bulk_edit'          => Posts\BulkEdit::class,
 
 			'terms_language_metabox'   => Terms\LangMetaBox::class,
 			'terms_create_translation' => Terms\CreateTranslation::class,
