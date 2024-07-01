@@ -277,12 +277,16 @@ class LangInterface {
 			}
 			$meta_id = update_post_meta( $post_id, 'ubb_source', $source_id );
 
-			if ( (bool) $meta_id ) {
-				\delete_transient( sprintf( 'ubb_%s_source_posts', $source_id ) );
-			}
-
 		} else {
 			$meta_id = add_post_meta( $post_id, 'ubb_source', $source_id, true );
+		}
+
+		if ( (bool) $meta_id ) {
+			// Delete transient for post translations.
+			\delete_transient( sprintf( 'ubb_%s_source_posts', $source_id ) );
+
+			// Update transient for post source.
+			\set_transient( sprintf( 'ubb_%s_post_source', $post_id ), $source_id, 30 );
 		}
 
 		return (bool) $meta_id;
@@ -542,6 +546,17 @@ class LangInterface {
 	 * @return bool True on success, false on failure.
 	 */
 	public static function delete_post_source( string $post_id ) : bool {
+
+		// Delete transient for translations.
+		$post_source   = self::get_post_source( $post_id );
+		if ( ! $post_source ) {
+			\delete_transient( sprintf( 'ubb_%s_source_posts', $post_source ) );
+		}
+
+		// Delete transient for source.
+		\delete_transient( sprintf( 'ubb_%s_post_source', $post_id ) );
+
+
 		return delete_post_meta( $post_id, 'ubb_source' );
 	}
 
@@ -659,12 +674,18 @@ class LangInterface {
 			}
 			$meta_id = update_term_meta( $term_id, 'ubb_source', $source_id );
 
-			if ( (bool) $meta_id ) {
-				\delete_transient( sprintf( 'ubb_%s_source_terms', $source_id ) );
-			}
 		} else {
 			$meta_id = add_term_meta( $term_id, 'ubb_source', $source_id, true );
 		}
+
+		if ( (bool) $meta_id ) {
+			// Delete transient for term translations.
+			\delete_transient( sprintf( 'ubb_%s_source_terms', $source_id ) );
+
+			// Update transient for term source.
+			\set_transient( sprintf( 'ubb_%s_term_source', $term_id ), $source_id, 30 );
+		}
+
 		return (bool) $meta_id;
 	}
 
@@ -856,6 +877,16 @@ class LangInterface {
 	 * @return bool True on success, false on failure.
 	 */
 	public static function delete_term_source( string $term_id ) : bool {
+
+		// Delete transient for translations.
+		$term_source   = self::get_term_source( $term_id );
+		if ( ! $term_source ) {
+			\delete_transient( sprintf( 'ubb_%s_source_terms', $term_source ) );
+		}
+
+		// Delete transient for source.
+		\delete_transient( sprintf( 'ubb_%s_term_source', $term_id ) );
+
 		return delete_term_meta( $term_id, 'ubb_source' );
 	}
 
