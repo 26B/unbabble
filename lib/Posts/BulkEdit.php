@@ -24,7 +24,10 @@ class BulkEdit {
 		// Add language column.
 		\add_action( 'init', [ $this, 'add_custom_columns' ], 99 );
 
-		// Add bulk edit custom box. Bulk edit uses `save_post` here due to using $_GET and not $_POST.
+		/**
+		 * Add bulk edit custom box. Bulk edit uses `save_post` instead of ChangeLanguage.php's
+		 * `save_post` here due to using $_GET and not $_POST.
+		 */
 		\add_action( 'bulk_edit_custom_box', [ $this, 'bulk_edit_custom_box' ], 10, 2 );
 		\add_action( 'save_post', [ $this, 'save_bulk_edit' ], PHP_INT_MAX - 10 );
 		\add_action( 'bulk_post_updated_messages', [ $this, 'bulk_edit_messages' ], 10, 2 );
