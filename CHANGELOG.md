@@ -45,6 +45,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.10] - 2023-03-08
 
+### Added
+
+- New action `ubb_options_updated` for when the Unbabble options value is changed.
+- New language filter for accurate post counts by post status.
+- Added missing locations for the customization of the front page.
+
+### Changed
+
+- Passing the check for running Unbabble into `Plugin`.
+- Use component classes instead of instantiating them immeditately in the list of components.
+- Register all the hooks immediately instead of waiting for `init`. This assumes that the components themselves are only registering hooks and not running code immediately. The only exception to this is the routing for the `Directory`.
+- Moved `Directory` language fetching to the earliest possible time when the plugin is being loaded.
+- Changed how options filter `ubb_options` works. Values passed to it will update the 'ubb_options' WordPress option value in the database during `wp_loaded`. The options returned in `Options::get` will now only return the value in the database or the default options value.
+
 ## [0.0.9] - 2023-03-06
 
 ### Added
