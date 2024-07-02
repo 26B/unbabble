@@ -47,9 +47,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.9] - 2023-03-06
 
+
+
 ## [0.0.8] - 2023-03-03
 
+### Fixed
+
+- Bugs with the translations of meta fields.
+- Accessing site_id property of WP_Site objects.
+- Network activated Unbabble not working.
+
 ## [0.0.7] - 2023-02-22
+
+### Changed
+
+- Remove vcs repository for `diqa/formatter` and use our fork `26b/diqa-formatter` directly.
+- Update `26b/diqa-formatter` version.
 
 ## [0.0.6] - 2023-02-17
 
