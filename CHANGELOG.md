@@ -57,6 +57,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.4] - 2023-01-09
 
+### Added
+
+- Filter `ubb_new_source_id` to bypass UUID generation for translation source IDs.
+
+### Changed
+
+- Switch use of `PHP_SELF` to `REQUEST_URI` completely.
+- Simplify condition for setting language in `$_GET` when current route matches language directory.
+
 ## [0.0.3] - 2023-01-06
 
 ### Added
