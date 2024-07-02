@@ -55,6 +55,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.5] - 2023-02-16
 
+### Changed
+
+- Updated dependencies.
+- Used Unbabble's shorthand `ubb` for commands instead of `unbabble`.
+- Simplified SQL to get a post's language.
+- Register components in the `init` WordPress action.
+- Delayed language matching for language directory until `wp_loaded`.
+
+### Fixed
+
+- Minimum PHP version in composer changed to 8.0 due to UUID lib dependency.
+
 ## [0.0.4] - 2023-01-09
 
 ### Added
