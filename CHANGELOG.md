@@ -59,6 +59,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.3] - 2023-01-06
 
+### Added
+
+- Multilingual homepage.
+- Multilingual menus.
+- WPML to Unbabble migrator.
+- `LangInterface::translate_current_url()` method to translate current url.
+- `LangInterface::is_taxonomy_translatable()` method to check if a taxonomy is translatable.
+- Routing type resolver to handle either query_var or directory routing depending on the settings.
+- `Options` method to fetch language information via the WordPress language packs.
+- Removing language query var from queries in otherwise empty queries. Needed for homepages in non-default languages.
+
+### Changed
+
+- Change the main plugin file `wp-plugin.php` to `unbabble.php`.
+
+### Fixed
+
+- Handle urls correctly when switching blogs.
+
 ## [0.0.2] - 2022-12-19
 
+### Removed
+
+- Unnecessary dependencies.
+
 ## [0.0.1] - 2023-12-19
+
+First Release!
+
+[unreleased]: https://github.com/26b/unbabble/compare/0.3.1...HEAD
+[0.3.1]: https://github.com/26b/unbabble/compare/0.3.0...0.3.1
+[0.3.0]: https://github.com/26b/unbabble/compare/0.2.3...0.3.0
+[0.2.3]: https://github.com/26b/unbabble/compare/0.2.2...0.2.3
+[0.2.2]: https://github.com/26b/unbabble/compare/0.2.1...0.2.2
+[0.2.1]: https://github.com/26b/unbabble/compare/0.2.0...0.2.1
+[0.2.0]: https://github.com/26b/unbabble/compare/0.1.1...0.2.0
+[0.1.1]: https://github.com/26b/unbabble/compare/0.1.0...0.1.1
+[0.0.13]: https://github.com/26b/unbabble/compare/0.0.12...0.0.13
+[0.1.0]: https://github.com/26b/unbabble/compare/0.0.12...0.1.0
+[0.0.12]: https://github.com/26b/unbabble/compare/0.0.11...0.0.12
+[0.0.11]: https://github.com/26b/unbabble/compare/0.0.10...0.0.11
+[0.0.10]: https://github.com/26b/unbabble/compare/0.0.9...0.0.10
+[0.0.9]: https://github.com/26b/unbabble/compare/0.0.8...0.0.9
+[0.0.8]: https://github.com/26b/unbabble/compare/0.0.7...0.0.8
+[0.0.7]: https://github.com/26b/unbabble/compare/0.0.6...0.0.7
+[0.0.6]: https://github.com/26b/unbabble/compare/0.0.5...0.0.6
+[0.0.5]: https://github.com/26b/unbabble/compare/0.0.4...0.0.5
+[0.0.4]: https://github.com/26b/unbabble/compare/0.0.3...0.0.4
+[0.0.3]: https://github.com/26b/unbabble/compare/0.0.2...0.0.3
+[0.0.2]: https://github.com/26b/unbabble/compare/0.0.1...0.0.2
+[0.0.1]: https://github.com/26b/unbabble/releases/tag/0.0.1
