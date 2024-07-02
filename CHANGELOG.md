@@ -47,7 +47,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.9] - 2023-03-06
 
+### Added
 
+- Constant `UNBABBLE_IDLE` to stop most of Unbabble from running on demand without having to turn off the plugin. Helpful to run migrations before switching completely to Unbabble.
+
+### Changed
+
+- When Unbabble shouldn't run: now depends only on the constant `UNBABBLE_IDLE` and if there is only one language defined.
+
+### Removed
+
+- Left over `console.log` in `ubb-admin.js`.
 
 ## [0.0.8] - 2023-03-03
 
