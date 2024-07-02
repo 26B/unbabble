@@ -53,6 +53,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.6] - 2023-02-17
 
+### Added
+
+- Dependency to `wp-cli/wp-cli` to WordPress CLI commands.
+- Dependency to `diqa/formatter` for better visual output in CLI commands.
+- Abstract `Command` class for CLI commands.
+- `Post` CLI command class for post related commands:
+  - `wp ubb post info <post_id>` for information on a post's language, source ID and translations.
+  - `wp ubb post set <post_id> <language>` for setting a post's language.
+  - `wp ubb post link <post_id> <target_id> [--force]` for linking a post to another as a translation.
+  - `wp ubb post unlink <post_id>` for unlinking a post from its translations.
+- `Term` CLI command class for term related commands:
+  - `wp ubb term info <term_id>` for information on a term's language, source ID and translations.
+  - `wp ubb term set <term_id> <language>` for setting a term's language.
+  - `wp ubb term link <term_id> <target_id> [--force]` for linking a term to another as a translation.
+  - `wp ubb term unlink <term_id>` for unlinking a term from its translations.
+- `Options` CLI command class for options/settings related commands:
+  - `wp ubb options get` for infomation on options/settings of Unbabble.
+- Check if term slug already exists when creating a term when language filter is being applied to terms.
+
+### Changed
+
+- Updated frontend dependencies.
+
 ## [0.0.5] - 2023-02-16
 
 ### Changed
@@ -84,7 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Multilingual homepage.
 - Multilingual menus.
-- WPML to Unbabble migrator.
+- WPML to Unbabble migrator and a CLI command `wp unbabble migrate-wpml` for it.
 - `LangInterface::translate_current_url()` method to translate current url.
 - `LangInterface::is_taxonomy_translatable()` method to check if a taxonomy is translatable.
 - Routing type resolver to handle either query_var or directory routing depending on the settings.
