@@ -6,6 +6,7 @@ use Ramsey\Uuid\Uuid;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use TwentySixB\WP\Plugin\Unbabble\SDK\LanguageContext;
 use WP_Post;
 use WP_Query;
 use WP_Term;
@@ -135,7 +136,7 @@ class LangInterface {
 		 *
 		 * @param string $language Current language.
 		 */
-		return apply_filters( 'ubb_current_lang', \sanitize_text_field( $lang ) );
+		return \apply_filters( 'ubb_current_lang', \sanitize_text_field( $lang ) );
 	}
 
 	/**
@@ -934,21 +935,21 @@ class LangInterface {
 
 		// Try to translate posts archive url.
 		if ( $wp_the_query instanceof WP_Query && $wp_the_query->is_posts_page ) {
-			add_filter( 'ubb_current_lang', $fn = fn () => $lang );
-			$page_for_posts = get_option( 'page_for_posts' );
-			$home_url       = home_url();
-			remove_filter( 'ubb_current_lang', $fn );
+			LanguageContext::switch_to_language( $lang );
+			$page_for_posts = \get_option( 'page_for_posts' );
+			$home_url       = \home_url();
+			LanguageContext::restore_language();
 			if ( empty( $page_for_posts ) ) {
 				return $home_url;
 			}
-			return get_permalink( $page_for_posts );
+			return \get_permalink( $page_for_posts );
 		}
 
 		// Try to translate a post types archive url.
 		if ( $wp_the_query instanceof WP_Query && $wp_the_query->is_post_type_archive() ) {
-			add_filter( 'ubb_current_lang', $fn = fn () => $lang );
-			$archive_link = get_post_type_archive_link( $wp_the_query->query['post_type'] );
-			remove_filter( 'ubb_current_lang', $fn );
+			LanguageContext::switch_to_language( $lang );
+			$archive_link = \get_post_type_archive_link( $wp_the_query->query['post_type'] );
+			LanguageContext::restore_language();
 			return $archive_link;
 		}
 
@@ -959,17 +960,17 @@ class LangInterface {
 		) {
 			$term_id = $wp_the_query->queried_object->term_id ?? null;
 			if ( $term_id === null ) {
-				add_filter( 'ubb_current_lang', $fn = fn () => $lang );
+				LanguageContext::switch_to_language( $lang );
 				$home_url = home_url();
-				remove_filter( 'ubb_current_lang', $fn );
+				LanguageContext::restore_language();
 				return $home_url;
 			}
 
 			$translation = self::get_term_translation( $term_id, $lang );
 			if ( $translation ) {
-				add_filter( 'ubb_current_lang', $fn = fn () => $lang );
-				$translation_permalink = get_term_link( $translation );
-				remove_filter( 'ubb_current_lang', $fn );
+				LanguageContext::switch_to_language( $lang );
+				$translation_permalink = \get_term_link( $translation );
+				LanguageContext::restore_language();
 				return $translation_permalink;
 			}
 		}
@@ -978,25 +979,25 @@ class LangInterface {
 		if ( $wp_the_query instanceof WP_Query && $wp_the_query->is_singular() ) {
 			$post_id = $wp_the_query->queried_object->ID ?? null;
 			if ( $post_id === null ) {
-				add_filter( 'ubb_current_lang', $fn = fn () => $lang );
+				LanguageContext::switch_to_language( $lang );
 				$home_url = home_url();
-				remove_filter( 'ubb_current_lang', $fn );
+				LanguageContext::restore_language();
 				return $home_url;
 			}
 
 			$translation = self::get_post_translation( $post_id, $lang );
 			if ( $translation ) {
-				add_filter( 'ubb_current_lang', $fn = fn () => $lang );
+				LanguageContext::switch_to_language( $lang );
 				$translation_permalink = get_permalink( $translation );
-				remove_filter( 'ubb_current_lang', $fn );
+				LanguageContext::restore_language();
 				return $translation_permalink;
 			}
 		}
 
 		// Default to home_url of the language.
-		add_filter( 'ubb_current_lang', $fn = fn () => $lang );
+		LanguageContext::switch_to_language( $lang );
 		$lang_link = home_url();
-		remove_filter( 'ubb_current_lang', $fn );
+		LanguageContext::restore_language();
 		return $lang_link;
 	}
 

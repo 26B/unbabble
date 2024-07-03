@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Changing post's language via bulk edit (#66).
+- `SDK\LanguageContext` to provide a more human readable interface for language context switching.
 
 ### Changed
 
