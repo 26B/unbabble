@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.1] - 2024-02-22
 
+### Fixed
+
+- Missing check for existence of function `wp_get_available_translations`.
+
 ## [0.3.0] - 2024-01-30
 
 ### Changed
