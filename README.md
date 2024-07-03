@@ -65,7 +65,7 @@ To know which entities are translations of any other entity, we add a meta to al
 
 - Only one translation for a given `ubb_source` with the same locale (avoids multiple options for the same entity). This does not break the site, but is shown as an issue. By default, when many posts share the same language, it first is selected.
 
-## Contributions
+# Contributions
 
 We welcome all contributors that find our approach reasonable and useful. You may contribute by filing a bug report, suggesting some feature or submiting your own code. We'll revew new features and code submitted through our goals for the project, stated above.
 
