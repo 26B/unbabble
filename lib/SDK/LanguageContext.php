@@ -10,28 +10,28 @@ namespace TwentySixB\WP\Plugin\Unbabble\SDK;
 class LanguageContext {
 
 	/**
-	 * The current language.
+	 * The language stack.
 	 *
 	 * @since [unreleased]
 	 *
-	 * @var string
+	 * @var array
 	 */
-	static $current_lang = null;
+	static $language_stack = [];
 
 	/**
-	 * The language to switch to.
+	 * Switch to the language at the top of the stack.
 	 *
 	 * @since [unreleased]
 	 *
 	 * @param string $lang The language to switch to.
 	 * @return string
 	 */
-	private static function switch( string $lang ) {
-		return static::$lang;
+	private static function switch() {
+		return static::$language_stack[ count( static::$language_stack ) - 1 ];
 	}
 
 	/**
-	 * Switch to a specific language.
+	 * Push a  to a specific language.
 	 *
 	 * @since [unreleased]
 	 *
@@ -47,12 +47,29 @@ class LanguageContext {
 			throw new \InvalidArgumentException( 'Language cannot be empty' );
 		}
 
-		static::$current_lang = $lang;
+		// Add only one filter instance to the hook.
+		if ( empty( static::$language_stack ) ) {
+			\add_filter( 'ubb_current_lang', [ self::class, 'switch' ] );
+		}
 
-		\add_filter( 'ubb_current_lang', [ self::class, 'switch' ] );
+		static::$language_stack[] = $lang;
 	}
 
+	/**
+	 * Restore the previous language in the stack.
+	 *
+	 * @since [unreleased]
+	 *
+	 * @return void
+	 */
 	public static function restore_language() {
-		\remove_filter( 'ubb_current_lang', [ self::class, 'switch' ] );
+
+		// Take the last language off the stack.
+		array_pop( static::$language_stack );
+
+		// Remove the filter if the stack is empty.
+		if ( empty( static::$language_stack ) ) {
+			\remove_filter( 'ubb_current_lang', [ self::class, 'switch' ] );
+		}
 	}
 }
