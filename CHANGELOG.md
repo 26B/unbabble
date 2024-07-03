@@ -29,6 +29,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.2] - 2024-01-16
 
+### Changed
+
+- Moved `Language/Frontend` to `Language\Locale`.
+
+### Fixed
+
+- Check function `wp_get_current_user` exists before using it in `LangInterface`.
+- Parse routing and set locale as early as possible to fix localization issues.
+
 ## [0.2.1] - 2024-01-11
 
 ### Added
