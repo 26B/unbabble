@@ -837,8 +837,13 @@ class LangInterface {
 		}
 
 		$table_name = ( new TermTable() )->get_table_name();
-
 		$ids_str    = implode( ',', array_map( fn ( $term ) => $term->term_id, $terms ) );
+
+		// Protection, but shouldn't happen.
+		if ( empty( $ids_str ) ) {
+			\set_transient( $transient_key, [], 30 );
+		}
+
 		$term_langs = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT term_id, locale
