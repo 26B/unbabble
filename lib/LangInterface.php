@@ -998,6 +998,49 @@ class LangInterface {
 			}
 		}
 
+		// Check for user defined routes.
+		if ( $wp_the_query instanceof WP_Query ) {
+
+			/**
+			 * Filter to add translatable routes outside of posts, taxonomies and archives.
+			 *
+			 * Only the top route needs to be added, the same that was added to the rewrite rules.
+			 * For example: A route for accounts 'account' might have sub routes like
+			 * 'account/address'. Only the top route 'account' needs to be added to this filter,
+			 * since WordPress will match the top route in the rewrite rules.
+			 *
+			 * @since 0.3.2
+			 *
+			 * @param array  $routes Translatable routes.
+			 * @param string $lang   Language code to translate route to.
+			 * @return array
+			 */
+			$routes = apply_filters( 'ubb_translatable_routes', [], $lang );
+
+			// Try to match all the routes with the route that WordPress matched. First one matched is chosen.
+			foreach ( $routes as $route ) {
+
+				// If the route is matched, return the translated url.
+				if ( isset( $wp_the_query->query[ $route ] ) ) {
+
+					// Get base url for the language requested.
+					add_filter( 'ubb_current_lang', $fn = fn () => $lang );
+					$home_url = \home_url();
+					remove_filter( 'ubb_current_lang', $fn );
+
+					// Build the url.
+					$url_parts = [
+						\untrailingslashit( $home_url ),
+						$route,
+						$wp_the_query->query[ $route ]
+					];
+					$url = implode( '/', array_filter( $url_parts ) );
+
+					return $url;
+				}
+			}
+		}
+
 		// Default to home_url of the language.
 		add_filter( 'ubb_current_lang', $fn = fn () => $lang );
 		$lang_link = home_url();
