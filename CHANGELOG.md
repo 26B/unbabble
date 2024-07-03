@@ -33,6 +33,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.0] - 2024-01-09
 
+### Added
+
+- Improved options page with javascript and via API.
+- `ubb_proxy_options` filter for general proxy options.
+- `Admin\OptionsProxy` class for general proxying of options.
+  - Includes a method `is_option_proxiable` to check if an option is proxiable or not.
+- YoastSEO's options for proxying.
+- Transient to `LangInterface::get_post_translation`.
+- Top menu and sub menu pages for Unbabble options.
+
+### Changed
+
+- Improved proxying of options to be changeable by the user.
+
+### Fixed
+
+- Query var bug with `rest_url`.
+
+### Removed
+
+- Unnecessary `post_type_archive_link` from Directory routing class.
+
 ## [0.1.1] - 2023-10-26
 
 ### Added
