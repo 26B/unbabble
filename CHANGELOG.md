@@ -31,6 +31,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.1] - 2024-01-11
 
+### Added
+
+- Pass CLI arguments to `WP_CLI::confirm` in the WPML migrator.
+
+### Removed
+
+- Database verification for UUID generation to improve performance.
+
 ## [0.2.0] - 2024-01-09
 
 ### Added
