@@ -35,6 +35,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2023-10-26
 
+### Added
+
+- Relevanssi Integration.
+- Fallback condition for post lang filter when post type format in WP_Query is not as expected.
+
+### Fixed
+
+- Check for `editpost` action for posts created via ajax.
+- Homepage in non-default language directory having language twice.
+- Yoast's rewrite-republish post's did not have language or a `ubb_source` meta.
+
 ## [0.0.13] - 2023-09-14
 
 ### Fixed
