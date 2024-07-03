@@ -10,11 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Changing post's language via bulk edit (#66).
+- Filter for posts without language or unknown languages in the back-office post list for translatable post types.
+- Filter `ubb_translatable_routes` for routes outside of post/term/archives that the user wants to be available in other languages when using the method `LangInterface::translate_current_url()`.
 - `SDK\LanguageContext` to provide a more human readable interface for language context switching.
 
 ### Changed
 
 - Use transients in LangInterface to optimize fetching language and translations (#55, #60).
+- Improved language interface in post edit for setting language for posts without language or with an unknown language.
 
 ### Fixed
 

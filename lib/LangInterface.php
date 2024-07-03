@@ -242,7 +242,7 @@ class LangInterface {
 		$transient_key = sprintf( 'ubb_%s_post_language', $post_id );
 		$post_lang     = \get_transient( $transient_key );
 		if ( $post_lang !== false ) {
-			return is_string( $post_lang ) ? $post_lang : null;
+			return ( is_string( $post_lang ) && ! empty( $post_lang ) ) ? $post_lang : null;
 		}
 
 		$table_name = ( new PostTable() )->get_table_name();
@@ -252,6 +252,11 @@ class LangInterface {
 				$post_id
 			)
 		);
+
+		// Make sure $post_lang is null if get_var returns empty string.
+		if ( empty( $post_lang ) ) {
+			$post_lang = null;
+		}
 
 		\set_transient( $transient_key, $post_lang, 30 );
 
@@ -991,6 +996,49 @@ class LangInterface {
 				$translation_permalink = get_permalink( $translation );
 				LanguageContext::restore_language();
 				return $translation_permalink;
+			}
+		}
+
+		// Check for user defined routes.
+		if ( $wp_the_query instanceof WP_Query ) {
+
+			/**
+			 * Filter to add translatable routes outside of posts, taxonomies and archives.
+			 *
+			 * Only the top route needs to be added, the same that was added to the rewrite rules.
+			 * For example: A route for accounts 'account' might have sub routes like
+			 * 'account/address'. Only the top route 'account' needs to be added to this filter,
+			 * since WordPress will match the top route in the rewrite rules.
+			 *
+			 * @since 0.3.2
+			 *
+			 * @param array  $routes Translatable routes.
+			 * @param string $lang   Language code to translate route to.
+			 * @return array
+			 */
+			$routes = apply_filters( 'ubb_translatable_routes', [], $lang );
+
+			// Try to match all the routes with the route that WordPress matched. First one matched is chosen.
+			foreach ( $routes as $route ) {
+
+				// If the route is matched, return the translated url.
+				if ( isset( $wp_the_query->query[ $route ] ) ) {
+
+					// Get base url for the language requested.
+					add_filter( 'ubb_current_lang', $fn = fn () => $lang );
+					$home_url = \home_url();
+					remove_filter( 'ubb_current_lang', $fn );
+
+					// Build the url.
+					$url_parts = [
+						\untrailingslashit( $home_url ),
+						$route,
+						$wp_the_query->query[ $route ]
+					];
+					$url = implode( '/', array_filter( $url_parts ) );
+
+					return $url;
+				}
 			}
 		}
 
