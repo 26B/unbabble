@@ -25,6 +25,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.0] - 2024-01-30
 
+### Changed
+
+- **Breaking:** Return for `get_posts_for_source` and `get_terms_for_source` changed. Optimized fetching of languages of posts and terms.
+
+### Fixed
+
+- Bug when deleting attachments with no metadata.
+
 ## [0.2.3] - 2024-01-16
 
 ### Changed
