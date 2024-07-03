@@ -41,6 +41,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.12] - 2023-03-27
 
+### Added
+
+- New `ubb_do_hidden_languages_filter` filter to stop or allow hidden languages from being filtered out of the languages list.
+- Arguments to the Hidden Content API for better control.
+- Unit tests for `LangInterface`.
+
+### Changed
+
+- Improve hidden languages handling in LangInterface.
+
+### Fixed
+
+- Stop hidden languages from being hidden in the WPML migrator.
+- Issue with `$_SERVER['HTTPS']` being unset during wp_cron.
+- Issues with language switcher.
+
+### Removed
+
+- Forcing `true` in permission callback for Hidden Content API.
+
 ## [0.0.11] - 2023-03-11
 
 ### Added
