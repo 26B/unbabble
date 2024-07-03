@@ -27,6 +27,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.3] - 2024-01-16
 
+### Changed
+
+- Changed `Language/Locale`'s `register` method for an `init` method.
+
+### Fixed
+
+- Issue with language switcher.
+
+### Removed
+
+- `init` method call in `Router/RoutingResolver`'s `register` method.
+
 ## [0.2.2] - 2024-01-16
 
 ### Changed
