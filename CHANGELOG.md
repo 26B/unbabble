@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Breaking:** Return for `get_posts_for_source` and `get_terms_for_source` changed. Optimized fetching of languages of posts and terms.
+- **Breaking:** Return for `get_posts_for_source` and `get_terms_for_source` changed. Optimized fetching of languages for posts and terms.
 
 ### Fixed
 
