@@ -10,10 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Changing post's language via bulk edit (#66).
+- Filter for posts without language or unknown languages in the back-office post list for translatable post types.
 
 ### Changed
 
 - Use transients in LangInterface to optimize fetching language and translations (#55, #60).
+- Improved language interface in post edit for setting language for posts without language or with an unknown language.
 
 ### Fixed
 
