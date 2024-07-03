@@ -223,7 +223,7 @@ class Admin {
 	 *
 	 * Stop enqueuing scripts if the current screen is for an untranslatable post type.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @return bool
 	 */

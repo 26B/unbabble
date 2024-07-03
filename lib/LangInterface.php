@@ -1009,7 +1009,7 @@ class LangInterface {
 			 * 'account/address'. Only the top route 'account' needs to be added to this filter,
 			 * since WordPress will match the top route in the rewrite rules.
 			 *
-			 * @since 0.3.2
+			 * @since 0.4.0
 			 *
 			 * @param array  $routes Translatable routes.
 			 * @param string $lang   Language code to translate route to.

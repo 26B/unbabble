@@ -8,14 +8,14 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 /**
  * For hooks related to bulk actions for posts.
  *
- * @since 0.3.2
+ * @since 0.4.0
  */
 class BulkEdit {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @return void
 	 */
@@ -37,7 +37,7 @@ class BulkEdit {
 	/**
 	 * Adds custom columns.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @return void
 	 */
@@ -54,7 +54,7 @@ class BulkEdit {
 	/**
 	 * Adds admin columns.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @param array $columns Columns.
 	 * @return array
@@ -67,7 +67,7 @@ class BulkEdit {
 	/**
 	 * Populates custom columns.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @param string $column  Column name.
 	 * @param int    $post_id Post ID.
@@ -94,7 +94,7 @@ class BulkEdit {
 	/**
 	 * Adds bulk edit custom box.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @param string $column_name Column name.
 	 * @param string $post_type   Post type.
@@ -163,7 +163,7 @@ class BulkEdit {
 	/**
 	 * Saves the bulk edit.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @param int $post_id Post ID.
 	 * @return void
@@ -219,7 +219,7 @@ class BulkEdit {
 	/**
 	 * Adds a message to the bulk edit update message.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @param array $bulk_messages Bulk messages.
 	 * @param array $bulk_counts   Bulk counts.
@@ -268,7 +268,7 @@ class BulkEdit {
 	/**
 	 * Add language update fail count to bulk edit redirect.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @param string $location
 	 * @return string

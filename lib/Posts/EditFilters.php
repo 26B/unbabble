@@ -92,7 +92,7 @@ class EditFilters {
 	/**
 	 * Returns whether the filtering of posts should happen.
 	 *
-	 * @since 0.3.2
+	 * @since 0.4.0
 	 *
 	 * @param WP_Query $query
 	 * @return bool
@@ -126,7 +126,7 @@ class EditFilters {
 		/**
 		 * Filters whether posts should be filtered by having an unknown language or having no language.
 		 *
-		 * @since 0.3.2
+		 * @since 0.4.0
 		 *
 		 * @param bool $apply_filter
 		 * @param WP_Query $query
