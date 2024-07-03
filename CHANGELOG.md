@@ -39,6 +39,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2023-08-29
 
+### Added
+
+- Gutenberg (Block Editor) support.
+- CLI commands for hidden posts, posts without language or unknown languages, via the `CLI\Hidden\Post` class:
+  - `wp ubb post hidden stats` for statistics about the hidden posts.
+  - `wp ubb post hidden list` to list the hidden posts.
+  - `wp ubb post hidden fix` to fix the hidden posts.
+- CLI commands for hidden terms, terms without language or unknown languages, via the `CLI\Hidden\Term` class:
+  - `wp ubb term hidden stats` for statistics about the hidden terms.
+  - `wp ubb term hidden list` to list the hidden terms.
+  - `wp ubb term hidden fix` to fix the hidden terms.
+
+### Changed
+
+- Improved output string of `CLI\Post`.
+- Finished language change method for Terms.
+- Improved Term language metabox.
+- Improved Post language metabox.
+- Check post type when fetching a post's translations.
+
+### Fixed
+
+- `LangInterface::translate_current_url` when WP_Query is not set.
+- Check post/term language is not empty in translations fetch methods in `LangInterface`.
+- `API\Actions\HiddenContent` default for the `focus` argument.
+- Bugs when editing hiddent posts/terms.
+- Bug with array key 0 of query's post types for language filter.
+
 ## [0.0.12] - 2023-03-27
 
 ### Added
