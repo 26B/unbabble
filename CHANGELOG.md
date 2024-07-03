@@ -43,6 +43,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.11] - 2023-03-11
 
+### Added
+
+- New option `hidden_languages` to hide a language from the frontend while allowing creation of content for it in the back-office.
+- New class `Validator` for options validation.
+- Validation of options format, value types and the values themselves in some edge cases.
+- Admin notices for failed validation and successful options update.
+- New methods for `LangInterface`:
+  - `get_languages()` to fetch an array of all the available language codes.
+  - `is_language_allowed()` to check if a language is allowed in the options.
+  - `get_default_language()` to get the default language defined in the options.
+  - `get_translatable_post_types()` to get a list of translatable post types as defined in the options.
+  - `get_translatable_taxonomies()` to get a list of translatable taxonomies as defined in the options.
+
+### Changed
+
+- Passed most fetching of option values from `Options` to `LangInterface`. Separates the actual option values from the ones necessary for most of the code. This allows us to change the values of the options, for example, what languages are allowed according to the new option `hidden_languages`.
+- Replace fetching of options values to use the new `LangInterface` methods. Exceptions are places where we need to use the options values directly (e.g. `OptionsPage`, `CLI/Options`).
+- Move options update method in `DB\Options` to the `Options` class. 
+- Improve option defaults.
+- Improve how the constant `UNBABBLE_IDLE` works to allow for better control in multisites.
+- Make `defaults` method in `Options` public.
+
+### Removed
+
+- Remove `DB\Options` class.
+
 ## [0.0.10] - 2023-03-08
 
 ### Added
