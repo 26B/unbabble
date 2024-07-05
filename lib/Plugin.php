@@ -6,6 +6,8 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\Relevanssi;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastSEO;
 use WP_CLI;
 
 /**
@@ -20,6 +22,9 @@ use WP_CLI;
  * @since 0.0.1
  */
 class Plugin {
+
+	// TODO: move to a more appropriate place.
+	const API_V1 = 'unbabble/v1';
 
 	/**
 	 * The unique identifier of this plugin.
@@ -49,6 +54,30 @@ class Plugin {
 	public function __construct( $name, $version ) {
 		$this->name    = $name;
 		$this->version = $version;
+	}
+
+	/**
+	 * Initialize the plugin.
+	 *
+	 * Dependencies and hooks that need to be added as early as possible.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @return void
+	 */
+	public function init() : void {
+		$components = [
+			'router_resolver' => Router\RoutingResolver::class,
+			'locale'          => Language\Locale::class,
+		];
+
+		if ( ! Options::should_run_unbabble() ) {
+			$components = [];
+		}
+
+		foreach ( $components as $component ) {
+			( new $component() )->init();
+		}
 	}
 
 	/**
@@ -117,6 +146,7 @@ class Plugin {
 			'language_switcher' => Admin\LanguageSwitcher::class,
 			'redirector'        => Admin\Redirector::class,
 			'customize'         => Admin\Customize::class,
+			'options_proxy'     => Admin\OptionsProxy::class,
 
 			'api_header'     => API\Header::class,
 			'api_query_vars' => API\QueryVar::class,
@@ -130,6 +160,8 @@ class Plugin {
 			'posts_change_language'    => Posts\ChangeLanguage::class,
 			'posts_language_metabox'   => Posts\LangMetaBox::class,
 			'posts_admin_notices'      => Posts\AdminNotices::class,
+			'posts_bulk_edit'          => Posts\BulkEdit::class,
+			'posts_edit_filter'        => Posts\EditFilters::class,
 
 			'terms_language_metabox'   => Terms\LangMetaBox::class,
 			'terms_create_translation' => Terms\CreateTranslation::class,
@@ -139,13 +171,13 @@ class Plugin {
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
 
-			'router_resolver'  => Router\RoutingResolver::class,
-			'router_routing'   => Router\Routing::class,
-
-			'lang_frontend' => Language\Frontend::class,
+			'locale'        => Language\Locale::class,
 			'lang_packages' => Language\LanguagePacks::class,
 
 			'options' => Options::class,
+
+			'router_routing'   => Router\Routing::class,
+			'router_resolver'  => Router\RoutingResolver::class,
 
 			// TODO: Filter the query for attaching an attachment.
 		];
@@ -158,7 +190,9 @@ class Plugin {
 		}
 
 		foreach ( $components as $component ) {
-			( new $component() )->register();
+			if ( method_exists( $component, 'register' ) ) {
+				( new $component() )->register();
+			}
 		}
 	}
 
@@ -168,8 +202,10 @@ class Plugin {
 		}
 
 		add_action( 'rest_api_init', function () {
-			$namespace = 'unbabble/v1';
+			$namespace = self::API_V1;
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
+			( new API\Gutenberg\Post( $this, $namespace ) )->register();
+			( new API\Options( $this, $namespace ) )->register();
 		} );
 	}
 
@@ -192,11 +228,24 @@ class Plugin {
 
 	private function define_integrations() : void {
 		$this->define_integration_migrators();
-		$integrations = [
+		$admin_integrations = [
 			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
 			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
 		];
-		\add_action( 'admin_init', function() use ( $integrations ) {
+		$integrations = [
+			Relevanssi::class => 'relevanssi/relevanssi.php',
+			YoastSEO::class => 'wordpress-seo/wp-seo.php',
+		];
+
+		\add_action( 'admin_init', function() use ( $admin_integrations ) {
+			foreach ( $admin_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'init', function() use ( $integrations ) {
 			foreach ( $integrations as $integration_class => $plugin_name ) {
 				if ( \is_plugin_active( $plugin_name ) ) {
 					( new $integration_class() )->register();

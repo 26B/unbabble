@@ -3,29 +3,59 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Integrations;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Error;
 use WP_Post;
 use WP_Term;
 
 class YoastDuplicatePost {
 	public function register() {
-		// TODO: Move post lang metabox input here.
+
+		// Remove ubb_source from rewrite republish copies.
+		\add_filter( 'duplicate_post_excludelist_filter', [ $this, 'exclude_ubb_source' ] );
+
+		// Set language of rewrite republish copy to be the original's language.
+		\add_action( 'add_post_meta', [ $this, 'set_language_on_copy' ], 10, 3 );
 
 		// Use Yoast's duplicate-post plugin to duplicate post before redirect.
 		\add_action( 'save_post', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
 		\add_action( 'edit_attachment', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
 	}
 
-	public function copy_and_redirect( int $post_id ) : void {
+	public function exclude_ubb_source( array $meta_keys ) : array {
+		return array_merge( $meta_keys, [ 'ubb_source' ] );
+	}
+
+	public function set_language_on_copy( $object_id, $meta_key, $_meta_value ) : void {
+		if ( $meta_key !== '_dp_original' ) {
+			return;
+		}
+
+		$post = get_post( $object_id );
+
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		$original = get_post( $_meta_value );
+
+		if ( ! $original instanceof WP_Post ) {
+			return;
+		}
+
+		$original_lang = LangInterface::get_post_language( $original->ID );
+
+		if ( empty( $original_lang ) ) {
+			return;
+		}
+
+		LangInterface::set_post_language( $post->ID, $original_lang, true);
+	}
+
+	public function copy_and_redirect( int $post_id, bool $redirect = true ) {
 		$post_type = get_post_type( $post_id );
 
 		// Sometimes ACF saves attachments (uses `save_post`) before the actual post, so we need to account for it.
 		if ( ( $_POST['post_type'] ?? '' ) !== $post_type || $post_id !== (int) $_POST['post_ID'] ) {
-			return;
-		}
-
-		if ( $post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return;
 		}
 
@@ -36,20 +66,48 @@ class YoastDuplicatePost {
 
 		// Language to set to the new post.
 		$lang_create = $_POST['ubb_create'] ?? '';
+
+		$new_post_id = $this->copy( $post_id, $lang_create );
+
+		if ( $new_post_id === null ) {
+			return;
+		}
+
+		if ( $redirect ) {
+			wp_safe_redirect( get_edit_post_link( $new_post_id, '&' ) . "&lang={$lang_create}", 302, 'Unbabble' );
+			exit;
+		}
+
+		return $new_post_id;
+	}
+
+	public function copy( int $post_id, string $target_language ) : ?int {
+		$post_type = get_post_type( $post_id );
+
+		if ( $post_type === 'revision' || ! LangInterface::is_post_type_translatable( $post_type ) ) {
+			return null;
+		}
+
+		// Language to set to the new post.
 		if (
-			empty( $lang_create )
-			|| ! LangInterface::is_language_allowed( $lang_create )
+			empty( $target_language )
+			|| ! LangInterface::is_language_allowed( $target_language )
 			// TODO: check if post_id has this language already
 		) {
 			// TODO: What else to do when this happens.
 			error_log( print_r( 'CreateTranslation - lang create failed', true ) );
-			return;
+			return null;
+		}
+
+		// Check if post already has translation for that language.
+		if ( ! empty( LangInterface::get_post_translation( $post_id, $target_language ) ) ) {
+			return null;
 		}
 
 		// Attachment language is set on 'add_attachment' via get_current_language.
 		if ( $post_type === 'attachment' ) {
 			$curr_lang = LangInterface::get_current_language();
-			LangInterface::set_current_language( $lang_create );
+			LangInterface::set_current_language( $target_language );
 			$fix_attachment_title = function ( array $new_post, WP_Post $post ) {
 				$new_post['post_title'] = $post->post_title;
 				return $new_post;
@@ -69,7 +127,7 @@ class YoastDuplicatePost {
 		if ( $new_post_id instanceof WP_Error ) {
 			error_log( print_r( 'CreateTranslation - New post error', true ) );
 			// TODO: How to show error.
-			return;
+			return null;
 		}
 
 		\delete_post_meta( $new_post_id, '_dp_original' );
@@ -80,17 +138,17 @@ class YoastDuplicatePost {
 		);
 
 		// Set filters to translate meta values before they're saved if needed.
-		$this->set_filters_for_meta( $post_id, $lang_create );
+		$this->set_filters_for_meta( $post_id, $target_language );
 		$this->filter_post_meta = true;
 		$post_duplicator->copy_post_meta_info( $new_post_id, get_post( $post_id ), $options );
 		$this->filter_post_meta = false;
 
 		// Set language in the custom post lang table.
-		if ( ! LangInterface::set_post_language( $new_post_id, $lang_create ) ) {
+		if ( ! LangInterface::set_post_language( $new_post_id, $target_language, true ) ) {
 			error_log( print_r( 'CreateTranslation - language set failed', true ) );
 			wp_delete_post( $new_post_id, true );
 			// TODO: What else to do when this happens.
-			return;
+			return null;
 		}
 
 		$source_id = LangInterface::get_post_source( $post_id );
@@ -102,7 +160,7 @@ class YoastDuplicatePost {
 				error_log( print_r( 'CreateTranslation - set source original failed', true ) );
 				wp_delete_post( $new_post_id, true );
 				// TODO: What to do when this happens.
-				return;
+				return null;
 			}
 		}
 
@@ -110,19 +168,18 @@ class YoastDuplicatePost {
 			error_log( print_r( 'CreateTranslation - set source on translation failed', true ) );
 			wp_delete_post( $new_post_id, true );
 			// TODO: What to do when this happens.
-			return;
+			return null;
 		}
 
 		// Set terms for translation.
-		if ( ! $this->set_translation_terms( $new_post_id, $post_id, $lang_create ) ) {
+		if ( ! $this->set_translation_terms( $new_post_id, $post_id, $target_language ) ) {
 			error_log( print_r( 'CreateTranslation - set translation terms failed', true ) );
 			wp_delete_post( $new_post_id, true );
 			// TODO: What to do when this happens.
-			return;
+			return null;
 		}
 
-		wp_safe_redirect( get_edit_post_link( $new_post_id, '&' ) . "&lang={$lang_create}", 302, 'Unbabble' );
-		exit;
+		return $new_post_id;
 	}
 
 	private function set_filters_for_meta( int $post_id, string $new_lang ) : void {

@@ -40,6 +40,8 @@ class Options {
 
 		$options = wp_parse_args( $options, $defaults );
 
+		$options = self::standardize( $options );
+
 		$errors = self::validate( $options );
 		if ( $errors ) {
 			\add_filter( 'admin_notices', fn () => ( new Admin() )->invalid_options_notice( __( 'loading options', 'unbabble' ), $errors ), 0 );
@@ -127,6 +129,8 @@ class Options {
 
 		$filter_options = \wp_parse_args( $filter_options, self::defaults() );
 
+		$filter_options = self::standardize( $filter_options );
+
 		$errors = self::validate( $filter_options );
 		if ( $errors ) {
 			// TODO: shows up twice if both the loading and the update are invalid.
@@ -155,6 +159,27 @@ class Options {
 		\do_action( 'ubb_options_updated', $filter_options, $options );
 
 		\add_action( 'admin_notices', [ new Admin(), 'options_updated' ], 0 );
+	}
+
+	public static function update_via_api( \WP_REST_Request $request ) {
+		$body = json_decode( $request->get_body(), true );
+		$new_options = self::build_options_from_api( $body );
+
+		$errors = self::validate( $new_options );
+		if ( $errors ) {
+			return $errors;
+		}
+
+		$current_options = self::get();
+		if ( $current_options === $new_options ) {
+			return true;
+		}
+
+		if ( ! \update_option( 'ubb_options', $new_options ) ) {
+			return []; //TODO: errors
+		}
+
+		return true;
 	}
 
 	/**
@@ -291,7 +316,6 @@ class Options {
 				continue;
 			}
 
-
 			// Shouldn't happen.
 			if ( ! isset( $wp_translations[ $ubb_lang ] ) ) {
 				$new_lang_info[ $ubb_lang ] = [ 'locale' => $ubb_lang ];
@@ -304,5 +328,70 @@ class Options {
 
 		update_option( 'ubb_lang_info', $new_lang_info );
 		return $new_lang_info;
+	}
+
+	public static function standardize( array $options ) : array {
+		$standard = $options;
+
+		$standard['post_types'] = array_values( $standard['post_types'] );
+		$standard['taxonomies'] = array_values( $standard['taxonomies'] );
+
+		return $standard;
+	}
+
+	private static function build_options_from_api( array $options ) : array {
+		$current_options = self::get();
+		$new_options     = [];
+
+		// Languages
+		$allowed_languages = array_map(
+			fn ( $language ) => $language['language'],
+			$options['languages']
+		);
+		$hidden_languages = array_map(
+			fn ( $language ) => $language['language'],
+			array_values( array_filter(
+				$options['languages'],
+				fn ( $language ) => ! empty( $language['hidden'] )
+			) )
+		);
+		$default_language = $options['defaultLanguage'];
+
+		// Routing. Keep same routing options if the router is not directory.
+		$router         = $options['routing']['router'];
+		$router_options = $current_options['router_options'];
+		if ( $router === 'directory' ) {
+			$router_options = $options['routing']['router_options'];
+			$router_options['directories'][ $default_language ] = '';
+			foreach ( array_keys( $router_options['directories'] ) as $language ) {
+				if ( is_string( $router_options['directories'][ $language ] ) ) {
+					continue;
+				}
+				$router_options['directories'][ $language ] = '';
+			}
+		}
+
+		// Types.
+		$post_types = $options['postTypes'];
+		$taxonomies = $options['taxonomies'];
+
+		$new_options = [
+			'allowed_languages' => array_unique( $allowed_languages ),
+			'hidden_languages'  => array_unique( $hidden_languages ),
+			'default_language'  => $default_language,
+			'router'            => $router,
+			'router_options'    => $router_options,
+			'post_types'        => array_unique( $post_types ),
+			'taxonomies'        => array_unique( $taxonomies ),
+		];
+
+		$new_options = wp_parse_args(
+			$new_options,
+			self::defaults()
+		);
+
+		$new_options = self::standardize( $new_options );
+
+		return $new_options;
 	}
 }

@@ -5,7 +5,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 use stdClass;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Query;
 
 /**
@@ -36,29 +35,42 @@ class LangFilter {
 	 */
 	public function filter_posts_by_language( string $where, WP_Query $query ) : string {
 		global $wpdb;
+
 		if ( ! $this->allow_filter( $query ) ) {
 			return $where;
 		}
 
-		// TODO: Deal with untranslatable post types.
+		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
+			return $where;
+		}
 
+		$where .= sprintf(
+			" AND (
+				{$wpdb->posts}.ID IN (
+					%s
+				)
+			)",
+			$this->get_lang_filter_where_query()
+		);
+
+		return $where;
+	}
+
+	public function get_lang_filter_where_query() : string {
+		global $wpdb;
+
+		// TODO: Deal with untranslatable post types.
 		$current_lang            = \esc_sql( LangInterface::get_current_language() );
 		$post_lang_table         = ( new PostTable() )->get_table_name();
 		$translatable_post_types = implode( "','", LangInterface::get_translatable_post_types() );
 
-		$where .= " AND (
-			{$wpdb->posts}.ID IN (
-				SELECT post_id
-				FROM {$post_lang_table} AS PT
-				WHERE locale = '{$current_lang}'
-				UNION
-				SELECT ID
-				FROM {$wpdb->posts}
-				WHERE post_type NOT IN ('{$translatable_post_types}')
-			)
-		)";
-
-		return $where;
+		return "SELECT post_id
+			FROM {$post_lang_table} AS PT
+			WHERE locale = '{$current_lang}'
+			UNION
+			SELECT ID
+			FROM {$wpdb->posts}
+			WHERE post_type NOT IN ('{$translatable_post_types}')";
 	}
 
 	/**
@@ -144,6 +156,8 @@ class LangFilter {
 				$post_type = '';
 			} else if ( is_string( current( $post_type ) ) ) {
 				$post_type = current( $post_type );
+			} else {
+				return false;
 			}
 		}
 

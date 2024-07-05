@@ -19,13 +19,18 @@ class NewTerm {
 	 * @since 0.0.1
 	 */
 	public function register() {
+		add_action( 'admin_init', [ $this, 'add_actions_for_term_create' ] );
+		add_action( 'rest_api_init', [ $this, 'add_actions_for_term_create' ] );
+
+		// Check if a term's slug already existed when being inserted due to the language filter applied to terms.
+		\add_filter( 'pre_insert_term', [ $this, 'check_term_slug_exists' ], 10, 3 );
+	}
+
+	public function add_actions_for_term_create() : void {
 		$taxonomies = array_intersect( \get_taxonomies(), LangInterface::get_translatable_taxonomies() );
 		foreach ( $taxonomies as $taxonomy ) {
 			\add_action( "create_{$taxonomy}", [ $this, 'new_term_ajax' ] );
 		}
-
-		// Check if a term's slug already existed when being inserted due to the language filter applied to terms.
-		\add_filter( 'pre_insert_term', [ $this, 'check_term_slug_exists' ], 10, 3 );
 	}
 
 	/**
@@ -37,7 +42,15 @@ class NewTerm {
 	 * @return void
 	 */
 	public function new_term_ajax( int $term_id ) : void {
-		if ( ( $_POST['action'] ?? '' ) !== 'add-category' ) {
+		if (
+			! (
+				defined( 'DOING_AJAX' )
+				&& DOING_AJAX
+				&& str_starts_with( $_POST['action'] ?? '' , 'add-' )
+			)
+			&& ! ( defined( 'REST_REQUEST' ) && REST_REQUEST )
+			&& $_POST['action'] !== 'editpost'
+		) {
 			return;
 		}
 

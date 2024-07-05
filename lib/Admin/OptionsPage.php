@@ -14,16 +14,48 @@ class OptionsPage {
 	 */
 	public function register() {
 
-		// Only show options page on debug mode for now.
-		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+		// Show options page on debug mode or for admins.
+		if (
+			! \current_user_can( 'manage_options' )
+			&& ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG )
+		) {
 			return;
 		}
+
 		\add_action( 'admin_menu', [ $this, 'add_options_page' ] );
 		\add_action( 'admin_init', [ $this, 'add_options_to_page' ] );
 	}
 
 	public function add_options_page() {
-		\add_options_page( 'Unbabble', 'Unbabble', 'manage_options', 'unbabble', [ $this, 'page_output' ], null );
+		\add_menu_page(
+			'Unbabble',
+			'Unbabble',
+			'manage_options',
+			'unbabble_options',
+			[ $this, 'options_page_output' ],
+			'dashicons-translation',
+			100
+		);
+
+		\add_submenu_page(
+			'unbabble_options',
+			'Settings',
+			'Settings',
+			'manage_options',
+			'unbabble_options',
+			[ $this, 'options_page_output' ],
+			101
+		);
+
+		\add_submenu_page(
+			'unbabble_options',
+			'Actions',
+			'Actions',
+			'manage_options',
+			'unbabble_actions',
+			[ $this, 'actions_page_output' ],
+			101
+		);
 	}
 
 	public function add_options_to_page() {
@@ -44,16 +76,9 @@ class OptionsPage {
 		// TODO: Field for directory names.
 	}
 
-	public function page_output() {
+	public function options_page_output() {
 		?>
-		<h2>Unbabble Settings</h2>
-		<form action="options.php" method="post">
-			<?php
-			\settings_fields( 'ubb_options' );
-			\do_settings_sections( 'unbabble' );
-			?>
-			<input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
-		</form>
+		<div id="ubb-options-page"></div>
 		<?php
 	}
 

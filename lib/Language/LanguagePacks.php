@@ -52,5 +52,9 @@ class LanguagePacks {
 				error_log( "Failure to download language pack for language {$lang_code}." );
 			}
 		}
+
+		// TODO: if the language is not recognized by WordPress, remove from options.
+		// TODO: Add notices.
+		// TODO: Keep an option with the list of languages on WordPress. in LangInterface get_languages, check if its in this option. Remove if not.
 	}
 }
