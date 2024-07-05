@@ -21,7 +21,7 @@ class Options {
 	/**
 	 * Returns the Unbabble options.
 	 *
-	 * @since Unreleased - added fetching for multisite blogs.
+	 * @since 0.4.1 - added fetching for multisite blogs.
 	 * @since 0.0.1
 	 *
 	 * @param array $args {
@@ -388,7 +388,7 @@ class Options {
 	/**
 	 * Fetches the options value from the database.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.1
 	 *
 	 * @param  ?int $blog_id
 	 * @return mixed

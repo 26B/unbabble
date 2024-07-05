@@ -1262,7 +1262,7 @@ class LangInterface {
 	 * This function is a workaround to check for a user session when the routing language check
 	 * runs too early for WordPress to have the user session already fetched and validated.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.1
 	 *
 	 * @return bool
 	 */
