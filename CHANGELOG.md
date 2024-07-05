@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Fetching Unbbable's options value from other blogs (#43).
+
 ### Fixed
 
 - Validating user session directly to show hidden languages (#76).

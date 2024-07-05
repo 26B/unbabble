@@ -21,20 +21,34 @@ class Options {
 	/**
 	 * Returns the Unbabble options.
 	 *
+	 * @since Unreleased - added fetching for multisite blogs.
 	 * @since 0.0.1
 	 *
+	 * @param array $args {
+	 * 		Optional arguments.
+	 *
+	 *		@type int $blog_id The blog id to fetch the options from.
+	 * }
 	 * @return array
 	 */
-	public static function get() : array {
-		if ( self::$options !== null ) {
+	public static function get( array $args = [] ) : array {
+		$blog_id = is_int( $args['blog_id'] ?? null ) ? $args['blog_id'] : null;
+
+		// Load from static if already loaded, and no blog_id is provided.
+		if ( $blog_id === null && self::$options !== null ) {
 			return self::$options;
 		}
 
 		$defaults = self::defaults();
-		$options  = \get_option( 'ubb_options' );
+		$options  = self::fetch_options_value( $blog_id );
 
 		if ( ! is_array( $options ) ) {
-			self::$options = $defaults;
+
+			// Save defaults to static if no blog_id is provided.
+			if ( $blog_id === null ) {
+				self::$options = $defaults;
+			}
+
 			return $defaults;
 		}
 
@@ -45,11 +59,20 @@ class Options {
 		$errors = self::validate( $options );
 		if ( $errors ) {
 			\add_filter( 'admin_notices', fn () => ( new Admin() )->invalid_options_notice( __( 'loading options', 'unbabble' ), $errors ), 0 );
-			self::$options = $defaults;
+
+			// Save defaults to static if no blog_id is provided.
+			if ( $blog_id === null ) {
+				self::$options = $defaults;
+			}
+
 			return $defaults;
 		}
 
-		self::$options = $options;
+		// Save to static if no blog_id is provided.
+		if ( $blog_id === null ) {
+			self::$options = $options;
+		}
+
 		return $options;
 	}
 
@@ -360,5 +383,39 @@ class Options {
 		$new_options = self::standardize( $new_options );
 
 		return $new_options;
+	}
+
+	/**
+	 * Fetches the options value from the database.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param  ?int $blog_id
+	 * @return mixed
+	 */
+	private static function fetch_options_value( ?int $blog_id = null ) : mixed {
+		global $wpdb;
+		if ( $blog_id === null || ! \is_multisite() ) {
+			return \get_option( 'ubb_options' );
+		}
+
+		switch_to_blog( $blog_id );
+
+		$options = $wpdb->get_results(
+			"SELECT option_name, option_value
+				FROM {$wpdb->options}
+				WHERE option_name IN ('active_plugins','ubb_options')",
+			OBJECT_K
+		);
+
+		restore_current_blog();
+
+		$active_plugins = maybe_unserialize( $options['active_plugins']->option_value ?? [] );
+		if ( ! in_array( 'unbabble/unbabble.php', $active_plugins, true ) ) {
+			return null;
+		}
+
+		$ubb_options = maybe_unserialize( $options['ubb_options']->option_value ?? [] );
+		return empty( $ubb_options ) ? null : $ubb_options;
 	}
 }
