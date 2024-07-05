@@ -38,8 +38,8 @@ class LangInterface {
 			return $allowed_languages;
 		}
 
-		// Don't filter language when the user is a high level user.
-		if ( function_exists( 'wp_get_current_user' ) && \current_user_can( 'manage_options' ) ) {
+		// Don't filter language when the user is logged in.
+		if ( self::user_is_logged_in() ) {
 			return $allowed_languages;
 		}
 
@@ -1254,5 +1254,24 @@ class LangInterface {
 		if ( ! $status ) {
 			// TODO: log.
 		}
+	}
+
+	/**
+	 * Returns whether a user is logged in via the session cookie.
+	 *
+	 * This function is a workaround to check for a user session when the routing language check
+	 * runs too early for WordPress to have the user session already fetched and validated.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return bool
+	 */
+	private static function user_is_logged_in() : bool {
+		require_once ABSPATH . WPINC . '/user.php';
+		require_once ABSPATH . WPINC . '/pluggable.php';
+		if ( ! function_exists( 'wp_validate_logged_in_cookie' ) ) {
+			return false;
+		}
+		return is_int( \wp_validate_logged_in_cookie( false ) );
 	}
 }
