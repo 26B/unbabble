@@ -104,7 +104,6 @@ class AdminNotices {
 			return;
 		}
 
-		// TODO: link to actions.
 		$message = _n(
 			'There is %1$s post without language or with an unknown language. <a href="%2$s">See post</a>',
 			'There are %1$s posts without language or with an unknown language. <a href="%2$s">See posts</a>',
@@ -112,8 +111,7 @@ class AdminNotices {
 			'unbabble'
 		);
 
-		$url       = add_query_arg( 'ubb_empty_lang_filter', '', parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
-		$post_type = \get_post_type();
+		$url = add_query_arg( 'ubb_empty_lang_filter', '', parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
 		if ( $post_type !== 'post' ) {
 			$url = add_query_arg( 'post_type', $post_type, $url );
 		}

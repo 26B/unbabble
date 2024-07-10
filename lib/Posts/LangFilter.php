@@ -40,10 +40,6 @@ class LangFilter {
 			return $where;
 		}
 
-		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
-			return $where;
-		}
-
 		$where .= sprintf(
 			" AND (
 				{$wpdb->posts}.ID IN (

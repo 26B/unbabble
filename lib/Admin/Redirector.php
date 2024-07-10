@@ -129,6 +129,12 @@ class Redirector {
 			return;
 		}
 
+		// If the language is not in the allowed languages, do nothing so user can fix it.
+		$languages = LangInterface::get_languages();
+		if ( ! in_array( $term_lang, $languages, true ) ) {
+			return;
+		}
+
 		wp_safe_redirect( add_query_arg( 'lang', $term_lang, get_edit_term_link( $_REQUEST['tag_ID'], '', '&' ) ) );
 		exit;
 	}

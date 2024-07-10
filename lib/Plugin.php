@@ -170,6 +170,7 @@ class Plugin {
 			'terms_language_filter'    => Terms\LangFilter::class,
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
+			'terms_edit_filter'        => Terms\EditFilters::class,
 
 			'locale'        => Language\Locale::class,
 			'lang_packages' => Language\LanguagePacks::class,

@@ -2,7 +2,6 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
-use stdClass;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use WP_Query;
@@ -20,8 +19,20 @@ class EditFilters {
 	 * @since 0.0.1
 	 */
 	public function register() {
+		if ( ! \is_admin() ) {
+
+			// Make sure the filter is not applied outside of admin.
+			unset( $_GET['ubb_empty_lang_filter'] );
+			return;
+		}
+
 		\add_filter( 'views_edit-post', [ $this, 'add_no_lang_filter' ], 10 );
-		\add_filter( 'posts_where', [ $this, 'filter_posts_without_language' ], 10, 2 );
+
+		// Only add this filter if the post filter is set in $_GET
+		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
+			\add_filter( 'posts_where', [ $this, 'filter_posts_without_language' ], 10, 2 );
+			\add_filter( 'ubb_use_post_lang_filter', '__return_false' );
+		}
 	}
 
 	public function add_no_lang_filter( array $views ) : array {
@@ -35,16 +46,26 @@ class EditFilters {
 			return $views;
 		}
 
-		$post_lang_table        = ( new PostTable() )->get_table_name();
-		$posts_without_language = $wpdb->get_var(
-			"SELECT COUNT( * )
-			FROM {$wpdb->posts}
-			WHERE post_type = '{$post_type}'
-			AND ID NOT IN ( SELECT post_id FROM {$post_lang_table} )"
+		$post_lang_table   = ( new PostTable() )->get_table_name();
+		$allowed_languages = implode( "','", LangInterface::get_languages() );
+		if ( empty( $allowed_languages ) ) {
+			return $views;
+		}
+
+		// TODO: Improve query, we don't need the valid count.
+		$posts_count = $wpdb->get_results(
+			"SELECT IF(UBB.locale IN ('{$allowed_languages}'), 'VALID', 'INVALID') as good_locale, COUNT( * ) as count
+				FROM {$wpdb->posts} AS P
+				LEFT JOIN {$post_lang_table} AS UBB ON (P.ID = UBB.post_id)
+				WHERE P.post_type = '{$post_type}'
+				GROUP BY good_locale",
+			OBJECT_K
 		);
 
-		$url       = \add_query_arg( 'ubb_empty_lang_filter', '', 'edit.php' );
-		$post_type = \get_post_type();
+		$valid_count   = $posts_count['VALID']->count ?? 0;
+		$invalid_count = $posts_count['INVALID']->count ?? 0;
+
+		$url = \add_query_arg( 'ubb_empty_lang_filter', '', 'edit.php' );
 		if ( $post_type !== 'post' ) {
 			$url = \add_query_arg( 'post_type', $post_type, $url );
 		}
@@ -56,7 +77,7 @@ class EditFilters {
 			$selected ? 'class="current"' : '',
 			esc_url( $url ),
 			esc_html__( 'No Language', 'unbabble' ),
-			(int) $posts_without_language
+			(int) $invalid_count
 		);
 
 		return $views;
@@ -75,13 +96,18 @@ class EditFilters {
 			return $where;
 		}
 
-		$post_lang_table = ( new PostTable() )->get_table_name();
+		$post_lang_table   = ( new PostTable() )->get_table_name();
+		$allowed_languages = implode( "','", LangInterface::get_languages() );
+		if ( empty( $allowed_languages ) ) {
+			return $where;
+		}
 
 		$where .= sprintf(
 			" AND (
 				{$wpdb->posts}.ID NOT IN (
 					SELECT post_id
 					FROM {$post_lang_table} AS PT
+					WHERE locale IN ('{$allowed_languages}')
 				)
 			)",
 		);
