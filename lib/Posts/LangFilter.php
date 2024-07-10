@@ -27,6 +27,7 @@ class LangFilter {
 	/**
 	 * Adds where clauses to query in order to filters posts by language, if necessary.
 	 *
+	 * @since Unreleased Remove posts with bad language filter check. Now done directly via the filter `ubb_use_post_lang_filter` hook.
 	 * @since 0.0.1
 	 *
 	 * @param string   $where
@@ -37,10 +38,6 @@ class LangFilter {
 		global $wpdb;
 
 		if ( ! $this->allow_filter( $query ) ) {
-			return $where;
-		}
-
-		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
 			return $where;
 		}
 

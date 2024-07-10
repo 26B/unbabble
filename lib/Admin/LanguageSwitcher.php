@@ -70,7 +70,7 @@ class LanguageSwitcher {
 		$wp_admin_bar->add_node(
 			[
 				'id'    => 'ubb_lang_switcher',
-				'title' => $current_label,
+				'title' => "<span style='display: inline-block; vertical-align: middle; margin-right: 5px; height: 24px;' class='dashicons-before dashicons-translation'></span>{$current_label}",
 			]
 		);
 

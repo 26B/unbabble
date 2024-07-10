@@ -235,6 +235,8 @@ class Post {
 
 			$language = LangInterface::get_post_language( $post_id );
 
+			// TODO: if language is empty, return error message
+
 			$page = $request->get_param( 'page' );
 			if ( ! is_numeric( $page ) ) {
 				$page = 1;

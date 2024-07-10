@@ -135,6 +135,7 @@ class Plugin {
 	/**
 	 * Register all of the hooks related to the plugin's base functionality.
 	 *
+	 * @since Unreleased - Added Terms Edit Filters.
 	 * @since  0.0.1
 	 * @access private
 	 */
@@ -170,6 +171,7 @@ class Plugin {
 			'terms_language_filter'    => Terms\LangFilter::class,
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
+			'terms_edit_filter'        => Terms\EditFilters::class,
 
 			'locale'        => Language\Locale::class,
 			'lang_packages' => Language\LanguagePacks::class,

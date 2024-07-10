@@ -57,6 +57,7 @@ class LangMetaBox {
 	/**
 	 * Prints metabox for when a new term is being created.
 	 *
+	 * @since Unreleased Add new `print_language_select` argument.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -69,7 +70,7 @@ class LangMetaBox {
 				<p>%3$s</p>
 			</div>',
 			esc_html__( 'Language', 'unbabble' ),
-			$this->print_language_select( 'ubb_lang', LangInterface::get_current_language(), LangInterface::get_languages(), 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
+			$this->print_language_select( 'ubb_lang', LangInterface::get_current_language(), LangInterface::get_languages(), 'ubb_language_metabox_nonce', 'ubb_language_metabox', false, true ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' )
 		);
 
@@ -84,6 +85,7 @@ class LangMetaBox {
 	/**
 	 * Prints metabox for when an existing term is being edited.
 	 *
+	 * @since Unreleased Add new `print_language_select` argument. Check for bad language and stop showing create and link translations if so.
 	 * @since 0.0.1
 	 *
 	 * @param WP_Term $term
@@ -169,14 +171,19 @@ class LangMetaBox {
 				</td>
 			</tr>',
 			esc_html__( 'Language', 'unbabble' ),
-			$this->print_language_select( 'ubb_lang', $lang, LangInterface::get_languages(), 'ubb_language_metabox_nonce', 'ubb_language_metabox', false ),
+			$this->print_language_select( 'ubb_lang', $lang, LangInterface::get_languages(), 'ubb_language_metabox_nonce', 'ubb_language_metabox', false, true ),
 			esc_html__( 'The term only appears on the site for this language.', 'unbabble' ),
 			esc_html__( 'Changing the language will remove all the relationships to posts that do not have the destination language.', 'unbabble' ),
 			esc_html__( 'Translations', 'unbabble' ),
 			$translations_string,
 		);
 
-		if ( is_string( $lang ) && ! empty( $available_languages ) ) {
+		$bad_language = false;
+		if ( ! empty( $lang ) || ! in_array( $lang, LangInterface::get_languages() ) ) {
+			$bad_language = true;
+		}
+
+		if ( ! $bad_language && is_string( $lang ) && ! empty( $available_languages ) ) {
 			printf(
 				'<tr class="form-field term-language-wrap-2">
 					<th scope="row"><label for="language">%1$s</label></th>
@@ -187,12 +194,12 @@ class LangMetaBox {
 					</td>
 				</tr>',
 				esc_html__( 'Create Translation', 'unbabble' ),
-				$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false ),
+				$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false, false ),
 			);
 		}
 
 		// Linking.
-		if ( is_string( $lang ) ) {
+		if ( ! $bad_language && is_string( $lang ) ) {
 			$options = array_reduce(
 				$this->get_possible_links( $term, $lang ),
 				fn ( $carry, $data ) => $carry . sprintf( "<option value='%s'>%s</option>\n", $data[0], $data[1] ),
@@ -244,6 +251,7 @@ class LangMetaBox {
 	/**
 	 * Print language select for the language metabox.
 	 *
+	 * @since Unreleased Add new argument for if this is the main select. Add handling for missing or unknown language.
 	 * @since 0.0.1
 	 * @todo duplicated in Posts/LangMetaBox
 	 *
@@ -255,24 +263,48 @@ class LangMetaBox {
 	 * @param  $echo
 	 * @return string
 	 */
-	private function print_language_select( string $name, $selected, $options, string $nonce_action, string $nonce_name, $echo = true ) : string {
-		$create_mode = is_numeric( $_GET['ubb_source'] ?? '' );
+	private function print_language_select( string $name, $selected, $allowed_languages, string $nonce_action, string $nonce_name, $echo = true, bool $main_select = false ) : string {
+		$create_mode   = is_numeric( $_GET['ubb_source'] ?? '' );
+		$error_message = '';
+		$lang_info     = Options::get_languages_info();
+
+		$options = [];
+		foreach ( array_values( $allowed_languages ) as $language ) {
+			if ( empty( $language ) ) {
+				continue;
+			}
+
+			if ( ! isset( $lang_info[ $language ] ) ) {
+				continue;
+			}
+
+			$options[ $language ] = sprintf( '%s (%s)', $lang_info[ $language ]['native_name'], $language );
+		}
+
+		if ( ! is_string( $selected ) || empty( $selected ) ) {
+			$options = array_merge( [ '' => __( 'Select Language', 'unbabble' ) ], $options );
+			$error_message = '<p style="color:FireBrick">Missing language. Please select a language from the list.</p>';
+		} else if ( $main_select && ! isset( $options[ $selected ] ) ) {
+			$options = array_merge( [ '' => sprintf( __( 'Unknown language: %s', 'unbabble' ), $selected ) ], $options );
+			$error_message = '<p style="color:FireBrick">Unknown language. Please select a language from the list.</p>';
+		}
+
 		$langs       = array_map(
 			function ( $text, $lang ) use ( $selected, $create_mode ) {
 				if ( is_int( $text ) ) {
 					$text = $lang;
 				}
-				$selected_str = \selected( $lang, $selected, false );
+				$selected_str = empty( $lang ) ? \selected( true, true, false ) : \selected( $lang, $selected, false );
 				return sprintf(
 					'<option value="%1$s" %2$s %3$s>%4$s</option>',
 					$lang,
 					$selected_str,
-					$create_mode && empty( $selected_str ) ? 'disabled' : '',
+					empty( $lang ) || ( $create_mode && empty( $selected_str ) ) ? 'disabled' : '',
 					$text
 				);
 			},
-			is_string( $selected ) ? array_keys( $options ) : array_merge( [ __( 'Select Language', 'unbabble' ) ], array_keys( $options ) ),
-			is_string( $selected ) ? $options : array_merge( [ '' ], $options )
+			array_values( $options ),
+			array_keys( $options )
 		);
 
 		if ( ! empty( $nonce_action ) && ! empty( $nonce_name ) ) {
@@ -282,9 +314,11 @@ class LangMetaBox {
 		$output = sprintf(
 			'<select id="%1$s" name="%1$s">
 				%2$s
-			</select>',
+			</select>
+			%3$s',
 			$name,
-			implode( '', $langs )
+			implode( '', $langs ),
+			$main_select ? $error_message : ''
 		);
 
 		return ! $echo ? $output : printf( $output );

@@ -123,6 +123,8 @@ const Language = () => {
 				.includes(lang)
 	);
 
+	const badLanguage = language !== null && !languages.includes(language);
+
 	return (
 		<LangContext.Provider
 			value={{
@@ -138,24 +140,24 @@ const Language = () => {
 		>
 			<PostLanguage />
 			<ListTranslations />
-			{untranslatedLangs.length > 0 && (
+			{!badLanguage && untranslatedLangs.length > 0 && (
 				<>
 					<hr />
 					<CreateTranslations />
 				</>
 			)}
-			<hr />
-			<p
-				style={{
-					textTransform: 'uppercase',
-					fontSize: 11,
-					fontWeight: 500,
-				}}
-			>
-				linking
-			</p>
-			{translatedLangs.length < 1 && (
+			{!badLanguage && translatedLangs.length < 1 && (
 				<>
+					<hr />
+					<p
+						style={{
+							textTransform: 'uppercase',
+							fontSize: 11,
+							fontWeight: 500,
+						}}
+					>
+						linking
+					</p>
 					<p>
 						This post currently has no translation group. You can
 						link it to existing posts in other languages.
@@ -165,6 +167,16 @@ const Language = () => {
 			)}
 			{translatedLangs.length > 0 && (
 				<>
+					<hr />
+					<p
+						style={{
+							textTransform: 'uppercase',
+							fontSize: 11,
+							fontWeight: 500,
+						}}
+					>
+						linking
+					</p>
 					<p>
 						This post is currently in a translation group. If you
 						wish to change, you must first unlink from the current

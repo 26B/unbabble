@@ -47,6 +47,7 @@ class Customize {
 	/**
 	 * Add lang metaboxes to nav menu edit.
 	 *
+	 * @since Unreleased Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
 	 * @since 0.0.3
 	 *
 	 * @return void
@@ -65,11 +66,13 @@ class Customize {
 		// TODO: Using term meta box has its problems, refactor into a better system of metaboxing.
 		ob_start();
 		( new Terms\LangMetaBox() )->edit_term_language_metabox( get_term( $menu_id ) );
-		$term_meta_box = ob_get_flush();
+		$term_meta_box = ob_get_clean();
 
 		$html  = '<div class="ubb-menu-settings">';
 		$html .= '<h3>' . __( 'Language' ) . '</h3>';
+		$html .= '<table><tbody>';
 		$html .= $term_meta_box;
+		$html .= '</tbody></table>';
 		$html .= '</div>';
 
 		$html = str_replace( [ "\t", "\n" ], '', $html );

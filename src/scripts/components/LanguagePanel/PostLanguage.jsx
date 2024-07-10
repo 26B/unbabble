@@ -7,6 +7,7 @@ import {
 	SelectControl,
 	Flex,
 	FlexItem,
+	Tooltip,
 } from '@wordpress/components';
 import useChangeLanguagePost from '../../hooks/useChangeLanguagePost';
 
@@ -20,7 +21,11 @@ const PostLanguage = ({
 	postId,
 }) => {
 	const [isEditOpen, setIsEditOpen] = useState(false);
-	const [editLanguage, setEditLanguage] = useState(postLanguage);
+	const [editLanguage, setEditLanguage] = useState(
+		postLanguage === null || !languages.includes(postLanguage)
+			? null
+			: postLanguage
+	);
 	const { mutate, isLoading, isError } = useChangeLanguagePost(postId);
 
 	const openEdit = () => setIsEditOpen(true);
@@ -50,6 +55,8 @@ const PostLanguage = ({
 		};
 	});
 
+	let langLabel = null;
+	let showUnknownError = false;
 	if (postLanguage === null) {
 		languageOptions = [
 			{
@@ -59,12 +66,23 @@ const PostLanguage = ({
 			},
 			...languageOptions,
 		];
+		langLabel = 'Select a language';
+	} else if (!languages.includes(postLanguage)) {
+		languageOptions = [
+			{
+				label: 'Select a language',
+				value: '',
+				disabled: false,
+			},
+			...languageOptions,
+		];
+		langLabel = `Unknown language ${postLanguage}`;
+		showUnknownError = true;
 	}
 
-	const langLabel =
-		postLanguage === null
-			? 'Select a language'
-			: `${languagesInfo[postLanguage].native_name} (${postLanguage})`;
+	if (langLabel === null) {
+		langLabel = `${languagesInfo[postLanguage].native_name} (${postLanguage})`;
+	}
 
 	return (
 		<PanelRow>
@@ -76,7 +94,22 @@ const PostLanguage = ({
 						width: '100%',
 					}}
 				>
-					<span style={{ gridColumn: '1/2' }}>{langLabel}</span>
+					<span style={{ gridColumn: '1/2' }}>
+						{showUnknownError && (
+							<span style={{ marginRight: '4px' }}>
+								<Tooltip
+									text="This language is not set in the Unbabble options. Please select a correct language."
+									delay="500"
+								>
+									<span
+										className="dashicons dashicons-warning"
+										style={{ color: 'FireBrick' }}
+									></span>
+								</Tooltip>
+							</span>
+						)}
+						{langLabel}
+					</span>
 					<Button
 						style={{ gridColumn: '2/2' }}
 						variant="link"

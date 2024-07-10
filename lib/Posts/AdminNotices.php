@@ -58,6 +58,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice for when there's posts with missing languages or with an unknown language.
 	 *
+	 * @since Unreleased Remove TODO and duplicate $post_type.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -104,7 +105,6 @@ class AdminNotices {
 			return;
 		}
 
-		// TODO: link to actions.
 		$message = _n(
 			'There is %1$s post without language or with an unknown language. <a href="%2$s">See post</a>',
 			'There are %1$s posts without language or with an unknown language. <a href="%2$s">See posts</a>',
@@ -112,8 +112,7 @@ class AdminNotices {
 			'unbabble'
 		);
 
-		$url       = add_query_arg( 'ubb_empty_lang_filter', '', parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
-		$post_type = \get_post_type();
+		$url = add_query_arg( 'ubb_empty_lang_filter', '', parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
 		if ( $post_type !== 'post' ) {
 			$url = add_query_arg( 'post_type', $post_type, $url );
 		}
@@ -128,6 +127,13 @@ class AdminNotices {
 		);
 	}
 
+	/**
+	 * Adds an admin notice explaining the post filter for unknown or missing languages.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @return void
+	 */
 	public function post_missing_language_filter_explanation() : void {
 		$screen = get_current_screen();
 		if (

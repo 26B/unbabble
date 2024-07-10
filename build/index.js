@@ -2423,6 +2423,7 @@ const Language = () => {
   const languages = (0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('languages', {});
   const languagesInfo = (0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('languagesInfo', {});
   const untranslatedLangs = languages.filter(lang => (language === null || lang !== language) && !translatedLangs.map(translatedLang => translatedLang.language).includes(lang));
+  const badLanguage = language !== null && !languages.includes(language);
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_contexts_LangContext__WEBPACK_IMPORTED_MODULE_5__["default"].Provider, {
     value: {
       currentLang,
@@ -2434,13 +2435,19 @@ const Language = () => {
       untranslatedLangs,
       refetchLangs: refetch
     }
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_PostLanguage__WEBPACK_IMPORTED_MODULE_6__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_ListTranslations__WEBPACK_IMPORTED_MODULE_7__["default"], null), untranslatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_CreateTranslations__WEBPACK_IMPORTED_MODULE_2__["default"], null)), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_PostLanguage__WEBPACK_IMPORTED_MODULE_6__["default"], null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_ListTranslations__WEBPACK_IMPORTED_MODULE_7__["default"], null), !badLanguage && untranslatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_CreateTranslations__WEBPACK_IMPORTED_MODULE_2__["default"], null)), !badLanguage && translatedLangs.length < 1 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
     style: {
       textTransform: 'uppercase',
       fontSize: 11,
       fontWeight: 500
     }
-  }, "linking"), translatedLangs.length < 1 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "This post currently has no translation group. You can link it to existing posts in other languages."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_LinkTranslations__WEBPACK_IMPORTED_MODULE_9__["default"], null)), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "This post is currently in a translation group. If you wish to change, you must first unlink from the current group."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_UnlinkTranslations__WEBPACK_IMPORTED_MODULE_8__["default"], null)));
+  }, "linking"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "This post currently has no translation group. You can link it to existing posts in other languages."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_LinkTranslations__WEBPACK_IMPORTED_MODULE_9__["default"], null)), translatedLangs.length > 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("hr", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    style: {
+      textTransform: 'uppercase',
+      fontSize: 11,
+      fontWeight: 500
+    }
+  }, "linking"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "This post is currently in a translation group. If you wish to change, you must first unlink from the current group."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_UnlinkTranslations__WEBPACK_IMPORTED_MODULE_8__["default"], null)));
 };
 /* harmony default export */ __webpack_exports__["default"] = (Language);
 
@@ -2855,7 +2862,7 @@ const PostLanguage = _ref => {
     postId
   } = _ref;
   const [isEditOpen, setIsEditOpen] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false);
-  const [editLanguage, setEditLanguage] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(postLanguage);
+  const [editLanguage, setEditLanguage] = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(postLanguage === null || !languages.includes(postLanguage) ? null : postLanguage);
   const {
     mutate,
     isLoading,
@@ -2881,14 +2888,27 @@ const PostLanguage = _ref => {
       disabled: (postLanguage === null || lang !== postLanguage) && translatedLangs.find(translatedLang => translatedLang.language === lang) !== undefined
     };
   });
+  let langLabel = null;
+  let showUnknownError = false;
   if (postLanguage === null) {
     languageOptions = [{
       label: 'Select a language',
       value: '',
       disabled: false
     }, ...languageOptions];
+    langLabel = 'Select a language';
+  } else if (!languages.includes(postLanguage)) {
+    languageOptions = [{
+      label: 'Select a language',
+      value: '',
+      disabled: false
+    }, ...languageOptions];
+    langLabel = `Unknown language ${postLanguage}`;
+    showUnknownError = true;
   }
-  const langLabel = postLanguage === null ? 'Select a language' : `${languagesInfo[postLanguage].native_name} (${postLanguage})`;
+  if (langLabel === null) {
+    langLabel = `${languagesInfo[postLanguage].native_name} (${postLanguage})`;
+  }
   return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.PanelRow, null, !isEditOpen && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     style: {
       display: 'grid',
@@ -2899,7 +2919,19 @@ const PostLanguage = _ref => {
     style: {
       gridColumn: '1/2'
     }
-  }, langLabel), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+  }, showUnknownError && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+    style: {
+      marginRight: '4px'
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Tooltip, {
+    text: "This language is not set in the Unbabble options. Please select a correct language.",
+    delay: "500"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+    className: "dashicons dashicons-warning",
+    style: {
+      color: 'FireBrick'
+    }
+  }))), langLabel), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
     style: {
       gridColumn: '2/2'
     },
