@@ -360,7 +360,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.1...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.4.2...HEAD
+[0.4.2]: https://github.com/26b/unbabble/compare/0.4.1...0.4.2
 [0.4.1]: https://github.com/26b/unbabble/compare/0.4.0...0.4.1
 [0.4.0]: https://github.com/26b/unbabble/compare/0.3.1...0.4.0
 [0.3.1]: https://github.com/26b/unbabble/compare/0.3.0...0.3.1
