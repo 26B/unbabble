@@ -110,7 +110,7 @@ class Redirector {
 	/**
 	 * Redirect if the current language is not the correct one for the current term.
 	 *
-	 * @since Unreleased Don't redirect when term lang is not in allowed languages to allow the user to fix it.
+	 * @since 0.4.2 Don't redirect when term lang is not in allowed languages to allow the user to fix it.
 	 * @since 0.0.1
 	 *
 	 * @return void

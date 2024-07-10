@@ -135,7 +135,7 @@ class Plugin {
 	/**
 	 * Register all of the hooks related to the plugin's base functionality.
 	 *
-	 * @since Unreleased - Added Terms Edit Filters.
+	 * @since 0.4.2 - Added Terms Edit Filters.
 	 * @since  0.0.1
 	 * @access private
 	 */

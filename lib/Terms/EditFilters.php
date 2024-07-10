@@ -9,7 +9,7 @@ use WP_Query;
 /**
  * Hooks for filters for the list of terms in the backoffice.
  *
- * @since Unreleased
+ * @since 0.4.2
  */
 class EditFilters {
 
@@ -20,7 +20,7 @@ class EditFilters {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.2
 	 */
 	public function register() {
 		if ( ! \is_admin() ) {
@@ -49,7 +49,7 @@ class EditFilters {
 	/**
 	 * Adds a filter to show terms without language.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.2
 	 *
 	 * @param array $views
 	 * @param string $taxonomy
@@ -123,7 +123,7 @@ class EditFilters {
 	 * Tries to add an filter entry to main term query's query vars in order for the method
 	 * `filter_terms_without_language` to be able to filter the terms for only the main query.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.2
 	 *
 	 * @param WP_Term_Query $query
 	 * @return void
@@ -156,7 +156,7 @@ class EditFilters {
 	/**
 	 * Adds a filter to show terms without language.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.2
 	 *
 	 * @param array $pieces
 	 * @param array $taxonomies
@@ -192,7 +192,7 @@ class EditFilters {
 	/**
 	 * Returns whether the filtering of term should happen.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.2
 	 *
 	 * @param WP_Query $query
 	 * @return bool
@@ -205,7 +205,7 @@ class EditFilters {
 		/**
 		 * Filters whether terms should be filtered by having an unknown language or having no language.
 		 *
-		 * @since Unreleased
+		 * @since 0.4.2
 		 *
 		 * @param bool $apply_filter
 		 * @param array $pieces

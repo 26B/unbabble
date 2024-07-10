@@ -58,7 +58,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice for when there's posts with missing languages or with an unknown language.
 	 *
-	 * @since Unreleased Remove TODO and duplicate $post_type.
+	 * @since 0.4.2 Remove TODO and duplicate $post_type.
 	 * @since 0.0.1
 	 *
 	 * @return void

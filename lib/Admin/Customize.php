@@ -47,7 +47,7 @@ class Customize {
 	/**
 	 * Add lang metaboxes to nav menu edit.
 	 *
-	 * @since Unreleased Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
+	 * @since 0.4.2 Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
 	 * @since 0.0.3
 	 *
 	 * @return void

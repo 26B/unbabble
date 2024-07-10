@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2024-07-10
+
 ### Added
 
 - Filter for terms without language or unknown languages in the back-office term list for translatable taxonomies.
