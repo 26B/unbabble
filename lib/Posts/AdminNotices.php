@@ -58,6 +58,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice for when there's posts with missing languages or with an unknown language.
 	 *
+	 * @since Unreleased Remove TODO and duplicate $post_type.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -126,6 +127,13 @@ class AdminNotices {
 		);
 	}
 
+	/**
+	 * Adds an admin notice explaining the post filter for unknown or missing languages.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @return void
+	 */
 	public function post_missing_language_filter_explanation() : void {
 		$screen = get_current_screen();
 		if (

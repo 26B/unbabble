@@ -16,6 +16,7 @@ class EditFilters {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Remove filter in $_GET when not in admin. Only add filter hook when $_GET filter is set. Stop post lang filter from being applied.
 	 * @since 0.0.1
 	 */
 	public function register() {
@@ -35,6 +36,15 @@ class EditFilters {
 		}
 	}
 
+	/**
+	 * Adds a filter to show posts without language.
+	 *
+	 * @since Unreleased Fixed the query not considering posts with unknown language.
+	 * @since 0.4.0
+	 *
+	 * @param array $views
+	 * @return array
+	 */
 	public function add_no_lang_filter( array $views ) : array {
 		global $wpdb;
 		$post_type = \get_post_type();

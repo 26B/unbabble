@@ -47,7 +47,13 @@ class EditFilters {
 	}
 
 	/**
+	 * Adds a filter to show terms without language.
+	 *
 	 * @since Unreleased
+	 *
+	 * @param array $views
+	 * @param string $taxonomy
+	 * @return array
 	 */
 	public function add_no_lang_filter( array $views, string $taxonomy ) : array {
 		global $wpdb;
@@ -114,7 +120,13 @@ class EditFilters {
 	}
 
 	/**
+	 * Tries to add an filter entry to main term query's query vars in order for the method
+	 * `filter_terms_without_language` to be able to filter the terms for only the main query.
+	 *
 	 * @since Unreleased
+	 *
+	 * @param WP_Term_Query $query
+	 * @return void
 	 */
 	public function pre_get_terms( \WP_Term_Query $query ) : void {
 		if ( $this::$filter_added ) {
@@ -142,8 +154,14 @@ class EditFilters {
 	}
 
 	/**
+	 * Adds a filter to show terms without language.
 	 *
 	 * @since Unreleased
+	 *
+	 * @param array $pieces
+	 * @param array $taxonomies
+	 * @param array $args
+	 * @return array
 	 */
 	public function filter_terms_without_language( array $pieces, array $taxonomies, array $args ) : array {
 		global $wpdb;
@@ -172,7 +190,7 @@ class EditFilters {
 	}
 
 	/**
-	 * Returns whether the filtering of posts should happen.
+	 * Returns whether the filtering of term should happen.
 	 *
 	 * @since Unreleased
 	 *
@@ -185,12 +203,14 @@ class EditFilters {
 		}
 
 		/**
-		 * Filters whether posts should be filtered by having an unknown language or having no language.
+		 * Filters whether terms should be filtered by having an unknown language or having no language.
 		 *
 		 * @since Unreleased
 		 *
 		 * @param bool $apply_filter
-		 * @param WP_Query $query
+		 * @param array $pieces
+		 * @param array $taxonomies
+		 * @param array $args
 		 */
 		return \apply_filters( 'ubb_use_term_lang_missing_filter', true, $pieces, $taxonomies, $args );
 	}

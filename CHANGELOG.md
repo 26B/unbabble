@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Filter for terms without language or unknown languages in the back-office term list for translatable taxonomies.
+- Missing doc blocks from version 0.4.0.
+- Admin notices for when a term missing or with an unknown language.
+- Admin notice explaining the term filter for missing/unknown languages.
+- Stop the archive admin notice for the existence of terms without language or with an unknown language showign when the filter is being applied.
+
+### Fixed
+
+- Fixed bad HTML for language metabox in the Menu customization page.
+- Setting term language when the term is missing language or has an unknown language in the term edit page.
+- Post's missing/unknown language filter not considering posts with unknown language.
+
+### Changed
+
+- Removed missing/unknown language filter check in `Posts\LangFilter`. Now done directly via the `ubb_use_post_lang_filter` filter.
+
 ## [0.4.1] - 2024-07-05
 
 ### Added

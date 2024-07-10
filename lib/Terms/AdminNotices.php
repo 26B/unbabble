@@ -17,6 +17,7 @@ class AdminNotices {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Add notices for a term missing/unknown languages and an explanation for the missing language filter.
 	 * @since 0.0.1
 	 */
 	public function register() {
@@ -66,6 +67,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice for when there's terms with missing languages or with an unknown language.
 	 *
+	 * @since Unreleased Stop showing when the user is already on the no language filter. Fix link for filter.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -137,6 +139,13 @@ class AdminNotices {
 		);
 	}
 
+	/**
+	 * Add an admin notice when a term has no language.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
 	public function term_missing_language() : void {
 		$screen = get_current_screen();
 		if (
@@ -164,6 +173,13 @@ class AdminNotices {
 		printf( '<div class="notice notice-error"><p><b>Unbabble: </b>%s</p></div>', esc_html( $message ) );
 	}
 
+	/**
+	 * Add an admin notice when a term has an unknown language.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
 	public function term_unknown_language() : void {
 		$screen = get_current_screen();
 		if (
@@ -197,6 +213,13 @@ class AdminNotices {
 		printf( '<div class="notice notice-error"><p><b>Unbabble: </b>%s</p></div>', sprintf( $message, $term_lang ) );
 	}
 
+	/**
+	 * Add an explanation for the missing language filter.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
 	public function term_missing_language_filter_explanation() : void {
 		$screen = get_current_screen();
 		if (

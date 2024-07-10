@@ -57,6 +57,7 @@ class LangMetaBox {
 	/**
 	 * Prints metabox for when a new term is being created.
 	 *
+	 * @since Unreleased Add new `print_language_select` argument.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -84,6 +85,7 @@ class LangMetaBox {
 	/**
 	 * Prints metabox for when an existing term is being edited.
 	 *
+	 * @since Unreleased Add new `print_language_select` argument. Check for bad language and stop showing create and link translations if so.
 	 * @since 0.0.1
 	 *
 	 * @param WP_Term $term
@@ -249,6 +251,7 @@ class LangMetaBox {
 	/**
 	 * Print language select for the language metabox.
 	 *
+	 * @since Unreleased Add new argument for if this is the main select. Add handling for missing or unknown language.
 	 * @since 0.0.1
 	 * @todo duplicated in Posts/LangMetaBox
 	 *
