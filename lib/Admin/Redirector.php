@@ -110,6 +110,7 @@ class Redirector {
 	/**
 	 * Redirect if the current language is not the correct one for the current term.
 	 *
+	 * @since 0.4.2 Don't redirect when term lang is not in allowed languages to allow the user to fix it.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -126,6 +127,12 @@ class Redirector {
 		$current_lang = LangInterface::get_current_language();
 		$term_lang    = LangInterface::get_term_language( $_REQUEST['tag_ID'] );
 		if ( $term_lang === null || $term_lang === $current_lang ) {
+			return;
+		}
+
+		// If the language is not in the allowed languages, do nothing so user can fix it.
+		$languages = LangInterface::get_languages();
+		if ( ! in_array( $term_lang, $languages, true ) ) {
 			return;
 		}
 

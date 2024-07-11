@@ -8,6 +8,7 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\ElasticPress;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\Relevanssi;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastSEO;
 use WP_CLI;
 
 /**
@@ -54,6 +55,30 @@ class Plugin {
 	public function __construct( $name, $version ) {
 		$this->name    = $name;
 		$this->version = $version;
+	}
+
+	/**
+	 * Initialize the plugin.
+	 *
+	 * Dependencies and hooks that need to be added as early as possible.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @return void
+	 */
+	public function init() : void {
+		$components = [
+			'router_resolver' => Router\RoutingResolver::class,
+			'locale'          => Language\Locale::class,
+		];
+
+		if ( ! Options::should_run_unbabble() ) {
+			$components = [];
+		}
+
+		foreach ( $components as $component ) {
+			( new $component() )->init();
+		}
 	}
 
 	/**
@@ -111,6 +136,7 @@ class Plugin {
 	/**
 	 * Register all of the hooks related to the plugin's base functionality.
 	 *
+	 * @since 0.4.2 - Added Terms Edit Filters.
 	 * @since  0.0.1
 	 * @access private
 	 */
@@ -122,6 +148,7 @@ class Plugin {
 			'language_switcher' => Admin\LanguageSwitcher::class,
 			'redirector'        => Admin\Redirector::class,
 			'customize'         => Admin\Customize::class,
+			'options_proxy'     => Admin\OptionsProxy::class,
 
 			'api_header'     => API\Header::class,
 			'api_query_vars' => API\QueryVar::class,
@@ -135,6 +162,8 @@ class Plugin {
 			'posts_change_language'    => Posts\ChangeLanguage::class,
 			'posts_language_metabox'   => Posts\LangMetaBox::class,
 			'posts_admin_notices'      => Posts\AdminNotices::class,
+			'posts_bulk_edit'          => Posts\BulkEdit::class,
+			'posts_edit_filter'        => Posts\EditFilters::class,
 
 			'terms_language_metabox'   => Terms\LangMetaBox::class,
 			'terms_create_translation' => Terms\CreateTranslation::class,
@@ -143,14 +172,15 @@ class Plugin {
 			'terms_language_filter'    => Terms\LangFilter::class,
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
+			'terms_edit_filter'        => Terms\EditFilters::class,
 
-			'router_resolver'  => Router\RoutingResolver::class,
-			'router_routing'   => Router\Routing::class,
-
-			'lang_frontend' => Language\Frontend::class,
+			'locale'        => Language\Locale::class,
 			'lang_packages' => Language\LanguagePacks::class,
 
 			'options' => Options::class,
+
+			'router_routing'   => Router\Routing::class,
+			'router_resolver'  => Router\RoutingResolver::class,
 
 			// TODO: Filter the query for attaching an attachment.
 		];
@@ -163,7 +193,9 @@ class Plugin {
 		}
 
 		foreach ( $components as $component ) {
-			( new $component() )->register();
+			if ( method_exists( $component, 'register' ) ) {
+				( new $component() )->register();
+			}
 		}
 	}
 
@@ -176,6 +208,7 @@ class Plugin {
 			$namespace = self::API_V1;
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
 			( new API\Gutenberg\Post( $this, $namespace ) )->register();
+			( new API\Options( $this, $namespace ) )->register();
 		} );
 	}
 
@@ -205,6 +238,7 @@ class Plugin {
 		$integrations = [
 			Relevanssi::class   => 'relevanssi/relevanssi.php',
 			ElasticPress::class => 'elasticpress/elasticpress.php',
+			YoastSEO::class     => 'wordpress-seo/wp-seo.php',
 		];
 
 		\add_action( 'admin_init', function() use ( $admin_integrations ) {

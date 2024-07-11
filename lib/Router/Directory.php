@@ -69,6 +69,35 @@ class Directory {
 	}
 
 	/**
+	 * Applies language to the page's link given it's language.
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string $page_link
+	 * @param WP_Post|int|mixed $page
+	 * @return string
+	 */
+	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+		if ( $page instanceof WP_Post ) {
+			$page_id = $page->ID;
+		} else if ( is_int( $page ) ) {
+			$page_id = $page;
+		} else {
+			return $page_link;
+		}
+
+		if (
+			'page' === get_option( 'show_on_front' )
+			&& get_option( 'page_on_front' ) == $page_id
+			&& $page_link === home_url( '/' )
+		) {
+			return $page_link;
+		}
+
+		return $this->apply_lang_to_post_url( $page_link, $page );
+	}
+
+	/**
 	 * Applies language to the post's link given it's language.
 	 *
 	 * @since 0.0.1
@@ -253,43 +282,6 @@ class Directory {
 
 		// Set language of homepage to the default language.
 		set_query_var( 'lang', LangInterface::get_default_language() );
-	}
-
-	/**
-	 * Applies the language to a post type's archvie link.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param string $link
-	 * @param string $post_type
-	 * @return string
-	 */
-	public function post_type_archive_link( string $link, string $post_type ) : string {
-		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === LangInterface::get_default_language() ) {
-			return $link;
-		}
-
-		// Get site's frontend url without language. Cannot use site_url due to cases where the WordPress installation is not in the root.
-		add_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
-		$home_url = home_url();
-		remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
-
-		$url_lang = $this->current_lang_from_uri( '', str_replace( $home_url, '', $link ) );
-		if ( $url_lang === $curr_lang ) {
-			return $link;
-		}
-
-		$source_url = trailingslashit( $home_url ) . $this->get_directory_name( $url_lang );
-
-		// If not default language, set the directory to the post language.
-		$target_url = $home_url;
-		if ( $curr_lang !== LangInterface::get_default_language() ) {
-			$directory  = $this->get_directory_name( $curr_lang );
-			$target_url = trailingslashit( trailingslashit( $home_url ) . $directory );
-		}
-
-		return str_replace( $source_url, $target_url, $link );
 	}
 
 	/**

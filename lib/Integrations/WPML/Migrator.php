@@ -37,6 +37,9 @@ class Migrator {
 	 * [--fresh]
 	 * : (Optional) Run a new migration.
 	 *
+	 * [--yes]
+	 * : (Optional) Skip confirmations.
+	 *
 	 * @since 0.0.3
 	 *
 	 * @param array $args
@@ -81,7 +84,7 @@ class Migrator {
 
 		$sql = $this->make_sql( $options );
 
-		WP_CLI::confirm( 'Run migration?' );
+		WP_CLI::confirm( 'Run migration?', $assoc_args );
 
 		$trids_migrated = $this->migrate( $sql );
 		if ( $trids_migrated === 0 ) {

@@ -39,7 +39,13 @@ class DeleteFile {
 	 * @return void
 	 */
 	public function set_hooks_for_file_deletion( int $post_id ) : void {
-		$meta  = wp_get_attachment_metadata( $post_id );
+		$meta = wp_get_attachment_metadata( $post_id );
+
+		// If the attachment has no metadata, ignore it.
+		if ( empty( $meta ) ) {
+			return;
+		}
+
 		$file  = $meta['file'];
 		$sizes = $meta['sizes'];
 		$files = [ $file ];

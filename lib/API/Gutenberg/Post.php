@@ -112,8 +112,7 @@ class Post {
 
 			$data['language'] = LangInterface::get_post_language( $post_id );
 			if ( empty( $data['language'] ) ) {
-				// TODO: Show this in backoffice.
-				$data['language'] = LangInterface::get_current_language();
+				$data['language'] = null;
 			}
 
 			$data['translations'] = [];
@@ -142,8 +141,16 @@ class Post {
 			$post_id      = $request['id'];
 			$new_language = $request['change_lang'];
 
-			if ( ! LangInterface::change_post_language( $post_id, $new_language ) ) {
-				return new WP_REST_Response( null, 400 );
+			$previous_language = LangInterface::get_post_language($post_id);
+			if ( empty( $previous_language ) ) {
+				if ( ! LangInterface::set_post_language( $post_id, $new_language ) ) {
+					return new WP_REST_Response( null, 400 );
+				}
+
+			} else {
+				if ( ! LangInterface::change_post_language( $post_id, $new_language ) ) {
+					return new WP_REST_Response( null, 400 );
+				}
 			}
 
 			return new WP_REST_Response( null, 200 );
@@ -227,6 +234,8 @@ class Post {
 			}
 
 			$language = LangInterface::get_post_language( $post_id );
+
+			// TODO: if language is empty, return error message
 
 			$page = $request->get_param( 'page' );
 			if ( ! is_numeric( $page ) ) {

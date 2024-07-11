@@ -27,11 +27,10 @@ class Customize {
 
 		// Options saving and loading.
 		$theme   = get_option( 'stylesheet' );
-		$options = ['page_on_front','show_on_front','page_for_posts', "theme_mods_$theme" ];
-		foreach ( $options as $option_name ) {
-			add_filter( "pre_option_{$option_name}", [ $this, 'pre_get_option_proxy' ], 10, 2 );
-			add_filter( "pre_update_option_{$option_name}", [ $this, 'pre_update_option_proxy' ], 10, 3 );
-		}
+		add_filter( 'ubb_proxy_options', fn ( $options ) => array_merge(
+			$options,
+			[ 'page_on_front','show_on_front','page_for_posts', "theme_mods_$theme" ]
+		) );
 
 		// Set menu language when created.
 		add_action( 'create_nav_menu', [ $this, 'set_menu_lang' ], 10, 2 );
@@ -48,6 +47,7 @@ class Customize {
 	/**
 	 * Add lang metaboxes to nav menu edit.
 	 *
+	 * @since 0.4.2 Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
 	 * @since 0.0.3
 	 *
 	 * @return void
@@ -66,11 +66,13 @@ class Customize {
 		// TODO: Using term meta box has its problems, refactor into a better system of metaboxing.
 		ob_start();
 		( new Terms\LangMetaBox() )->edit_term_language_metabox( get_term( $menu_id ) );
-		$term_meta_box = ob_get_flush();
+		$term_meta_box = ob_get_clean();
 
 		$html  = '<div class="ubb-menu-settings">';
 		$html .= '<h3>' . __( 'Language' ) . '</h3>';
+		$html .= '<table><tbody>';
 		$html .= $term_meta_box;
+		$html .= '</tbody></table>';
 		$html .= '</div>';
 
 		$html = str_replace( [ "\t", "\n" ], '', $html );
@@ -140,52 +142,5 @@ class Customize {
 		$parsed_args['include']         = $query->get_posts();
 		$parsed_args['__ubb_filtering'] = true;
 		return wp_dropdown_pages( $parsed_args );
-	}
-
-	/**
-	 * Proxy loading of option.
-	 *
-	 * Always try to load the option from the proxy, even with the default language. This handles
-	 * cases when default language is changed and the values would otherwise be mixed up.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param mixed  $pre_option
-	 * @param string $option
-	 * @return mixed
-	 */
-	public function pre_get_option_proxy( $pre_option, string $option ) {
-		$curr_lang = LangInterface::get_current_language();
-		$ubb_wp_options = get_option( 'ubb_wp_options', [] );
-		return $ubb_wp_options[ $curr_lang ][ $option ] ?? $pre_option;
-	}
-
-	/**
-	 * Proxy updating of option.
-	 *
-	 * Also updates the base WordPress option when the language is the default. This is to keep the
-	 * default information in the core WordPress incase Unbabble is deactivated/uninstalled.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param mixed $value
-	 * @param mixed $old_value
-	 * @param string $option
-	 * @return mixed
-	 */
-	public function pre_update_option_proxy( $value, $old_value, string $option ) {
-		$curr_lang = LangInterface::get_current_language();
-
-		$ubb_wp_options = get_option( 'ubb_wp_options', [] );
-		$ubb_wp_options[ $curr_lang ][ $option ] = $value;
-		update_option( 'ubb_wp_options', $ubb_wp_options );
-
-		// Update base WordPress option too in case of default language.
-		if ( $curr_lang === LangInterface::get_default_language() ) {
-			return $value;
-		}
-
-		// Return old value so the value does not get updated.
-		return $old_value;
 	}
 }

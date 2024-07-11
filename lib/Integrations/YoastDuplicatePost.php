@@ -9,11 +9,46 @@ use WP_Term;
 
 class YoastDuplicatePost {
 	public function register() {
-		// TODO: Move post lang metabox input here.
+
+		// Remove ubb_source from rewrite republish copies.
+		\add_filter( 'duplicate_post_excludelist_filter', [ $this, 'exclude_ubb_source' ] );
+
+		// Set language of rewrite republish copy to be the original's language.
+		\add_action( 'add_post_meta', [ $this, 'set_language_on_copy' ], 10, 3 );
 
 		// Use Yoast's duplicate-post plugin to duplicate post before redirect.
 		\add_action( 'save_post', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
 		\add_action( 'edit_attachment', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
+	}
+
+	public function exclude_ubb_source( array $meta_keys ) : array {
+		return array_merge( $meta_keys, [ 'ubb_source' ] );
+	}
+
+	public function set_language_on_copy( $object_id, $meta_key, $_meta_value ) : void {
+		if ( $meta_key !== '_dp_original' ) {
+			return;
+		}
+
+		$post = get_post( $object_id );
+
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		$original = get_post( $_meta_value );
+
+		if ( ! $original instanceof WP_Post ) {
+			return;
+		}
+
+		$original_lang = LangInterface::get_post_language( $original->ID );
+
+		if ( empty( $original_lang ) ) {
+			return;
+		}
+
+		LangInterface::set_post_language( $post->ID, $original_lang, true);
 	}
 
 	public function copy_and_redirect( int $post_id, bool $redirect = true ) {

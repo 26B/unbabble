@@ -22,9 +22,6 @@ class RoutingResolver {
 	 */
 	public function register() {
 		if ( ! is_admin() ) {
-			// Needs to be done as early as possible.
-			$this->init();
-
 			\add_filter( 'pre_get_posts', [ $this, 'homepage_default_lang_redirect' ], 1 );
 		}
 
@@ -38,7 +35,7 @@ class RoutingResolver {
 
 		if ( in_array( 'page', $translatable_post_types, true ) ) {
 			// Page permalink.
-			\add_filter( 'page_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+			\add_filter( 'page_link', [ $this, 'apply_lang_to_page_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'attachment', $translatable_post_types, true ) ) {
@@ -62,6 +59,8 @@ class RoutingResolver {
 		\add_filter( 'network_home_url', [ $this, 'network_home_url' ], 10, 3 );
 
 		\add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
+
+		\add_filter( 'rest_url', [ $this, 'rest_url' ], 10, 4 );
 	}
 
 	/**
@@ -92,6 +91,23 @@ class RoutingResolver {
 			return $router->apply_lang_to_post_url( $post_link, $post );
 		}
 		return $post_link;
+	}
+
+	/**
+	 * Apply routing changes to hook `apply_lang_to_page_url`.
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string $page_link
+	 * @param WP_Post|int|mixed $page
+	 * @return string
+	 */
+	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+		$router = $this->get_current_router_object();
+		if ( $router !== null && method_exists( $router, 'apply_lang_to_page_url' ) ) {
+			return $router->apply_lang_to_page_url( $page_link, $page );
+		}
+		return $page_link;
 	}
 
 	/**
@@ -249,6 +265,31 @@ class RoutingResolver {
 		$router = $this->get_current_router_object();
 		if ( $router !== null && method_exists( $router, 'admin_url' ) ) {
 			return $router->admin_url( $url );
+		}
+		return $url;
+	}
+
+	/**
+	 * Apply routing changes to hook `rest_url`.
+	 *
+	 * @since 0.0.3
+	 *
+	 * @param string $url     REST URL.
+	 * @param string $path    REST route.
+	 * @param mixed  $blog_id Blog ID.
+	 * @param string $scheme  Sanitization scheme.
+	 * @return string
+	 */
+	public function rest_url( string $url, string $path, $blog_id, string $scheme ) : string {
+
+		// TODO: add docs.
+		if ( ! apply_filters( 'ubb_apply_lang_to_rest_url', true, $url, $path, $blog_id, $scheme ) ) {
+			return $url;
+		}
+
+		$router = $this->get_current_router_object();
+		if ( $router !== null && method_exists( $router, 'rest_url' ) ) {
+			return $router->rest_url( $url, $path, $blog_id, $scheme );
 		}
 		return $url;
 	}

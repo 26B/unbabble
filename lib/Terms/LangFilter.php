@@ -4,7 +4,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
  * Hooks for filtering terms based on their language.

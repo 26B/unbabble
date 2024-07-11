@@ -23,8 +23,8 @@ export const unlinkPost = (id) =>
 		url: `/edit/post/${id}/translation/unlink`,
 	});
 
-export const linkPost = (id, translationId) =>
-	request({
+export const linkPost = async (id, translationId) =>
+	await request({
 		method: 'patch',
 		url: `/edit/post/${id}/translation/${translationId}/link`,
 	});
@@ -32,4 +32,11 @@ export const linkPost = (id, translationId) =>
 export const linkablePosts = (id, page) =>
 	request({
 		url: `/edit/post/${id}/translation/link?page=${page}`,
+	});
+
+export const submitOptions = (data) =>
+	request({
+		method: 'post',
+		url: `/options`,
+		data,
 	});

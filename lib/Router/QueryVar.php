@@ -45,6 +45,19 @@ class QueryVar {
 	}
 
 	/**
+	 * Applies language to the page's link given it's language.
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string $page_link
+	 * @param WP_Post|int|mixed $page
+	 * @return string
+	 */
+	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+		return $this->apply_lang_to_post_url( $page_link, $page );
+	}
+
+	/**
 	 * Applies language to the custom post's link given it's language.
 	 *
 	 * @since 0.0.1
@@ -324,5 +337,28 @@ class QueryVar {
 		}
 
 		return add_query_arg( 'lang', $curr_lang, $url );
+	}
+
+	/**
+	 * Return rest url without the lang query var.
+	 *
+	 * @since 0.0.0
+	 *
+	 * @param string $url     REST URL.
+	 * @param string $path    REST route.
+	 * @param mixed  $blog_id Blog ID.
+	 * @param string $scheme  Sanitization scheme.
+	 * @return string
+	 */
+	public function rest_url( string $url, string $path, $blog_id, string $scheme ) : string {
+		\add_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+		\add_filter( 'ubb_apply_lang_to_rest_url', '__return_false' );
+
+		$rest_url = \get_rest_url( $blog_id, $path, $scheme );
+
+		\remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
+		\remove_filter( 'ubb_apply_lang_to_rest_url', '__return_false' );
+
+		return $rest_url;
 	}
 }
