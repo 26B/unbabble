@@ -2651,11 +2651,43 @@ const LinkOption = _ref => {
     }
   }, !isSuccess && 'Link', isSuccess && 'Linked'));
 };
-const LinkTranslations = _ref3 => {
+const SearchBar = _ref3 => {
+  let {
+    search,
+    setSearch,
+    refetch
+  } = _ref3;
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+    style: {
+      display: 'flex',
+      width: '100%'
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("input", {
+    type: "text",
+    value: search,
+    onChange: e => setSearch(e.target.value),
+    style: {
+      width: '100%'
+    },
+    onKeyDown: e => {
+      if (event.key === 'Enter') {
+        setSearch(e.target.value);
+        refetch(e.target.value);
+      }
+    }
+  }), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_3__.Button, {
+    style: {
+      marginLeft: '8px'
+    },
+    variant: "primary",
+    onClick: () => refetch(search)
+  }, "Search"));
+};
+const LinkTranslations = _ref4 => {
   let {
     postId,
     refetchLangs
-  } = _ref3;
+  } = _ref4;
   const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(false);
   const {
     data,
@@ -2665,6 +2697,7 @@ const LinkTranslations = _ref3 => {
   } = (0,_hooks_useLinkablePosts__WEBPACK_IMPORTED_MODULE_5__["default"])(postId, 1);
   const [page, setPage] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(1);
   const [totalPages, setTotalPages] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(data?.pages || 1);
+  const [search, setSearch] = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)('');
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const previousPage = () => {
@@ -2672,14 +2705,18 @@ const LinkTranslations = _ref3 => {
       return;
     }
     setPage(page - 1);
-    refetch(page - 1);
+    refetch(page - 1, search);
   };
   const nextPage = () => {
     if (page >= totalPages) {
       return;
     }
     setPage(page + 1);
-    refetch(page + 1);
+    refetch(page + 1, search);
+  };
+  const fetchSearch = searchValue => {
+    setPage(1);
+    refetch(1, searchValue);
   };
   if (!isLoading && totalPages !== (data?.pages || 1)) {
     setTotalPages(data?.pages || 1);
@@ -2702,10 +2739,14 @@ const LinkTranslations = _ref3 => {
     status: "warning",
     isDismissible: false,
     politeness: "polite"
-  }, ' ', "You will unlink from the post's current translations if you link to another."), isLoading && 'Loading...', isError && 'ERROR!!!', !isLoading && data?.options && data.options.map(option => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(LinkOption, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, option, {
+  }, ' ', "You will unlink from the post's current translations if you link to another."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(SearchBar, {
+    search: search,
+    setSearch: setSearch,
+    refetch: fetchSearch
+  }), isLoading && 'Loading...', isError && 'ERROR!!!', !isLoading && data?.options && data.options.length !== 0 && data.options.map(option => (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)(LinkOption, (0,_babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__["default"])({}, option, {
     postId: postId,
     refetchLangs: refetchLangs
-  })))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
+  }))), !isLoading && data?.options && data.options.length === 0 && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", null, "No results found.")), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_1__.createElement)("div", {
     style: {
       display: 'flex',
       width: '100%',
@@ -3834,9 +3875,11 @@ const useLinkablePosts = (postId, page) => {
   const [data, setData] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
   const [isLoading, setIsLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   const [isError, setIsError] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const fetch = async page => {
+  const fetch = async function (page) {
+    let search = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    setIsError(false);
     setIsLoading(true);
-    return (0,_services_requests__WEBPACK_IMPORTED_MODULE_1__.linkablePosts)(postId, page).then(_ref => {
+    return (0,_services_requests__WEBPACK_IMPORTED_MODULE_1__.linkablePosts)(postId, page, search).then(_ref => {
       let {
         data
       } = _ref;
@@ -3989,9 +4032,12 @@ const linkPost = async (id, translationId) => await (0,_gateway__WEBPACK_IMPORTE
   method: 'patch',
   url: `/edit/post/${id}/translation/${translationId}/link`
 });
-const linkablePosts = (id, page) => (0,_gateway__WEBPACK_IMPORTED_MODULE_0__.request)({
-  url: `/edit/post/${id}/translation/link?page=${page}`
-});
+const linkablePosts = function (id, page) {
+  let search = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+  return (0,_gateway__WEBPACK_IMPORTED_MODULE_0__.request)({
+    url: `/edit/post/${id}/translation/link?page=${page}&s=${search}`
+  });
+};
 const submitOptions = data => (0,_gateway__WEBPACK_IMPORTED_MODULE_0__.request)({
   method: 'post',
   url: `/options`,

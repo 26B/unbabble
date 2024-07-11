@@ -80,11 +80,38 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 	);
 };
 
+const SearchBar = ({ search, setSearch, refetch }) => {
+	return (
+		<div style={{ display: 'flex', width: '100%' }}>
+			<input
+				type="text"
+				value={search}
+				onChange={(e) => setSearch(e.target.value)}
+				style={{ width: '100%' }}
+				onKeyDown={(e) => {
+					if ( event.key === 'Enter' ) {
+						setSearch(e.target.value);
+						refetch(e.target.value);
+					}
+				}}
+			/>
+			<Button
+				style={{ marginLeft: '8px' }}
+				variant="primary"
+				onClick={() => refetch(search)}
+			>
+				Search
+			</Button>
+		</div>
+	);
+};
+
 const LinkTranslations = ({ postId, refetchLangs }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { data, refetch, isLoading, isError } = useLinkablePosts(postId, 1);
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(data?.pages || 1);
+	const [search, setSearch] = useState('');
 
 	const openModal = () => setIsModalOpen(true);
 	const closeModal = () => setIsModalOpen(false);
@@ -93,7 +120,7 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 			return;
 		}
 		setPage(page - 1);
-		refetch(page - 1);
+		refetch(page - 1, search);
 	};
 
 	const nextPage = () => {
@@ -101,7 +128,12 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 			return;
 		}
 		setPage(page + 1);
-		refetch(page + 1);
+		refetch(page + 1, search);
+	};
+
+	const fetchSearch = (searchValue) => {
+		setPage(1);
+		refetch(1, searchValue);
 	};
 
 	if (!isLoading && totalPages !== (data?.pages || 1)) {
@@ -135,10 +167,16 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 							You will unlink from the post's current translations
 							if you link to another.
 						</Notice>
+						<SearchBar
+							search={search}
+							setSearch={setSearch}
+							refetch={fetchSearch}
+						/>
 						{isLoading && 'Loading...'}
 						{isError && 'ERROR!!!'}
 						{!isLoading &&
 							data?.options &&
+							data.options.length !== 0 &&
 							data.options.map((option) => (
 								<LinkOption
 									{...option}
@@ -146,6 +184,11 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 									refetchLangs={refetchLangs}
 								/>
 							))}
+						{!isLoading &&
+							data?.options &&
+							data.options.length === 0 && (
+								<div>No results found.</div>
+							)}
 					</div>
 					<div
 						style={{

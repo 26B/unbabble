@@ -7,9 +7,10 @@ const useLinkablePosts = (postId, page) => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isError, setIsError] = useState(false);
 
-	const fetch = async (page) => {
+	const fetch = async (page, search = '') => {
+		setIsError(false);
 		setIsLoading(true);
-		return linkablePosts(postId, page)
+		return linkablePosts(postId, page, search)
 			.then(({ data }) => setData(data))
 			.catch(() => setIsError(true))
 			.then(() => setIsLoading(false));

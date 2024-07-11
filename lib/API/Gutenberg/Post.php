@@ -242,7 +242,12 @@ class Post {
 				$page = 1;
 			}
 
-			$possible_links = ( new LinkTranslation() )->get_possible_links( $post, $language, $page );
+			$search = $request->get_param( 's' );
+			if ( empty( $search ) ) {
+				$search = null;
+			}
+
+			$possible_links = ( new LinkTranslation() )->get_possible_links( $post, $language, $page, $search );
 
 			return new WP_REST_Response( $possible_links, 200 );
 
