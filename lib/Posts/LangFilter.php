@@ -138,6 +138,7 @@ class LangFilter {
 	/**
 	 * Returns whether the filtering of posts should happen.
 	 *
+	 * @since Unreleased - Add check for `ubb_lang_filter` query_var with a false value to stop the lang filter.
 	 * @since 0.0.1
 	 *
 	 * @param WP_Query $query
@@ -171,6 +172,7 @@ class LangFilter {
 			return false;
 		}
 
+		// Stop the language filter via a query_var.
 		if ( ! ( $query->query_vars['ubb_lang_filter'] ?? true ) ) {
 			return false;
 		}

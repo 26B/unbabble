@@ -6,8 +6,23 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use WP_Post;
 use WP_Query;
 
+/**
+ * Hooks for integrating with ElasticPress.
+ *
+ * @since Unreleased
+ */
 class ElasticPress {
+
+	/**
+	 * Register hooks.
+	 *
+	 * @since Unreleased
+	 */
 	public function register() {
+		if ( ! \is_plugin_active( 'elasticpress/elasticpress.php' ) ) {
+			return;
+		}
+
 		\add_filter( 'ep_index_posts_args', [ $this, 'ep_index_posts_args' ], 10, 1 );
 		\add_filter( 'ep_prepare_meta_data', [ $this, 'ep_prepare_meta_data' ], 10, 2 );
 		\add_filter( 'ep_skip_query_integration', [ $this, 'ep_skip_query_integration' ], PHP_INT_MIN, 2 );
@@ -15,6 +30,8 @@ class ElasticPress {
 
 	/**
 	 * Add argument to ElasticPress's sync query arguments to not apply Unbabble's lang filter.
+	 *
+	 * @since Unreleased
 	 *
 	 * @param array $args
 	 * @return array
@@ -27,6 +44,8 @@ class ElasticPress {
 	/**
 	 * Add post language to meta entries sent to ElasticPress in order to be able to filter by
 	 * language later.
+	 *
+	 * @since Unreleased
 	 *
 	 * @param array   $meta
 	 * @param WP_Post $post
@@ -49,6 +68,8 @@ class ElasticPress {
 	 *
 	 * Using the `ep_skip_query_integration` filter since its the last filter we can use to
 	 * specifically change the fetch query, and there is no appropriate filter otherwise.
+	 *
+	 * @since Unreleased
 	 *
 	 * @param bool     $return
 	 * @param WP_Query $query
