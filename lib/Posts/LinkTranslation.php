@@ -134,6 +134,18 @@ class LinkTranslation {
 		return true;
 	}
 
+	/**
+	 * Get possible links for post $post_id.
+	 *
+	 * @since Unreleased Add search argument and search filter to query.
+	 * @since 0.1.0
+	 *
+	 * @param WP_Post $post
+	 * @param string $post_lang
+	 * @param int $page
+	 * @param string|null $search
+	 * @return array
+	 */
 	public function get_possible_links( WP_Post $post, string $post_lang, int $page, ?string $search ) : array {
 		global $wpdb;
 		$translations_table    = ( new PostTable() )->get_table_name();
@@ -148,6 +160,7 @@ class LinkTranslation {
 			$search_filter = $wpdb->prepare( "AND P.post_title LIKE %s", '%' . $wpdb->esc_like( $search ) . '%' );
 		}
 
+		// FIXME: if there are any posts with multiple ubb_sources (bug), it can cause the post to show up in the list multiple times.
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT SQL_CALC_FOUND_ROWS

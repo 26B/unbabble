@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Search filter for link translations.
+
+### Changed
+
+- Improved loading in link translations modal.
+
 ## [0.4.2] - 2024-07-10
 
 ### Added

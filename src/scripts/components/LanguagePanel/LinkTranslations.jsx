@@ -1,11 +1,20 @@
 import { useState } from 'react';
 
-import { Button, Notice, Modal } from '@wordpress/components';
+import {
+	Button,
+	Notice,
+	Modal,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalZStack as ZStack,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 
 import Collapse from '../Collapse';
 import useLinkablePosts from '../../hooks/useLinkablePosts';
 import { withLangContext } from '../../contexts/LangContext';
 import useLinkPost from '../../hooks/useLinkPost';
+import Loading from '../Loading';
 
 const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 	const { mutate, isLoading, isSuccess, isError } = useLinkPost(
@@ -54,6 +63,7 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 							</h4>
 							{posts.slice(1).map(({ title, ID, lang }) => (
 								<div
+									key={`link-other-${ID}`}
 									style={{
 										width: '100%',
 										justifyContent: 'space-between',
@@ -80,7 +90,7 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 	);
 };
 
-const SearchBar = ({ search, setSearch, refetch }) => {
+const SearchBar = ({ search, setSearch, refetch, disabled }) => {
 	return (
 		<div style={{ display: 'flex', width: '100%' }}>
 			<input
@@ -89,16 +99,18 @@ const SearchBar = ({ search, setSearch, refetch }) => {
 				onChange={(e) => setSearch(e.target.value)}
 				style={{ width: '100%' }}
 				onKeyDown={(e) => {
-					if ( event.key === 'Enter' ) {
+					if (event.key === 'Enter') {
 						setSearch(e.target.value);
 						refetch(e.target.value);
 					}
 				}}
+				disabled={disabled}
 			/>
 			<Button
 				style={{ marginLeft: '8px' }}
 				variant="primary"
 				onClick={() => refetch(search)}
+				disabled={disabled}
 			>
 				Search
 			</Button>
@@ -107,7 +119,7 @@ const SearchBar = ({ search, setSearch, refetch }) => {
 };
 
 const LinkTranslations = ({ postId, refetchLangs }) => {
-	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isModalOpen, setIsModalOpen] = useState(true);
 	const { data, refetch, isLoading, isError } = useLinkablePosts(postId, 1);
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(data?.pages || 1);
@@ -149,6 +161,7 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 				<Modal
 					title="Link to existing posts:"
 					onRequestClose={closeModal}
+					size="large"
 				>
 					<div
 						style={{
@@ -171,24 +184,31 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 							search={search}
 							setSearch={setSearch}
 							refetch={fetchSearch}
+							disabled={isLoading}
 						/>
-						{isLoading && 'Loading...'}
-						{isError && 'ERROR!!!'}
-						{!isLoading &&
-							data?.options &&
-							data.options.length !== 0 &&
-							data.options.map((option) => (
-								<LinkOption
-									{...option}
-									postId={postId}
-									refetchLangs={refetchLangs}
-								/>
-							))}
-						{!isLoading &&
-							data?.options &&
-							data.options.length === 0 && (
-								<div>No results found.</div>
+						<div
+							style={{ position: 'relative', minHeight: '50px' }}
+						>
+							{data?.options && data.options.length !== 0 && (
+								<VStack expanded>
+									{data.options.map((option) => (
+										<LinkOption
+											key={`link-option-${option.source}`}
+											{...option}
+											postId={postId}
+											refetchLangs={refetchLangs}
+										/>
+									))}
+								</VStack>
 							)}
+							{isLoading && <Loading overlay />}
+							{!isLoading &&
+								data?.options &&
+								data.options.length === 0 && (
+									<div>No results found.</div>
+								)}
+							{isError && 'ERROR!!!'}
+						</div>
 					</div>
 					<div
 						style={{
