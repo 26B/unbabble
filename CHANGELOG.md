@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- ElasticPress integration.
+- Query var `ubb_lang_filter` to stop language filter being added to query if value set to false.
+
 ## [0.4.2] - 2024-07-10
 
 ### Added
