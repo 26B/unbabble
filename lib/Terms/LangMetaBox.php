@@ -179,7 +179,7 @@ class LangMetaBox {
 		);
 
 		$bad_language = false;
-		if ( ! empty( $lang ) || ! in_array( $lang, LangInterface::get_languages() ) ) {
+		if ( empty( $lang ) || ! in_array( $lang, LangInterface::get_languages() ) ) {
 			$bad_language = true;
 		}
 
