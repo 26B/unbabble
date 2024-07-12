@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ElasticPress integration.
 - Query var `ubb_lang_filter` to stop language filter being added to query if value set to false.
 
+### Fixed
+
+- Bad language check in term language metabox for hiding creating and linking fields.
+
 ## [0.4.2] - 2024-07-10
 
 ### Added
