@@ -85,7 +85,7 @@ class LangMetaBox {
 	/**
 	 * Prints metabox for when an existing term is being edited.
 	 *
-	 * @since Unreleased Fixed issue with bad language check.
+	 * @since 0.4.3 Fixed issue with bad language check.
 	 * @since 0.4.2 Add new `print_language_select` argument. Check for bad language and stop showing create and link translations if so.
 	 * @since 0.0.1
 	 *
