@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Missing docblock for `ubb_proxy_options` filter.
 - Missing docblock for `Admin\OptionsProxy::is_option_proxiable` method.
 - Versions of docblocks in `Admin\OptionsProxy`.
+- Remove development assets and use production build assets instead.
 
 ### [0.4.3] - 2024-07-12
 

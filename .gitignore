@@ -68,3 +68,7 @@ Thumbs.db
 # PHPUnit Files #
 #################
 .phpunit.result.cache
+
+# JS #
+######
+*.js.map
