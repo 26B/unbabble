@@ -69,4 +69,4 @@ To know which entities are translations of any other entity, we add a meta to al
 
 We welcome all contributors that find our approach reasonable and useful. You may contribute by filing a bug report, suggesting some feature or submiting your own code. We'll revew new features and code submitted through our goals for the project, stated above.
 
-All contributions must include a CHANGELOG entry with adhering to the specification from: https://keepachangelog.com/en/1.1.0/
+All contributions must include a CHANGELOG entry adhering to the specification from: https://keepachangelog.com/en/1.1.0/
