@@ -90,7 +90,7 @@ class OptionsProxy {
 	/**
 	 * Returns whether an option is proxiable by Unbabble.
 	 *
-	 * @since Unreleased Add handling for dynamic option keys.
+	 * @since 0.4.4 Add handling for dynamic option keys.
 	 * @since 0.2.0
 	 *
 	 * @param string $option
