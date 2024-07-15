@@ -117,22 +117,22 @@ class OptionsProxy {
 			return false;
 		}
 
+		// Match literal options before trying dynamic options.
 		if ( in_array( $option, $proxied_options, true ) ) {
 			return true;
 		}
 
 		// Check for dynamic options.
 		foreach ( $proxied_options as $proxied_option ) {
-			$option_regex = null;
-			if ( strpos( $proxied_option, '%d' ) !== false ) {
-				$option_regex = str_replace( '%d', '([0-9]+)', $proxied_option, $count );
-			}
+			$count        = 0;
+			$option_regex = str_replace(
+				[ '%d', '%s' ],
+				[ '([0-9]+)', '([a-zA-Z0-9]+)' ],
+				$proxied_option,
+				$count
+			);
 
-			if ( strpos( $proxied_option, '%s' ) !== false ) {
-				$option_regex = str_replace( '%s', '([a-zA-Z0-9]+)', $proxied_option, $count );
-			}
-
-			if ( $option_regex === null ) {
+			if ( $count === 0 ) {
 				continue;
 			}
 
