@@ -7,7 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### [0.4.3] - 2024-07-12
+### Added
+
+- Develop section on the `README.md`.
+- `wp-env` setup.
+- Update NodeJS to v18.
+- Replace `ReactDOM.render()` with `createRoot` to be compatible with React >17.
+
+### Fixed
+
+- Always include `wp-admin/includes/plugin.php` so we have `is_active_plugin()` in the front-end.
+
+## [0.4.3] - 2024-07-12
 
 ### Added
 
