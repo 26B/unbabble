@@ -48,7 +48,7 @@ $plugin->init();
 	$plugin->run();
 
 	/**
-	 * Detect plugin everywhere, including the fronten.
+	 * Detect plugin everywhere, including the frontend.
 	 *
 	 * @see https://developer.wordpress.org/reference/functions/is_plugin_active/
 	 */
