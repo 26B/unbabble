@@ -46,4 +46,11 @@ $plugin->init();
  */
 \add_action( 'plugins_loaded', function () use ( $plugin ) {
 	$plugin->run();
+
+	/**
+	 * Detect plugin everywhere, including the fronten.
+	 *
+	 * @see https://developer.wordpress.org/reference/functions/is_plugin_active/
+	 */
+	include_once ABSPATH . 'wp-admin/includes/plugin.php';
 } );
