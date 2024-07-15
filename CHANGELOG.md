@@ -18,6 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Always include `wp-admin/includes/plugin.php` so we have `is_active_plugin()` in the front-end.
 
+## [0.4.4] - 2024-07-15
+
+### Added
+
+- Dynamic options key handling for option proxying.
+
+### Fixed
+
+- Missing docblock for `ubb_proxy_options` filter.
+- Missing docblock for `Admin\OptionsProxy::is_option_proxiable` method.
+- Versions of docblocks in `Admin\OptionsProxy`.
+- Remove development assets and use production build assets instead.
+
 ## [0.4.3] - 2024-07-12
 
 ### Added
@@ -382,7 +395,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.3...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.4.4...HEAD
+[0.4.4]: https://github.com/26b/unbabble/compare/0.4.3...0.4.4
 [0.4.3]: https://github.com/26b/unbabble/compare/0.4.2...0.4.3
 [0.4.2]: https://github.com/26b/unbabble/compare/0.4.1...0.4.2
 [0.4.1]: https://github.com/26b/unbabble/compare/0.4.0...0.4.1

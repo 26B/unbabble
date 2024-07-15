@@ -7,14 +7,14 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 /**
  * Proxy system for options relating to specific languages.
  *
- * @since 0.0.0
+ * @since 0.2.0
  */
 class OptionsProxy {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.0.0
+	 * @since 0.2.0
 	 */
 	public function register() {
 		add_filter( 'pre_option', [ $this, 'pre_get_option_proxy' ], 10, 2 );
@@ -35,7 +35,7 @@ class OptionsProxy {
 	 * Always try to load the option from the proxy, even with the default language. This handles
 	 * cases when default language is changed and the values would otherwise be mixed up.
 	 *
-	 * @since 0.0.0
+	 * @since 0.2.0
 	 *
 	 * @param mixed  $option
 	 * @param string $proxied_option
@@ -60,7 +60,7 @@ class OptionsProxy {
 	 * Also updates the base WordPress option when the language is the default. This is to keep the
 	 * default information in the core WordPress incase Unbabble is deactivated/uninstalled.
 	 *
-	 * @since 0.0.0
+	 * @since 0.2.0
 	 *
 	 * @param mixed $value
 	 * @param string $option
@@ -87,8 +87,60 @@ class OptionsProxy {
 		return $old_value;
 	}
 
+	/**
+	 * Returns whether an option is proxiable by Unbabble.
+	 *
+	 * @since 0.4.4 Add handling for dynamic option keys.
+	 * @since 0.2.0
+	 *
+	 * @param string $option
+	 * @return bool
+	 */
 	public function is_option_proxiable( string $option ) : bool {
+		/**
+		 * Returns options that are to be proxied by Unbabble for each language.
+		 *
+		 * Options value is save to the database with the following format:
+		 * - ubb_proxy_({language})_({option_key})
+		 *
+		 * The default language value is always saved to the original option key.
+		 *
+		 * If the option has a dynamic key, like an integer or string, the key should be supplied
+		 * to this filter with a %d for dynamic integers or %s for dynamic strings.
+		 * Example: An option with the keys 'my_option_0', 'my_option_1', etc, would be passed
+		 * as 'my_option_%d' to the filter.
+		 *
+		 * @since 0.2.0
+		 */
 		$proxied_options = apply_filters( 'ubb_proxy_options', [] );
-		return is_array( $proxied_options ) && in_array( $option, $proxied_options, true );
+		if ( ! is_array( $proxied_options ) ) {
+			return false;
+		}
+
+		// Match literal options before trying dynamic options.
+		if ( in_array( $option, $proxied_options, true ) ) {
+			return true;
+		}
+
+		// Check for dynamic options.
+		foreach ( $proxied_options as $proxied_option ) {
+			$count        = 0;
+			$option_regex = str_replace(
+				[ '%d', '%s' ],
+				[ '([0-9]+)', '([a-zA-Z0-9]+)' ],
+				$proxied_option,
+				$count
+			);
+
+			if ( $count === 0 ) {
+				continue;
+			}
+
+			if ( preg_match( '/^' . $option_regex . '$/', $option ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
