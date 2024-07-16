@@ -910,7 +910,7 @@ class LangInterface {
 	 * @return bool
 	 */
 	public static function is_unbabble_active() : bool {
-		return is_plugin_active( 'unbabble/unbabble.php' );
+		return \is_plugin_active( 'unbabble/unbabble.php' );
 	}
 
 	/**
