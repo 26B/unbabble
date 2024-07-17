@@ -22,6 +22,7 @@ class Directory {
 	 * directory is removed and the lang query argument is added. This procedure needs to be done as
 	 * early as possible in order to avoid problems.
 	 *
+	 * @since Unreleased Remove check for directory, already done inside current_lang_from_uri.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -35,10 +36,7 @@ class Directory {
 			return;
 		}
 
-		$directory = $this->get_directory_name( $lang );
-		if ( str_starts_with( $request_uri, "/{$directory}/" ) ) {
-			$_GET['lang'] = $lang;
-		}
+		$_GET['lang'] = $lang;
 	}
 
 	/**
@@ -47,6 +45,7 @@ class Directory {
 	 * If the $uri does not contain a known directory (language), then the first argument $curr_lang
 	 * is returned.
 	 *
+	 * @since Unreleased Add check for routes like `{directory}?{key}={value}`.
 	 * @since 0.0.1
 	 *
 	 * @param string $curr_lang
@@ -62,6 +61,8 @@ class Directory {
 			}
 			$directory = $this->get_directory_name( $lang );
 			if ( str_starts_with( $uri, "/{$directory}/" ) ) {
+				return $lang;
+			} else if ( str_starts_with( $uri, "/{$directory}?" ) ) {
 				return $lang;
 			}
 		}
