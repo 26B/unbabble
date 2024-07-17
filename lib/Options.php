@@ -113,6 +113,7 @@ class Options {
 	 * Updates the Unbabble options if the value returned from the filter `ubb_options` is
 	 * different from the saved options.
 	 *
+	 * @since Unreleased Force 'nav_menu' and 'nav_menu_item' to be translatable if one of them is.
 	 * @since 0.0.11
 	 *
 	 * @return void
@@ -159,6 +160,23 @@ class Options {
 			// TODO: shows up twice if both the loading and the update are invalid.
 			\add_filter( 'admin_notices', fn () => ( new Admin() )->invalid_options_notice( \__( 'updating options', 'unbabble' ), $errors ), 0 );
 			return;
+		}
+
+		/**
+		 * If one of `nav_menu_item` and `nav_menu` are translatable but the other one isn't,
+		 * force the missing one into the options.
+		 */
+		if (
+			in_array( 'nav_menu_item', $filter_options['post_types'], true )
+			&& ! in_array( 'nav_menu', $filter_options['taxonomies'], true )
+		) {
+			$filter_options['taxonomies'][] = 'nav_menu';
+
+		} else if (
+			in_array( 'nav_menu', $filter_options['taxonomies'], true )
+			&& ! in_array( 'nav_menu_item', $filter_options['post_types'], true )
+		) {
+			$filter_options['post_types'][] = 'nav_menu_item';
 		}
 
 		$options = self::get();
