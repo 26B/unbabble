@@ -549,7 +549,13 @@ const SearchBar = ({
   refetch,
   disabled
 }) => {
-  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("form", {
+    onSubmit: e => {
+      e.preventDefault();
+      refetch();
+      return false;
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     style: {
       display: 'flex',
       width: '100%'
@@ -561,27 +567,22 @@ const SearchBar = ({
     style: {
       width: '100%'
     },
-    onKeyDown: e => {
-      if (event.key === 'Enter') {
-        setSearch(e.target.value);
-        refetch(e.target.value);
-      }
-    },
     disabled: disabled
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
     style: {
       marginLeft: '8px'
     },
     variant: "primary",
-    onClick: () => refetch(search),
-    disabled: disabled
-  }, "Search"));
+    onClick: () => refetch(),
+    disabled: disabled,
+    type: "submit"
+  }, "Search")));
 };
 const LinkTranslations = ({
   postId,
   refetchLangs
 }) => {
-  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
+  const [isModalOpen, setIsModalOpen] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const {
     data,
     refetch,
@@ -592,7 +593,9 @@ const LinkTranslations = ({
   const [totalPages, setTotalPages] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(data?.pages || 1);
   const [search, setSearch] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
   const previousPage = () => {
     if (page <= 1) {
       return;
@@ -607,9 +610,9 @@ const LinkTranslations = ({
     setPage(page + 1);
     refetch(page + 1, search);
   };
-  const fetchSearch = searchValue => {
+  const fetchSearch = () => {
     setPage(1);
-    refetch(1, searchValue);
+    refetch(1, search);
   };
   if (!isLoading && totalPages !== (data?.pages || 1)) {
     setTotalPages(data?.pages || 1);
@@ -626,7 +629,6 @@ const LinkTranslations = ({
     style: {
       display: 'grid',
       flexWrap: 'wrap',
-      padding: '20px',
       gap: '8px'
     }
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
@@ -654,20 +656,26 @@ const LinkTranslations = ({
     overlay: true
   }), !isLoading && data?.options && data.options.length === 0 && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, "No results found."), isError && 'ERROR!!!')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     style: {
+      position: 'sticky',
       display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       width: '100%',
-      paddingLeft: '20px'
+      marginTop: 20
     }
-  }, page > 1 && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
     variant: "secondary",
-    onClick: previousPage
-  }, "Previous Page"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("b", {
+    onClick: previousPage,
+    disabled: page < 2
+  }, "Previous Page"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
     style: {
-      padding: '10px'
+      display: 'flex',
+      gap: 5
     }
-  }, page), page < totalPages && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, page), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, "/"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, totalPages)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
     variant: "secondary",
-    onClick: nextPage
+    onClick: nextPage,
+    disabled: page >= totalPages
   }, "Next Page"))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
     style: {
       boxSizing: 'border-box'

@@ -92,41 +92,46 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 
 const SearchBar = ({ search, setSearch, refetch, disabled }) => {
 	return (
-		<div style={{ display: 'flex', width: '100%' }}>
-			<input
-				type="text"
-				value={search}
-				onChange={(e) => setSearch(e.target.value)}
-				style={{ width: '100%' }}
-				onKeyDown={(e) => {
-					if (event.key === 'Enter') {
-						setSearch(e.target.value);
-						refetch(e.target.value);
-					}
-				}}
-				disabled={disabled}
-			/>
-			<Button
-				style={{ marginLeft: '8px' }}
-				variant="primary"
-				onClick={() => refetch(search)}
-				disabled={disabled}
-			>
-				Search
-			</Button>
-		</div>
+		<form
+			onSubmit={(e) => {
+				e.preventDefault();
+				refetch();
+				return false;
+			}}
+		>
+			<div style={{ display: 'flex', width: '100%' }}>
+				<input
+					type="text"
+					value={search}
+					onChange={(e) => setSearch(e.target.value)}
+					style={{ width: '100%' }}
+					disabled={disabled}
+				/>
+				<Button
+					style={{ marginLeft: '8px' }}
+					variant="primary"
+					onClick={() => refetch()}
+					disabled={disabled}
+					type="submit"
+				>
+					Search
+				</Button>
+			</div>
+		</form>
 	);
 };
 
 const LinkTranslations = ({ postId, refetchLangs }) => {
-	const [isModalOpen, setIsModalOpen] = useState(true);
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { data, refetch, isLoading, isError } = useLinkablePosts(postId, 1);
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(data?.pages || 1);
 	const [search, setSearch] = useState('');
 
 	const openModal = () => setIsModalOpen(true);
-	const closeModal = () => setIsModalOpen(false);
+	const closeModal = () => {
+		setIsModalOpen(false);
+	};
 	const previousPage = () => {
 		if (page <= 1) {
 			return;
@@ -143,9 +148,9 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 		refetch(page + 1, search);
 	};
 
-	const fetchSearch = (searchValue) => {
+	const fetchSearch = () => {
 		setPage(1);
-		refetch(1, searchValue);
+		refetch(1, search);
 	};
 
 	if (!isLoading && totalPages !== (data?.pages || 1)) {
@@ -167,7 +172,6 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 						style={{
 							display: 'grid',
 							flexWrap: 'wrap',
-							padding: '20px',
 							gap: '8px',
 						}}
 					>
@@ -212,22 +216,33 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 					</div>
 					<div
 						style={{
+							position: 'sticky',
 							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center',
 							width: '100%',
-							paddingLeft: '20px',
+							marginTop: 20,
 						}}
 					>
-						{page > 1 && (
-							<Button variant="secondary" onClick={previousPage}>
-								Previous Page
-							</Button>
-						)}
-						<b style={{ padding: '10px' }}>{page}</b>
-						{page < totalPages && (
-							<Button variant="secondary" onClick={nextPage}>
-								Next Page
-							</Button>
-						)}
+						<Button
+							variant="secondary"
+							onClick={previousPage}
+							disabled={page < 2}
+						>
+							Previous Page
+						</Button>
+						<span style={{ display: 'flex', gap: 5 }}>
+							<strong>{page}</strong>
+							<span>/</span>
+							<span>{totalPages}</span>
+						</span>
+						<Button
+							variant="secondary"
+							onClick={nextPage}
+							disabled={page >= totalPages}
+						>
+							Next Page
+						</Button>
 					</div>
 				</Modal>
 			)}
