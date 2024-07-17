@@ -163,6 +163,7 @@ class BulkEdit {
 	/**
 	 * Saves the bulk edit.
 	 *
+	 * @since Unreleased Fix $_GET['bulk_edit'] check.
 	 * @since 0.4.0
 	 *
 	 * @param int $post_id Post ID.
@@ -171,7 +172,7 @@ class BulkEdit {
 	public function save_bulk_edit( int $post_id ) : void {
 
 		// Make sure we're in a bulk edit for posts.
-		if ( ( $_GET['bulk_edit'] ?? '' ) !== 'Update' || ( $_GET['action'] ?? '' ) !== 'edit' ) {
+		if ( ! isset( $_GET['bulk_edit'] ) || ( $_GET['action'] ?? '' ) !== 'edit' ) {
 			return;
 		}
 
@@ -268,6 +269,7 @@ class BulkEdit {
 	/**
 	 * Add language update fail count to bulk edit redirect.
 	 *
+	 * @since Unreleased Fix $_GET['bulk_edit'] check.
 	 * @since 0.4.0
 	 *
 	 * @param string $location
@@ -276,7 +278,7 @@ class BulkEdit {
 	public function bulk_edit_redirect( string $location ) : string {
 
 		// Make sure we're in a bulk edit for posts.
-		if ( ( $_REQUEST['bulk_edit'] ?? '' ) !== 'Update' || ( $_REQUEST['action'] ?? '' ) !== 'edit' ) {
+		if ( ! isset( $_REQUEST['bulk_edit'] ) || ( $_REQUEST['action'] ?? '' ) !== 'edit' ) {
 			return $location;
 		}
 
