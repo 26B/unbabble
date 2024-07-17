@@ -7,11 +7,7 @@ This plugin aims to be several things which, hopefully, we'll be able to keep:
 - Simple concepts of translation
 - Aligned with how we found translations to be used in WordPress (it's our take after all)
 - Developer first APIs and configuration
-- No magic stuff, just default to something obvious, even if wrong.
-
-## Developing
-
-We use a standard WordPress plugin approach with OOP style and composer to manage dependencies. There are also some screens that are made with JavaScript, using ReactJS, and we try to match all the minimum requirements from WordPress.
+- No magic stuff, just default to something obvious, even if wrong or causes an error.
 
 ## No more than what's needed
 
@@ -65,8 +61,50 @@ To know which entities are translations of any other entity, we add a meta to al
 
 - Only one translation for a given `ubb_source` with the same locale (avoids multiple options for the same entity). This does not break the site, but is shown as an issue. By default, when many posts share the same language, it first is selected.
 
-# Contributions
+## Develop
+
+We use a standard WordPress plugin approach with OOP style and composer to manage dependencies. There are also some screens that are made with JavaScript, using ReactJS, and we try to match all the minimum requirements from WordPress.
+
+Development requires:
+
+- NodeJS v18
+- PHP >=8.0
+- Composer v2
+- WordPress >=6.5
+- Docker (optional)
+
+To get up and running follow the steps below.
+
+- Clone and install dependencies
+
+```bash
+# Clone the repository.
+git clone git@github.com:26B/unbabble.git
+
+# Switch to the plugin folder and install dependencies
+cd unbabble
+composer install
+npm install
+```
+
+- If you want to use docker, you can use `@wordpress/env` to set it up
+
+```bash
+# Local wp-env setup
+npm run wp-env start
+
+# If you have a global wp-env install just use that
+wp-env start
+```
+
+- Build development assets and watch for changes
+
+```bash
+npm run start
+```
+
+## Contributions
 
 We welcome all contributors that find our approach reasonable and useful. You may contribute by filing a bug report, suggesting some feature or submiting your own code. We'll revew new features and code submitted through our goals for the project, stated above.
 
-All contributions must include a CHANGELOG entry with adhering to the specification from: https://keepachangelog.com/en/1.1.0/
+All contributions must include a CHANGELOG entry adhering to the specification from: https://keepachangelog.com/en/1.1.0/

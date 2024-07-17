@@ -16,6 +16,7 @@ class EditFilters {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Add views-edit-{$post_type} filter for all translatable post types.
 	 * @since 0.4.2 Remove filter in $_GET when not in admin. Only add filter hook when $_GET filter is set. Stop post lang filter from being applied.
 	 * @since 0.0.1
 	 */
@@ -27,7 +28,10 @@ class EditFilters {
 			return;
 		}
 
-		\add_filter( 'views_edit-post', [ $this, 'add_no_lang_filter' ], 10 );
+		$post_types = LangInterface::get_translatable_post_types();
+		foreach ( $post_types as $post_type ) {
+			\add_filter( "views_edit-{$post_type}", [ $this, 'add_no_lang_filter' ], 10 );
+		}
 
 		// Only add this filter if the post filter is set in $_GET
 		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
@@ -39,6 +43,7 @@ class EditFilters {
 	/**
 	 * Adds a filter to show posts without language.
 	 *
+	 * @since Unreleased Get post type via $_GET instead of `get_post`.
 	 * @since 0.4.2 Fixed the query not considering posts with unknown language.
 	 * @since 0.4.0
 	 *
@@ -47,7 +52,7 @@ class EditFilters {
 	 */
 	public function add_no_lang_filter( array $views ) : array {
 		global $wpdb;
-		$post_type = \get_post_type();
+		$post_type = $_GET['post_type'] ?? 'post';
 		if (
 			empty( $post_type )
 			|| ! is_string( $post_type )

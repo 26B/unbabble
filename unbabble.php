@@ -4,7 +4,7 @@
  * Plugin Name: Unbabble
  * Plugin URI:  https://github.com/26B/unbabble
  * Description: A new and simple i18n system for WordPress
- * Version:     0.4.2
+ * Version:     0.4.4
  * Author:      26B
  * Author URI:  https://26b.io/
  * License:     GPL-2.0+
@@ -12,6 +12,14 @@
  * Text Domain: unbabble
  * Domain Path: /languages
  */
+
+// Useful global constants.
+define( 'UNBABBLE_PLUGIN_VERSION', '0.1.0' );
+define( 'UNBABBLE_PLUGIN_URL', \plugin_dir_url( __FILE__ ) );
+define( 'UNBABBLE_PLUGIN_PATH', \plugin_dir_path( __FILE__ ) );
+define( 'UNBABBLE_PLUGIN_LIB', UNBABBLE_PLUGIN_PATH . 'lib/' );
+define( 'UNBABBLE_PLUGIN_BUILD_URL', UNBABBLE_PLUGIN_URL . 'build/' );
+define( 'UNBABBLE_PLUGIN_BUILD_PATH', UNBABBLE_PLUGIN_PATH . 'build/' );
 
 if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
 	require_once dirname( __FILE__ ) . '/vendor/autoload.php';
@@ -34,7 +42,7 @@ if ( ! defined( 'WPINC' ) ) {
  */
 \register_deactivation_hook( __FILE__, '\TwentySixB\WP\Plugin\Unbabble\Deactivator::deactivate' );
 
-$plugin = new TwentySixB\WP\Plugin\Unbabble\Plugin( 'unbabble', '0.4.2' );
+$plugin = new TwentySixB\WP\Plugin\Unbabble\Plugin( 'unbabble', '0.4.4' );
 
 // Initialize plugin.
 $plugin->init();
@@ -46,4 +54,11 @@ $plugin->init();
  */
 \add_action( 'plugins_loaded', function () use ( $plugin ) {
 	$plugin->run();
+
+	/**
+	 * Detect plugin everywhere, including the frontend.
+	 *
+	 * @see https://developer.wordpress.org/reference/functions/is_plugin_active/
+	 */
+	include_once ABSPATH . 'wp-admin/includes/plugin.php';
 } );

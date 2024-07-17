@@ -10,10 +10,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Search filter for link translations.
+- Add hidden input `ubb_source` for new menu's when linking.
+- Delete term's empty string `ubb_source`'s from the DB if found.
+- Add handling for nav_menu language change.
+- Develop section on the `README.md`.
+- `wp-env` setup.
+- Update NodeJS to v18.
+- Replace `ReactDOM.render()` with `createRoot` to be compatible with React >17.
+- SearchWP integration.
 
 ### Changed
 
 - Improved loading in link translations modal.
+
+### Fixed
+
+- Always include `wp-admin/includes/plugin.php` so we have `is_active_plugin()` in the front-end.
+- Directory routing in cases for routes with `{directory}?{key}={value}`.
+- Added missing return when terms are empty in `LangInterface::get_terms_for_source`.
+- Bulk edit not working on non english back-offices and for non `post` post types.
+- No language filters not showing up for non `post` post types.
+
+## [0.4.4] - 2024-07-15
+
+### Added
+
+- Dynamic options key handling for option proxying.
+
+### Fixed
+
+- Missing docblock for `ubb_proxy_options` filter.
+- Missing docblock for `Admin\OptionsProxy::is_option_proxiable` method.
+- Versions of docblocks in `Admin\OptionsProxy`.
+- Remove development assets and use production build assets instead.
+
+## [0.4.3] - 2024-07-12
+
+### Added
+
+- ElasticPress integration.
+- Query var `ubb_lang_filter` to stop language filter being added to query if value set to false.
+
+### Fixed
+
+- Bad language check in term language metabox for hiding creating and linking fields.
 
 ## [0.4.2] - 2024-07-10
 
@@ -368,7 +408,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.2...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.4.4...HEAD
+[0.4.4]: https://github.com/26b/unbabble/compare/0.4.3...0.4.4
+[0.4.3]: https://github.com/26b/unbabble/compare/0.4.2...0.4.3
 [0.4.2]: https://github.com/26b/unbabble/compare/0.4.1...0.4.2
 [0.4.1]: https://github.com/26b/unbabble/compare/0.4.0...0.4.1
 [0.4.0]: https://github.com/26b/unbabble/compare/0.3.1...0.4.0

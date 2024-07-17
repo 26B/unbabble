@@ -6,7 +6,9 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\ElasticPress;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\Relevanssi;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\SearchWP;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastSEO;
 use WP_CLI;
 
@@ -235,8 +237,10 @@ class Plugin {
 			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
 		];
 		$integrations = [
-			Relevanssi::class => 'relevanssi/relevanssi.php',
-			YoastSEO::class => 'wordpress-seo/wp-seo.php',
+			Relevanssi::class   => 'relevanssi/relevanssi.php',
+			ElasticPress::class => 'elasticpress/elasticpress.php',
+			YoastSEO::class     => 'wordpress-seo/wp-seo.php',
+			SearchWP::class     => 'searchwp/index.php',
 		];
 
 		\add_action( 'admin_init', function() use ( $admin_integrations ) {

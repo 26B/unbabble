@@ -164,7 +164,7 @@ class Post {
 		try {
 
 			// Check if the Yoast's duplicate post plugin is active.
-			if ( ! is_plugin_active( 'duplicate-post/duplicate-post.php' ) ) {
+			if ( ! \is_plugin_active( 'duplicate-post/duplicate-post.php' ) ) {
 				return new WP_REST_Response( null, 404 );
 			}
 
