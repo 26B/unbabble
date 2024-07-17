@@ -697,6 +697,7 @@ class LangInterface {
 	/**
 	 * Returns the term's source ID.
 	 *
+	 * @since Unreleased Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
 	 * @param int $term_id ID of the term to get source for.
@@ -706,11 +707,25 @@ class LangInterface {
 		$transient_key = sprintf( 'ubb_%s_term_source', $term_id );
 		$source_id     = \get_transient( $transient_key );
 		if ( $source_id !== false ) {
-			return is_string( $source_id ) ? $source_id: null;
+			return is_string( $source_id ) ? $source_id : null;
 		}
 
-		$source_id = get_term_meta( $term_id, 'ubb_source', true );
-		$source_id = empty( $source_id ) ? null : $source_id;
+		$source_id = \get_term_meta( $term_id, 'ubb_source', true );
+
+		/**
+		 * If the source_id is an empty string, delete it and return null.
+		 *
+		 * `get_term_meta` returns empty string when term id doesn't exist, so we are unable to
+		 * know if there is an actual empty string in the DB or not, so we try to delete it
+		 * either way.
+		 */
+		if ( is_string( $source_id ) && empty( $source_id ) ) {
+			\delete_term_meta( $term_id, 'ubb_source' );
+			$source_id = null;
+
+		} else {
+			$source_id = empty( $source_id ) ? null : $source_id;
+		}
 
 		\set_transient( $transient_key, $source_id, 30 );
 
@@ -751,7 +766,7 @@ class LangInterface {
 	 */
 	public static function get_term_translations( int $term_id ) : array {
 		$source_id = self::get_term_source( $term_id );
-		if ( $source_id === null ) {
+		if ( empty( $source_id ) ) {
 			return [];
 		}
 
@@ -808,6 +823,7 @@ class LangInterface {
 	/**
 	 * Returns the terms for a source ID.
 	 *
+	 * @since Unreleased Added missing return when terms are empty.
 	 * @since 0.0.1
 	 *
 	 * @param string $source_id The source ID to get translations map.
@@ -842,6 +858,7 @@ class LangInterface {
 		// Protection, but shouldn't happen.
 		if ( empty( $ids_str ) ) {
 			\set_transient( $transient_key, [], 30 );
+			return [];
 		}
 
 		$term_langs = $wpdb->get_results(

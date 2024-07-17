@@ -25,6 +25,7 @@ class ChangeLanguage {
 	/**
 	 * Change the language of the saved term.
 	 *
+	 * @since Unreleased Add handling for nav_menu language change.
 	 * @since 0.0.1
 	 *
 	 * @param int $term_id
@@ -37,7 +38,19 @@ class ChangeLanguage {
 		}
 
 		$taxonomy = $term->taxonomy;
-		if ( ( $_POST['taxonomy'] ?? '' ) !== $taxonomy || $term_id !== (int) $_POST['tag_ID'] ) {
+		if (
+			// Check for nav_menu edits.
+			! (
+				LangInterface::is_taxonomy_translatable( 'nav_menu' )
+				&& $term_id === (int) ( $_POST['menu'] ?? '' )
+			)
+			&&
+			// Check for most taxonomy edits.
+			! (
+				( $_POST['taxonomy'] ?? '' ) === $taxonomy
+				&& $term_id === (int) ( $_POST['tag_ID']  ?? '' )
+			)
+		) {
 			return;
 		}
 

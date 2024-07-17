@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add hidden input `ubb_source` for new menu's when linking.
+- Delete term's empty string `ubb_source`'s from the DB if found.
+- Add handling for nav_menu language change.
 - Develop section on the `README.md`.
 - `wp-env` setup.
 - Update NodeJS to v18.
@@ -17,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Always include `wp-admin/includes/plugin.php` so we have `is_active_plugin()` in the front-end.
+- Added missing return when terms are empty in `LangInterface::get_terms_for_source`.
 - Bulk edit not working on non english back-offices and for non `post` post types.
 - No language filters not showing up for non `post` post types.
 
