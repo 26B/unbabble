@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `wp-env` setup.
 - Update NodeJS to v18.
 - Replace `ReactDOM.render()` with `createRoot` to be compatible with React >17.
+- SearchWP integration.
 
 ### Fixed
 

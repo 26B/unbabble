@@ -61,6 +61,12 @@ class LangFilter {
 		$post_lang_table         = ( new PostTable() )->get_table_name();
 		$translatable_post_types = implode( "','", LangInterface::get_translatable_post_types() );
 
+		/**
+		 *  FIXME: possible problem when making a post type untranslatable, the locale info will
+		 *  still be in the table but it should be ignored.
+		 *
+		 * Should we only show untranslatable posts that have the default language or NULL.
+		 */
 		return "SELECT post_id
 			FROM {$post_lang_table} AS PT
 			WHERE locale = '{$current_lang}'
