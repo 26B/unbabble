@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Always include `wp-admin/includes/plugin.php` so we have `is_active_plugin()` in the front-end.
+- Directory routing in cases for routes with `{directory}?{key}={value}`.
 
 ## [0.4.4] - 2024-07-15
 
