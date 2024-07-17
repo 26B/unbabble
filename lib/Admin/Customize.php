@@ -23,7 +23,7 @@ class Customize {
 	public function register() {
 
 		// Only register customize hooks if nav_menu is translatable.
-		if ( ! LangInterface::is_post_type_translatable( 'nav_menu' ) ) {
+		if ( ! LangInterface::is_taxonomy_translatable( 'nav_menu' ) ) {
 			return;
 		}
 
