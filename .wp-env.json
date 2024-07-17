@@ -1,11 +1,5 @@
 {
 	"core": "WordPress/WordPress#6.5.5",
 	"phpVersion": "8.1",
-	"plugins": [ "." ],
-	"config": {
-		"WP_DEBUG": true,
-		"WP_DEBUG_LOG": "wp-content/plugins/unbabble/debug.log",
-		"WP_DEBUG_DISPLAY": false,
-		"SCRIPT_DEBUG": true
-	}
+	"plugins": [ "." ]
 }

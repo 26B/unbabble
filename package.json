@@ -20,7 +20,12 @@
 		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
 		"test:unit": "wp-scripts test-unit-js",
-		"wp-env": "wp-env"
+		"wp-env": "wp-env",
+		"wp-env:start": "wp-env start",
+		"wp-env:stop": "wp-env stop",
+		"wp-env:update": "wp-env start --update",
+		"composer": "wp-env run cli --env-cwd=wp-content/plugins/unbabble composer",
+		"wp": "wp-env run cli --env-cwd=wp-content/plugins/unbabble wp"
 	},
 	"repository": {
 		"type": "git",
@@ -38,9 +43,9 @@
 	"homepage": "https://github.com/26B/unbabble#readme",
 	"devDependencies": {
 		"@wordpress/env": "^10.3.0",
-		"@wordpress/scripts": "^28.3.0"
+		"@wordpress/scripts": "^27.0.0"
 	},
 	"dependencies": {
-		"@wordpress/components": "^28.3.0"
+		"@wordpress/icons": "^10.3.0"
 	}
 }
