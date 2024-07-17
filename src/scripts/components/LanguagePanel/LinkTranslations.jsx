@@ -1,11 +1,20 @@
 import { useState } from 'react';
 
-import { Button, Notice, Modal } from '@wordpress/components';
+import {
+	Button,
+	Notice,
+	Modal,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalZStack as ZStack,
+	// eslint-disable-next-line @wordpress/no-unsafe-wp-apis
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 
 import Collapse from '../Collapse';
 import useLinkablePosts from '../../hooks/useLinkablePosts';
 import { withLangContext } from '../../contexts/LangContext';
 import useLinkPost from '../../hooks/useLinkPost';
+import Loading from '../Loading';
 
 const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 	const { mutate, isLoading, isSuccess, isError } = useLinkPost(
@@ -54,6 +63,7 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 							</h4>
 							{posts.slice(1).map(({ title, ID, lang }) => (
 								<div
+									key={`link-other-${ID}`}
 									style={{
 										width: '100%',
 										justifyContent: 'space-between',
@@ -80,20 +90,54 @@ const LinkOption = ({ postId, refetchLangs, posts, source }) => {
 	);
 };
 
+const SearchBar = ({ search, setSearch, refetch, disabled }) => {
+	return (
+		<form
+			onSubmit={(e) => {
+				e.preventDefault();
+				refetch();
+				return false;
+			}}
+		>
+			<div style={{ display: 'flex', width: '100%' }}>
+				<input
+					type="text"
+					value={search}
+					onChange={(e) => setSearch(e.target.value)}
+					style={{ width: '100%' }}
+					disabled={disabled}
+				/>
+				<Button
+					style={{ marginLeft: '8px' }}
+					variant="primary"
+					onClick={() => refetch()}
+					disabled={disabled}
+					type="submit"
+				>
+					Search
+				</Button>
+			</div>
+		</form>
+	);
+};
+
 const LinkTranslations = ({ postId, refetchLangs }) => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const { data, refetch, isLoading, isError } = useLinkablePosts(postId, 1);
 	const [page, setPage] = useState(1);
 	const [totalPages, setTotalPages] = useState(data?.pages || 1);
+	const [search, setSearch] = useState('');
 
 	const openModal = () => setIsModalOpen(true);
-	const closeModal = () => setIsModalOpen(false);
+	const closeModal = () => {
+		setIsModalOpen(false);
+	};
 	const previousPage = () => {
 		if (page <= 1) {
 			return;
 		}
 		setPage(page - 1);
-		refetch(page - 1);
+		refetch(page - 1, search);
 	};
 
 	const nextPage = () => {
@@ -101,7 +145,12 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 			return;
 		}
 		setPage(page + 1);
-		refetch(page + 1);
+		refetch(page + 1, search);
+	};
+
+	const fetchSearch = () => {
+		setPage(1);
+		refetch(1, search);
 	};
 
 	if (!isLoading && totalPages !== (data?.pages || 1)) {
@@ -117,12 +166,12 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 				<Modal
 					title="Link to existing posts:"
 					onRequestClose={closeModal}
+					size="large"
 				>
 					<div
 						style={{
 							display: 'grid',
 							flexWrap: 'wrap',
-							padding: '20px',
 							gap: '8px',
 						}}
 					>
@@ -135,36 +184,65 @@ const LinkTranslations = ({ postId, refetchLangs }) => {
 							You will unlink from the post's current translations
 							if you link to another.
 						</Notice>
-						{isLoading && 'Loading...'}
-						{isError && 'ERROR!!!'}
-						{!isLoading &&
-							data?.options &&
-							data.options.map((option) => (
-								<LinkOption
-									{...option}
-									postId={postId}
-									refetchLangs={refetchLangs}
-								/>
-							))}
+						<SearchBar
+							search={search}
+							setSearch={setSearch}
+							refetch={fetchSearch}
+							disabled={isLoading}
+						/>
+						<div
+							style={{ position: 'relative', minHeight: '50px' }}
+						>
+							{data?.options && data.options.length !== 0 && (
+								<VStack expanded>
+									{data.options.map((option) => (
+										<LinkOption
+											key={`link-option-${option.source}`}
+											{...option}
+											postId={postId}
+											refetchLangs={refetchLangs}
+										/>
+									))}
+								</VStack>
+							)}
+							{isLoading && <Loading overlay />}
+							{!isLoading &&
+								data?.options &&
+								data.options.length === 0 && (
+									<div>No results found.</div>
+								)}
+							{isError && 'ERROR!!!'}
+						</div>
 					</div>
 					<div
 						style={{
+							position: 'sticky',
 							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center',
 							width: '100%',
-							paddingLeft: '20px',
+							marginTop: 20,
 						}}
 					>
-						{page > 1 && (
-							<Button variant="secondary" onClick={previousPage}>
-								Previous Page
-							</Button>
-						)}
-						<b style={{ padding: '10px' }}>{page}</b>
-						{page < totalPages && (
-							<Button variant="secondary" onClick={nextPage}>
-								Next Page
-							</Button>
-						)}
+						<Button
+							variant="secondary"
+							onClick={previousPage}
+							disabled={page < 2}
+						>
+							Previous Page
+						</Button>
+						<span style={{ display: 'flex', gap: 5 }}>
+							<strong>{page}</strong>
+							<span>/</span>
+							<span>{totalPages}</span>
+						</span>
+						<Button
+							variant="secondary"
+							onClick={nextPage}
+							disabled={page >= totalPages}
+						>
+							Next Page
+						</Button>
 					</div>
 				</Modal>
 			)}

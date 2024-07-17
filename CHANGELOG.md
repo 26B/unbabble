@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Search filter for link translations.
 - Add hidden input `ubb_source` for new menu's when linking.
 - Delete term's empty string `ubb_source`'s from the DB if found.
 - Add handling for nav_menu language change.
@@ -17,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update NodeJS to v18.
 - Replace `ReactDOM.render()` with `createRoot` to be compatible with React >17.
 - SearchWP integration.
+
+### Changed
+
+- Improved loading in link translations modal.
 
 ### Fixed
 

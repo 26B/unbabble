@@ -29,9 +29,9 @@ export const linkPost = async (id, translationId) =>
 		url: `/edit/post/${id}/translation/${translationId}/link`,
 	});
 
-export const linkablePosts = (id, page) =>
+export const linkablePosts = (id, page, search = '') =>
 	request({
-		url: `/edit/post/${id}/translation/link?page=${page}`,
+		url: `/edit/post/${id}/translation/link?page=${page}&s=${search}`,
 	});
 
 export const submitOptions = (data) =>

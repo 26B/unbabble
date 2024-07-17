@@ -475,7 +475,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _hooks_useLinkablePosts__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../hooks/useLinkablePosts */ "./src/scripts/hooks/useLinkablePosts.js");
 /* harmony import */ var _contexts_LangContext__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../contexts/LangContext */ "./src/scripts/contexts/LangContext.jsx");
 /* harmony import */ var _hooks_useLinkPost__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../hooks/useLinkPost */ "./src/scripts/hooks/useLinkPost.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _Loading__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Loading */ "./src/scripts/components/Loading.jsx");
+
 
 
 
@@ -497,62 +498,85 @@ const LinkOption = ({
   } = (0,_hooks_useLinkPost__WEBPACK_IMPORTED_MODULE_5__["default"])(postId, source);
   const onLink = () => mutate().then(() => refetchLangs());
   const main_post = posts[0];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     style: {
       display: 'flex',
       justifyContent: 'space-between',
       border: '1px solid #e0e0e0',
       padding: '8px'
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(1, 1fr)',
+      alignContent: 'center'
+    }
+  }, posts.length === 1 && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("summary", null, '(' + main_post.lang + ') ' + main_post.title), posts.length > 1 && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_Collapse__WEBPACK_IMPORTED_MODULE_2__["default"], {
+    title: '(' + main_post.lang + ') ' + main_post.title
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      marginLeft: 20
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h4", {
+    style: {
+      marginTop: 0
+    }
+  }, "Other translations in the group:"), posts.slice(1).map(({
+    title,
+    ID,
+    lang
+  }) => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    key: `link-other-${ID}`,
+    style: {
+      width: '100%',
+      justifyContent: 'space-between'
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, "(", lang, ") "), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, title, " ")))))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    variant: "secondary",
+    onClick: onLink,
+    disabled: isLoading || isSuccess,
+    style: {
+      height: 'min-content',
+      margin: 'auto 0 auto 32px'
+    }
+  }, !isSuccess && 'Link', isSuccess && 'Linked'));
+};
+const SearchBar = ({
+  search,
+  setSearch,
+  refetch,
+  disabled
+}) => {
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("form", {
+    onSubmit: e => {
+      e.preventDefault();
+      refetch();
+      return false;
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      display: 'flex',
+      width: '100%'
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: "text",
+    value: search,
+    onChange: e => setSearch(e.target.value),
+    style: {
+      width: '100%'
     },
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-      style: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(1, 1fr)',
-        alignContent: 'center'
-      },
-      children: [posts.length === 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("summary", {
-        children: '(' + main_post.lang + ') ' + main_post.title
-      }), posts.length > 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_Collapse__WEBPACK_IMPORTED_MODULE_2__["default"], {
-        title: '(' + main_post.lang + ') ' + main_post.title,
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-          style: {
-            display: 'flex',
-            flexWrap: 'wrap',
-            marginLeft: 20
-          },
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("h4", {
-            style: {
-              marginTop: 0
-            },
-            children: "Other translations in the group:"
-          }), posts.slice(1).map(({
-            title,
-            ID,
-            lang
-          }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-            style: {
-              width: '100%',
-              justifyContent: 'space-between'
-            },
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("span", {
-              children: ["(", lang, ") "]
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("span", {
-              children: [title, " "]
-            })]
-          }))]
-        })
-      })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-      variant: "secondary",
-      onClick: onLink,
-      disabled: isLoading || isSuccess,
-      style: {
-        height: 'min-content',
-        margin: 'auto 0 auto 32px'
-      },
-      children: [!isSuccess && 'Link', isSuccess && 'Linked']
-    })]
-  });
+    disabled: disabled
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    style: {
+      marginLeft: '8px'
+    },
+    variant: "primary",
+    onClick: () => refetch(),
+    disabled: disabled,
+    type: "submit"
+  }, "Search")));
 };
 const LinkTranslations = ({
   postId,
@@ -567,21 +591,28 @@ const LinkTranslations = ({
   } = (0,_hooks_useLinkablePosts__WEBPACK_IMPORTED_MODULE_3__["default"])(postId, 1);
   const [page, setPage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(1);
   const [totalPages, setTotalPages] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(data?.pages || 1);
+  const [search, setSearch] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)('');
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
   const previousPage = () => {
     if (page <= 1) {
       return;
     }
     setPage(page - 1);
-    refetch(page - 1);
+    refetch(page - 1, search);
   };
   const nextPage = () => {
     if (page >= totalPages) {
       return;
     }
     setPage(page + 1);
-    refetch(page + 1);
+    refetch(page + 1, search);
+  };
+  const fetchSearch = () => {
+    setPage(1);
+    refetch(1, search);
   };
   if (!isLoading && totalPages !== (data?.pages || 1)) {
     setTotalPages(data?.pages || 1);
@@ -590,57 +621,68 @@ const LinkTranslations = ({
   // TODO: Only permit linking if there are no translations.
   // TODO: Add footnote under unlink: you must first unlink to link to other translations.
 
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.Fragment, {
-    children: [isModalOpen && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Modal, {
-      title: "Link to existing posts:",
-      onRequestClose: closeModal,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-        style: {
-          display: 'grid',
-          flexWrap: 'wrap',
-          padding: '20px',
-          gap: '8px'
-        },
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
-          status: "warning",
-          isDismissible: false,
-          politeness: "polite",
-          children: [' ', "You will unlink from the post's current translations if you link to another."]
-        }), isLoading && 'Loading...', isError && 'ERROR!!!', !isLoading && data?.options && data.options.map(option => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(LinkOption, {
-          ...option,
-          postId: postId,
-          refetchLangs: refetchLangs
-        }))]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
-        style: {
-          display: 'flex',
-          width: '100%',
-          paddingLeft: '20px'
-        },
-        children: [page > 1 && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-          variant: "secondary",
-          onClick: previousPage,
-          children: "Previous Page"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("b", {
-          style: {
-            padding: '10px'
-          },
-          children: page
-        }), page < totalPages && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-          variant: "secondary",
-          onClick: nextPage,
-          children: "Next Page"
-        })]
-      })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-      style: {
-        boxSizing: 'border-box'
-      },
-      variant: "secondary",
-      onClick: openModal,
-      children: "Link translations"
-    })]
-  });
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, isModalOpen && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Modal, {
+    title: "Link to existing posts:",
+    onRequestClose: closeModal,
+    size: "large"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      display: 'grid',
+      flexWrap: 'wrap',
+      gap: '8px'
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Notice, {
+    status: "warning",
+    isDismissible: false,
+    politeness: "polite"
+  }, ' ', "You will unlink from the post's current translations if you link to another."), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(SearchBar, {
+    search: search,
+    setSearch: setSearch,
+    refetch: fetchSearch,
+    disabled: isLoading
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      position: 'relative',
+      minHeight: '50px'
+    }
+  }, data?.options && data.options.length !== 0 && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.__experimentalVStack, {
+    expanded: true
+  }, data.options.map(option => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(LinkOption, {
+    key: `link-option-${option.source}`,
+    ...option,
+    postId: postId,
+    refetchLangs: refetchLangs
+  }))), isLoading && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_Loading__WEBPACK_IMPORTED_MODULE_6__["default"], {
+    overlay: true
+  }), !isLoading && data?.options && data.options.length === 0 && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", null, "No results found."), isError && 'ERROR!!!')), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      position: 'sticky',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%',
+      marginTop: 20
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    variant: "secondary",
+    onClick: previousPage,
+    disabled: page < 2
+  }, "Previous Page"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
+    style: {
+      display: 'flex',
+      gap: 5
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("strong", null, page), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, "/"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", null, totalPages)), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    variant: "secondary",
+    onClick: nextPage,
+    disabled: page >= totalPages
+  }, "Next Page"))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    style: {
+      boxSizing: 'border-box'
+    },
+    variant: "secondary",
+    onClick: openModal
+  }, "Link translations"));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,_contexts_LangContext__WEBPACK_IMPORTED_MODULE_4__.withLangContext)(LinkTranslations));
 
@@ -1012,6 +1054,70 @@ const LanguagePanel = ({
   }), isClassic && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)(_Content_jsx__WEBPACK_IMPORTED_MODULE_1__["default"], {})]
 });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (LanguagePanel);
+
+/***/ }),
+
+/***/ "./src/scripts/components/Loading.jsx":
+/*!********************************************!*\
+  !*** ./src/scripts/components/Loading.jsx ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
+/* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
+
+
+const Loading = ({
+  overlay = false,
+  size = 'md'
+}) => {
+  const styles = {
+    size: {
+      sm: {
+        width: '20px',
+        height: '20px'
+      },
+      md: {
+        width: '40px',
+        height: '40px'
+      },
+      lg: {
+        width: '60px',
+        height: '60px'
+      }
+    },
+    overlay: {
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+      bottom: 0,
+      display: 'flex',
+      height: '100%',
+      justifyContent: 'center',
+      left: 0,
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      width: '100%',
+      zIndex: 1000
+    }
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      ...(overlay ? styles.overlay : {})
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, {
+    style: {
+      ...styles.size[size]
+    }
+  }));
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Loading);
 
 /***/ }),
 
@@ -1876,9 +1982,10 @@ const useLinkablePosts = (postId, page) => {
   const [data, setData] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
   const [isLoading, setIsLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(true);
   const [isError, setIsError] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  const fetch = async page => {
+  const fetch = async (page, search = '') => {
+    setIsError(false);
     setIsLoading(true);
-    return (0,_services_requests__WEBPACK_IMPORTED_MODULE_1__.linkablePosts)(postId, page).then(({
+    return (0,_services_requests__WEBPACK_IMPORTED_MODULE_1__.linkablePosts)(postId, page, search).then(({
       data
     }) => setData(data)).catch(() => setIsError(true)).then(() => setIsLoading(false));
   };
@@ -2027,8 +2134,8 @@ const linkPost = async (id, translationId) => await (0,_gateway__WEBPACK_IMPORTE
   method: 'patch',
   url: `/edit/post/${id}/translation/${translationId}/link`
 });
-const linkablePosts = (id, page) => (0,_gateway__WEBPACK_IMPORTED_MODULE_0__.request)({
-  url: `/edit/post/${id}/translation/link?page=${page}`
+const linkablePosts = (id, page, search = '') => (0,_gateway__WEBPACK_IMPORTED_MODULE_0__.request)({
+  url: `/edit/post/${id}/translation/link?page=${page}&s=${search}`
 });
 const submitOptions = data => (0,_gateway__WEBPACK_IMPORTED_MODULE_0__.request)({
   method: 'post',

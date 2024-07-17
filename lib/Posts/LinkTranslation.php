@@ -134,7 +134,19 @@ class LinkTranslation {
 		return true;
 	}
 
-	public function get_possible_links( WP_Post $post, string $post_lang, int $page ) : array {
+	/**
+	 * Get possible links for post $post_id.
+	 *
+	 * @since Unreleased Add search argument and search filter to query.
+	 * @since 0.1.0
+	 *
+	 * @param WP_Post $post
+	 * @param string $post_lang
+	 * @param int $page
+	 * @param string|null $search
+	 * @return array
+	 */
+	public function get_possible_links( WP_Post $post, string $post_lang, int $page, ?string $search ) : array {
 		global $wpdb;
 		$translations_table    = ( new PostTable() )->get_table_name();
 		$allowed_languages_str = implode( "','", LangInterface::get_languages() );
@@ -143,6 +155,12 @@ class LinkTranslation {
 			$page = 1;
 		}
 
+		$search_filter = '';
+		if ( ! empty( $search ) ) {
+			$search_filter = $wpdb->prepare( "AND P.post_title LIKE %s", '%' . $wpdb->esc_like( $search ) . '%' );
+		}
+
+		// FIXME: if there are any posts with multiple ubb_sources (bug), it can cause the post to show up in the list multiple times.
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT SQL_CALC_FOUND_ROWS
@@ -155,6 +173,7 @@ class LinkTranslation {
 					INNER JOIN {$wpdb->posts} as P ON (PT.post_id = P.ID)
 					WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
 					AND PT.locale IN ('{$allowed_languages_str}')
+					{$search_filter}
 				) AS A
 				WHERE locale != %s
 				AND source NOT IN (
