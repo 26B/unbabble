@@ -13,6 +13,14 @@
  * Domain Path: /languages
  */
 
+// Useful global constants.
+define( 'UNBABBLE_PLUGIN_VERSION', '0.1.0' );
+define( 'UNBABBLE_PLUGIN_URL', \plugin_dir_url( __FILE__ ) );
+define( 'UNBABBLE_PLUGIN_PATH', \plugin_dir_path( __FILE__ ) );
+define( 'UNBABBLE_PLUGIN_LIB', UNBABBLE_PLUGIN_PATH . 'lib/' );
+define( 'UNBABBLE_PLUGIN_BUILD_URL', UNBABBLE_PLUGIN_URL . 'build/' );
+define( 'UNBABBLE_PLUGIN_BUILD_PATH', UNBABBLE_PLUGIN_PATH . 'build/' );
+
 if ( file_exists( dirname( __FILE__ ) . '/vendor/autoload.php' ) ) {
 	require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 }
