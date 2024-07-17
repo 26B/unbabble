@@ -47,6 +47,7 @@ class Customize {
 	/**
 	 * Add lang metaboxes to nav menu edit.
 	 *
+	 * @since Unreleased Add hidden input `ubb_source` for new menu's when linking.
 	 * @since 0.4.2 Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
 	 * @since 0.0.3
 	 *
@@ -59,23 +60,35 @@ class Customize {
 			$menu_id = get_user_option( 'nav_menu_recently_edited' );
 		}
 
-		if ( empty( $menu_id ) ) {
+		// If menu id is empty and ubb_source is not set, return.
+		if ( empty( $_GET['ubb_source'] ?? false ) && empty( $menu_id ) ) {
 			return;
 		}
 
-		// TODO: Using term meta box has its problems, refactor into a better system of metaboxing.
-		ob_start();
-		( new Terms\LangMetaBox() )->edit_term_language_metabox( get_term( $menu_id ) );
-		$term_meta_box = ob_get_clean();
+		// Add hidden ubb_source for new menu's.
+		if ( empty( $menu_id ) ) {
+			$html = sprintf(
+				'<input type="hidden" id="ubb_source" name="ubb_source" value="%s">',
+				esc_sql( $_GET['ubb_source'] )
+			);
 
-		$html  = '<div class="ubb-menu-settings">';
-		$html .= '<h3>' . __( 'Language' ) . '</h3>';
-		$html .= '<table><tbody>';
-		$html .= $term_meta_box;
-		$html .= '</tbody></table>';
-		$html .= '</div>';
+		// Otherwise add normal language metabox.
+		} else {
+			// TODO: Using term meta box has its problems, refactor into a better system of metaboxing.
+			ob_start();
+			( new Terms\LangMetaBox() )->edit_term_language_metabox( get_term( $menu_id ) );
+			$term_meta_box = ob_get_clean();
 
-		$html = str_replace( [ "\t", "\n" ], '', $html );
+			$html  = '<div class="ubb-menu-settings">';
+			$html .= '<h3>' . __( 'Language' ) . '</h3>';
+			$html .= '<table><tbody>';
+			$html .= $term_meta_box;
+			$html .= '</tbody></table>';
+			$html .= '</div>';
+
+			$html = str_replace( [ "\t", "\n" ], '', $html );
+		}
+
 		?>
 		<script type="text/javascript">
 			jQuery(document).ready(function () {

@@ -32,6 +32,7 @@ class CreateTranslation {
 	/**
 	 * Redirect to new term creation page to make a new translation.
 	 *
+	 * @since Unreleased Add redirect for nav_menu translation create.
 	 * @since 0.0.1
 	 *
 	 * @param int    $term_id
@@ -59,6 +60,24 @@ class CreateTranslation {
 			// TODO: What else to do when this happens.
 			error_log( print_r( 'CreateTranslation - lang create failed', true ) );
 			return;
+		}
+
+		// Check if create is for menu's and handle differently.
+		if ( LangInterface::is_taxonomy_translatable( 'nav_menu' ) && $term_id === (int) ( $_POST['menu'] ?? '' ) ) {
+			wp_safe_redirect(
+				add_query_arg(
+					[
+						'action'     => 'edit',
+						'menu'       => 0,
+						'lang'       => $lang_create,
+						'ubb_source' => $term_id,
+					],
+					admin_url( 'nav-menus.php' )
+				),
+				302,
+				'Unbabble'
+			);
+			exit;
 		}
 
 		// TODO: Add something in the page to show that a translation is being saved. Use existence of ubb_source.
@@ -104,7 +123,7 @@ class CreateTranslation {
 		}
 
 		$original_source = LangInterface::get_term_source( $src_term->term_id );
-		if ( $original_source === null ) {
+		if ( empty( $original_source ) ) {
 			$original_source = LangInterface::get_new_term_source_id();
 			LangInterface::set_term_source( $src_term->term_id, $original_source );
 		}
@@ -161,7 +180,6 @@ class CreateTranslation {
 		}
 
 		$source_id = LangInterface::get_term_source( $term_id );
-		error_log( print_r( 'Source -' . $source_id, true ) );
 
 		// If first translations. set source on the original term.
 		if ( ! $source_id ) {
@@ -179,7 +197,6 @@ class CreateTranslation {
 			return;
 		}
 
-		error_log( print_r( get_edit_term_link( $new_term_id, $taxonomy, '&' ), true ) );
 		wp_safe_redirect( get_edit_term_link( $new_term_id, $taxonomy, '&' ) . "&lang={$lang_create}", 302, 'Unbabble' );
 		exit;
 	}

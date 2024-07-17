@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### [0.4.4] - 2024-07-15
+### Added
+
+- Add hidden input `ubb_source` for new menu's when linking.
+- Delete term's empty string `ubb_source`'s from the DB if found.
+- Add handling for nav_menu language change.
+
+### Fixed
+
+- Added missing return when terms are empty in `LangInterface::get_terms_for_source`.
+
+## [0.4.4] - 2024-07-15
 
 ### Added
 
@@ -20,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Versions of docblocks in `Admin\OptionsProxy`.
 - Remove development assets and use production build assets instead.
 
-### [0.4.3] - 2024-07-12
+## [0.4.3] - 2024-07-12
 
 ### Added
 
