@@ -35,10 +35,7 @@ class Directory {
 			return;
 		}
 
-		$directory = $this->get_directory_name( $lang );
-		if ( str_starts_with( $request_uri, "/{$directory}/" ) ) {
-			$_GET['lang'] = $lang;
-		}
+		$_GET['lang'] = $lang;
 	}
 
 	/**
@@ -62,6 +59,8 @@ class Directory {
 			}
 			$directory = $this->get_directory_name( $lang );
 			if ( str_starts_with( $uri, "/{$directory}/" ) ) {
+				return $lang;
+			} else if ( str_starts_with( $uri, "/{$directory}?" ) ) {
 				return $lang;
 			}
 		}
