@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { registerPlugin } from '@wordpress/plugins';
 import LanguagePanel from './scripts/components/LanguagePanel';
 import OptionsPage from './scripts/components/OptionsPage';
@@ -9,7 +9,8 @@ window.addEventListener('load', () => {
 	const rootEl = document.getElementById('ubb-language');
 
 	if (rootEl) {
-		ReactDOM.render(<LanguagePanel isClassic />, rootEl);
+		const root = createRoot(rootEl);
+		root.render(<LanguagePanel isClassic />);
 	}
 });
 
@@ -24,6 +25,7 @@ window.addEventListener('load', () => {
 	const rootEl = document.getElementById('ubb-options-page');
 
 	if (rootEl) {
-		ReactDOM.render(<OptionsPage />, rootEl);
+		const root = createRoot(rootEl);
+		root.render(<OptionsPage />);
 	}
 });

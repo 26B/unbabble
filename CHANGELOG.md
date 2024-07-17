@@ -12,9 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add hidden input `ubb_source` for new menu's when linking.
 - Delete term's empty string `ubb_source`'s from the DB if found.
 - Add handling for nav_menu language change.
+- Develop section on the `README.md`.
+- `wp-env` setup.
+- Update NodeJS to v18.
+- Replace `ReactDOM.render()` with `createRoot` to be compatible with React >17.
 
 ### Fixed
 
+- Always include `wp-admin/includes/plugin.php` so we have `is_active_plugin()` in the front-end.
 - Added missing return when terms are empty in `LangInterface::get_terms_for_source`.
 
 ## [0.4.4] - 2024-07-15

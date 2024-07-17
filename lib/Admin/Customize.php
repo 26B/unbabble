@@ -17,9 +17,16 @@ class Customize {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Add check for translatable nav_menu.
 	 * @since 0.0.3
 	 */
 	public function register() {
+
+		// Only register customize hooks if nav_menu is translatable.
+		if ( ! LangInterface::is_post_type_translatable( 'nav_menu' ) ) {
+			return;
+		}
+
 		// FIXME: Lang cookie usage in customize.php can lead to lang desync.
 
 		// Filter dropdown pages.
