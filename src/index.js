@@ -9,7 +9,8 @@ window.addEventListener('load', () => {
 	const rootEl = document.getElementById('ubb-language');
 
 	if (rootEl) {
-		createRoot(<LanguagePanel isClassic />, rootEl);
+		const root = createRoot(rootEl);
+		root.render(<LanguagePanel isClassic />);
 	}
 });
 
@@ -24,6 +25,7 @@ window.addEventListener('load', () => {
 	const rootEl = document.getElementById('ubb-options-page');
 
 	if (rootEl) {
-		createRoot(<OptionsPage />, rootEl);
+		const root = createRoot(rootEl);
+		root.render(<OptionsPage />);
 	}
 });

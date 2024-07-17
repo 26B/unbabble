@@ -161,30 +161,20 @@ class Admin {
 			}
 		}
 
-		// FIXME:
-		$base_uri = get_template_directory_uri() . '/public/';
-		\wp_enqueue_script(
-			'vendor-js',
-			$base_uri . 'scripts/vendor.js',
-			[],
-			'0.0.6',
-			false
-		);
-
-		\wp_localize_script(
-			'vendor-js',
-			'UBB',
-			$data
-		);
-
 		$assets = include dirname( __FILE__, 3 ) . '/build/index.asset.php';
 
 		\wp_enqueue_script(
-			'frontend',
+			'ubb-admin',
 			plugin_dir_url( dirname( __FILE__, 2 ) ) . 'build/index.js',
 			$assets['dependencies'],
 			$assets['version'],
 			true
+		);
+
+		\wp_localize_script(
+			'ubb-admin',
+			'UBB',
+			$data
 		);
 
 		if ( ! self::is_block_editor() ) {
