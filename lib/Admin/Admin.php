@@ -150,6 +150,7 @@ class Admin {
 			'wpLanguages'   => $wp_languages,
 			'wpPostTypes'   => array_values( get_post_types() ),
 			'wpTaxonomies'  => array_values( get_taxonomies() ),
+			'post_type'     => $this->get_current_post_type(),
 		];
 
 		// Information to show when a post's translation is being created.
@@ -235,5 +236,21 @@ class Admin {
 		}
 
 		return LangInterface::is_post_type_translatable( get_post_type() );
+	}
+
+	/**
+	 * Returns the current post type.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return string|null
+	 */
+	private function get_current_post_type() : ?string {
+		$post_type = get_post_type();
+		if ( is_string( $post_type ) && ! empty( $post_type ) ) {
+			return $post_type;
+		}
+
+		return null;
 	}
 }

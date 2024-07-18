@@ -352,7 +352,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _hooks_useCopyPost__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../hooks/useCopyPost */ "./src/scripts/hooks/useCopyPost.js");
 /* harmony import */ var _contexts_LangContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../contexts/LangContext */ "./src/scripts/contexts/LangContext.jsx");
 /* harmony import */ var _services_settings__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../services/settings */ "./src/scripts/services/settings.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
 
@@ -374,10 +373,15 @@ const CreateTranslations = ({
     isLoading,
     isError
   } = (0,_hooks_useCopyPost__WEBPACK_IMPORTED_MODULE_2__["default"])(postId, current);
-  const createUrlQuery = new URLSearchParams({
+  let urlParams = {
     ubb_source: postId,
     lang: current
-  });
+  };
+  const postType = (0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('post_type', '');
+  if (postType) {
+    urlParams.post_type = postType;
+  }
+  const createUrlQuery = new URLSearchParams(urlParams);
   const createUrl = `${(0,_services_settings__WEBPACK_IMPORTED_MODULE_4__["default"])('admin_url', '')}/post-new.php?${createUrlQuery.toString()}`;
   const openDirtyModal = () => setIsDirtyModalOpen(true);
   const closeDirtyModal = () => setIsDirtyModalOpen(false);
@@ -402,56 +406,43 @@ const CreateTranslations = ({
 
   // TODO: isDirty can be unset when clicking the button directly after inserting text into the block editor.
   const isDirty = wp?.data?.select('core/editor').isEditedPostDirty() || false;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Flex, {
-      direction: "column",
-      style: {
-        width: '100%'
-      },
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
-        label: "Create Translations",
-        onChange: changeValue,
-        value: current,
-        options: selectOptions
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CheckboxControl, {
-        label: "Copy content",
-        help: "When creating the translation, copy the content of this post.",
-        checked: shouldCopy,
-        onChange: toggleShouldCopy
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Flex, {
-        justify: "end",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-          variant: "secondary",
-          onClick: onSubmit,
-          children: "Create"
-        })
-      }), isError && 'ERROR!!!!', data && JSON.stringify(data)]
-    }), isDirtyModalOpen && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Modal, {
-      title: "Unsaved changes",
-      onRequestClose: closeDirtyModal,
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("p", {
-        children: "The current post has unsaved changes."
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("p", {
-        children: "Copying with unsaved changes will not copy those changes to the new translation post."
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)("div", {
-        style: {
-          display: 'flex',
-          justifyContent: 'end',
-          gap: '10px',
-          paddingTop: '20px'
-        },
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-          variant: "secondary",
-          onClick: closeDirtyModal,
-          children: "Cancel"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
-          variant: "primary",
-          onClick: onSubmitCopy,
-          children: "Copy"
-        })]
-      })]
-    })]
-  });
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Flex, {
+    direction: "column",
+    style: {
+      width: '100%'
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.SelectControl, {
+    label: "Create Translations",
+    onChange: changeValue,
+    value: current,
+    options: selectOptions
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.CheckboxControl, {
+    label: "Copy content",
+    help: "When creating the translation, copy the content of this post.",
+    checked: shouldCopy,
+    onChange: toggleShouldCopy
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Flex, {
+    justify: "end"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    variant: "secondary",
+    onClick: onSubmit
+  }, "Create")), isError && 'ERROR!!!!', data && JSON.stringify(data)), isDirtyModalOpen && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Modal, {
+    title: "Unsaved changes",
+    onRequestClose: closeDirtyModal
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "The current post has unsaved changes."), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "Copying with unsaved changes will not copy those changes to the new translation post."), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'end',
+      gap: '10px',
+      paddingTop: '20px'
+    }
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    variant: "secondary",
+    onClick: closeDirtyModal
+  }, "Cancel"), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    variant: "primary",
+    onClick: onSubmitCopy
+  }, "Copy"))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ((0,_contexts_LangContext__WEBPACK_IMPORTED_MODULE_3__.withLangContext)(CreateTranslations));
 
@@ -6087,7 +6078,7 @@ function buildURL(url, params, options) {
   if (!params) {
     return url;
   }
-  
+
   const _encode = options && options.encode || encode;
 
   const serializeFn = options && options.serialize;
@@ -8274,7 +8265,7 @@ const isThenable = (thing) =>
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -8288,14 +8279,14 @@ const isThenable = (thing) =>
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
 /******/ 	(() => {
@@ -8308,7 +8299,7 @@ const isThenable = (thing) =>
 /******/ 			return getter;
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -8320,12 +8311,12 @@ const isThenable = (thing) =>
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -8336,7 +8327,7 @@ const isThenable = (thing) =>
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
 var __webpack_exports__ = {};
 /*!**********************!*\
