@@ -1016,6 +1016,7 @@ class LangInterface {
 	 *
 	 * Unlinks term from its translations.
 	 *
+	 * @since Unreleased Added `ubb_term_source_delete` action.
 	 * @since 0.0.1
 	 *
 	 * @param string $term_id ID of the term to delete source.
@@ -1024,13 +1025,23 @@ class LangInterface {
 	public static function delete_term_source( string $term_id ) : bool {
 
 		// Delete transient for translations.
-		$term_source   = self::get_term_source( $term_id );
+		$term_source = self::get_term_source( $term_id );
 		if ( ! $term_source ) {
 			\delete_transient( sprintf( 'ubb_%s_source_terms', $term_source ) );
 		}
 
 		// Delete transient for source.
 		\delete_transient( sprintf( 'ubb_%s_term_source', $term_id ) );
+
+		/**
+		 * Fires before a term's source is deleted.
+		 *
+		 * @since Unreleased
+		 *
+		 * @param int    $term_id     ID of the term.
+		 * @param string $term_source Source ID of the term.
+		 */
+		do_action( 'ubb_term_source_delete', $term_id, $term_source );
 
 		return delete_term_meta( $term_id, 'ubb_source' );
 	}
