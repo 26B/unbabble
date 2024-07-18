@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix post type missing in url when creating a translation.
+
 ## [0.4.5] - 2024-07-18
 
 ### Added
