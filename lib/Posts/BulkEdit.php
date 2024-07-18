@@ -163,7 +163,7 @@ class BulkEdit {
 	/**
 	 * Saves the bulk edit.
 	 *
-	 * @since Unreleased Fix $_GET['bulk_edit'] check.
+	 * @since 0.4.5 Fix $_GET['bulk_edit'] check.
 	 * @since 0.4.0
 	 *
 	 * @param int $post_id Post ID.
@@ -269,7 +269,7 @@ class BulkEdit {
 	/**
 	 * Add language update fail count to bulk edit redirect.
 	 *
-	 * @since Unreleased Fix $_GET['bulk_edit'] check.
+	 * @since 0.4.5 Fix $_GET['bulk_edit'] check.
 	 * @since 0.4.0
 	 *
 	 * @param string $location

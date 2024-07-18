@@ -697,7 +697,7 @@ class LangInterface {
 	/**
 	 * Returns the term's source ID.
 	 *
-	 * @since Unreleased Delete empty string `ubb_source`'s from the DB.
+	 * @since 0.4.5 Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
 	 * @param int $term_id ID of the term to get source for.
@@ -823,7 +823,7 @@ class LangInterface {
 	/**
 	 * Returns the terms for a source ID.
 	 *
-	 * @since Unreleased Added missing return when terms are empty.
+	 * @since 0.4.5 Added missing return when terms are empty.
 	 * @since 0.0.1
 	 *
 	 * @param string $source_id The source ID to get translations map.

@@ -32,7 +32,7 @@ class CreateTranslation {
 	/**
 	 * Redirect to new term creation page to make a new translation.
 	 *
-	 * @since Unreleased Add redirect for nav_menu translation create.
+	 * @since 0.4.5 Add redirect for nav_menu translation create.
 	 * @since 0.0.1
 	 *
 	 * @param int    $term_id

@@ -8,14 +8,14 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 /**
  * For hooks related to the SearchWP plugin.
  *
- * @since Unreleased
+ * @since 0.4.5
  */
 class SearchWP {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.5
 	 *
 	 * @return void
 	 */
@@ -26,7 +26,7 @@ class SearchWP {
 	/**
 	 * Filters the SearchWP query to include the language filter.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.5
 	 *
 	 * @param array $query SearchWP query.
 	 * @param array $args  SearchWP arguments.

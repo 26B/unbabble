@@ -25,7 +25,7 @@ class ChangeLanguage {
 	/**
 	 * Change the language of the saved term.
 	 *
-	 * @since Unreleased Add handling for nav_menu language change.
+	 * @since 0.4.5 Add handling for nav_menu language change.
 	 * @since 0.0.1
 	 *
 	 * @param int $term_id

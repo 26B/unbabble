@@ -17,7 +17,7 @@ class Customize {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Add check for translatable nav_menu.
+	 * @since 0.4.5 Add check for translatable nav_menu.
 	 * @since 0.0.3
 	 */
 	public function register() {
@@ -54,7 +54,7 @@ class Customize {
 	/**
 	 * Add lang metaboxes to nav menu edit.
 	 *
-	 * @since Unreleased Add hidden input `ubb_source` for new menu's when linking.
+	 * @since 0.4.5 Add hidden input `ubb_source` for new menu's when linking.
 	 * @since 0.4.2 Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
 	 * @since 0.0.3
 	 *

@@ -113,7 +113,7 @@ class Options {
 	 * Updates the Unbabble options if the value returned from the filter `ubb_options` is
 	 * different from the saved options.
 	 *
-	 * @since Unreleased Force 'nav_menu' and 'nav_menu_item' to be translatable if one of them is.
+	 * @since 0.4.5 Force 'nav_menu' and 'nav_menu_item' to be translatable if one of them is.
 	 * @since 0.0.11
 	 *
 	 * @return void
