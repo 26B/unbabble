@@ -7,8 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Actions added to `LangInterface`:
+  - ubb_post_language_set
+  - ubb_post_language_change
+  - ubb_post_source_set
+  - ubb_post_source_delete
+  - ubb_term_language_set
+  - ubb_term_language_change
+  - ubb_term_source_set
+  - ubb_term_source_delete
+- Check for empty post ubb_source and delete it to prevent weird cases.
+
 ### Fixed
 
+- Change null check to empty check in `LangInterface::get_post_translations` for $source_id to prevent errors from empty ubb_source's.
 - Fix post type missing in url when creating a translation.
 
 ## [0.4.5] - 2024-07-18
