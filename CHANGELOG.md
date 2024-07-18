@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Change null check to empty check in `LangInterface::get_post_translations` for $source_id to prevent errors from empty ubb_source's.
+- Fix post type missing in url when creating a translation.
 
 ## [0.4.5] - 2024-07-18
 

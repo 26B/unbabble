@@ -23,10 +23,18 @@ const CreateTranslations = ({
 	const [isDirtyModalOpen, setIsDirtyModalOpen] = useState(false);
 	const { mutate, data, isLoading, isError } = useCopyPost(postId, current);
 
-	const createUrlQuery = new URLSearchParams({
+	let urlParams = {
 		ubb_source: postId,
 		lang: current,
-	});
+	};
+
+	const postType = getUBBSetting('post_type', '');
+	if (postType) {
+		urlParams.post_type = postType;
+	}
+
+	const createUrlQuery = new URLSearchParams(urlParams);
+
 	const createUrl = `${getUBBSetting(
 		'admin_url',
 		''
