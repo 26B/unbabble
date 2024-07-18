@@ -241,7 +241,7 @@ class Admin {
 	/**
 	 * Returns the current post type.
 	 *
-	 * @since Unreleased
+	 * @since 0.4.6
 	 *
 	 * @return string|null
 	 */

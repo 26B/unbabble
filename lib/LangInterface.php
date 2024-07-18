@@ -184,7 +184,7 @@ class LangInterface {
 	 * If the language is already set, nothing will happen and it will return `false`. Use the $force
 	 * argument to force the language change.
 	 *
-	 * @since Unreleased Added `ubb_post_language_set` action.
+	 * @since 0.4.6 Added `ubb_post_language_set` action.
 	 * @since 0.0.1
 	 *
 	 * @param  int    $post_id  The post that language is being set for.
@@ -226,7 +226,7 @@ class LangInterface {
 			/**
 			 * Fires after a post's language is set.
 			 *
-			 * @since Unreleased
+			 * @since 0.4.6
 			 *
 			 * @param int     $post_id      ID of the post.
 			 * @param string  $language     Language code of the post.
@@ -284,7 +284,7 @@ class LangInterface {
 	 *
 	 * A post's source, via a meta entry, is what links it to other posts (translations).
 	 *
-	 * @since Unreleased Added `ubb_post_source_set` action.
+	 * @since 0.4.6 Added `ubb_post_source_set` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $post_id   Post to set source for.
@@ -316,7 +316,7 @@ class LangInterface {
 			/**
 			 * Fires after a post's source is set.
 			 *
-			 * @since Unreleased
+			 * @since 0.4.6
 			 *
 			 * @param int     $post_id         ID of the post.
 			 * @param string  $source_id       Source ID of the post.
@@ -332,7 +332,7 @@ class LangInterface {
 	/**
 	 * Returns the post's source ID.
 	 *
-	 * @since Unreleased Delete empty string `ubb_source`'s from the DB.
+	 * @since 0.4.6 Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
 	 * @param int $post_id ID of the post to get source for.
@@ -389,7 +389,7 @@ class LangInterface {
 	/**
 	 * Returns a post's translations.
 	 *
-	 * @since Unreleased Change null check to empty check for $source_id to prevent errors from empty ubb_source's.
+	 * @since 0.4.6 Change null check to empty check for $source_id to prevent errors from empty ubb_source's.
 	 * @since 0.0.1
 	 *
 	 * @param int $post_id ID of post to get translatiosn for.
@@ -427,7 +427,7 @@ class LangInterface {
 	 * `ubb_change_language_post_meta_translate_keys` filter, more in-depth description on the
 	 * filter documentation.
 	 *
-	 * @since Unreleased Add `ubb_post_language_change` action.
+	 * @since 0.4.6 Add `ubb_post_language_change` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $post_id ID of the post being changed.
@@ -474,7 +474,7 @@ class LangInterface {
 		 *
 		 * TODO: should this be the same action as the one in `set_post_language`?
 		 *
-		 * @since Unreleased
+		 * @since 0.4.6
 		 *
 		 * @param int     $post_id  ID of the post.
 		 * @param string  $lang     New language of the post.
@@ -608,7 +608,7 @@ class LangInterface {
 	 *
 	 * Unlinks post from its translations.
 	 *
-	 * @since Unreleased Added `ubb_post_source_delete` action.
+	 * @since 0.4.6 Added `ubb_post_source_delete` action.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_id ID of the post to delete source.
@@ -628,7 +628,7 @@ class LangInterface {
 		/**
 		 * Fires before a post's source is deleted.
 		 *
-		 * @since Unreleased
+		 * @since 0.4.6
 		 *
 		 * @param int    $post_id     ID of the post.
 		 * @param string $post_source Source ID of the post.
@@ -668,7 +668,7 @@ class LangInterface {
 	 * If the language is already set, nothing will happen and it will return `false`. Use the $force
 	 * argument to force the language change.
 	 *
-	 * @since Unreleased Added `ubb_term_language_set` action.
+	 * @since 0.4.6 Added `ubb_term_language_set` action.
 	 * @since 0.0.1
 	 *
 	 * @param  int    $term_id  The term that language is being set for.
@@ -706,7 +706,7 @@ class LangInterface {
 			/**
 			 * Fires after a term's language is set.
 			 *
-			 * @since Unreleased
+			 * @since 0.4.6
 			 *
 			 * @param int     $term_id      ID of the term.
 			 * @param string  $language     Language code of the term.
@@ -753,7 +753,7 @@ class LangInterface {
 	 *
 	 * A term's source, via a meta entry, is what links it to other terms (translations).
 	 *
-	 * @since Unreleased Added `ubb_term_source_set` action.
+	 * @since 0.4.6 Added `ubb_term_source_set` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $term_id   Post to set source for.
@@ -784,7 +784,7 @@ class LangInterface {
 			/**
 			 * Fires after a term's source is set.
 			 *
-			 * @since Unreleased
+			 * @since 0.4.6
 			 *
 			 * @param int     $term_id         ID of the term.
 			 * @param string  $source_id       Source ID of the term.
@@ -885,7 +885,7 @@ class LangInterface {
 	 *
 	 *  TODO: What to do when term language changes? How to handle post relationships?
 	 *
-	 * @since Unreleased Added `ubb_term_language_change` action.
+	 * @since 0.4.6 Added `ubb_term_language_change` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $term_id ID of the term being changed.
@@ -926,7 +926,7 @@ class LangInterface {
 		 *
 		 * TODO: should this be the same action as the one in `set_term_language`?
 		 *
-		 * @since Unreleased
+		 * @since 0.4.6
 		 *
 		 * @param int     $term_id  ID of the term.
 		 * @param string  $lang     New language of the term.
@@ -1016,7 +1016,7 @@ class LangInterface {
 	 *
 	 * Unlinks term from its translations.
 	 *
-	 * @since Unreleased Added `ubb_term_source_delete` action.
+	 * @since 0.4.6 Added `ubb_term_source_delete` action.
 	 * @since 0.0.1
 	 *
 	 * @param string $term_id ID of the term to delete source.
@@ -1036,7 +1036,7 @@ class LangInterface {
 		/**
 		 * Fires before a term's source is deleted.
 		 *
-		 * @since Unreleased
+		 * @since 0.4.6
 		 *
 		 * @param int    $term_id     ID of the term.
 		 * @param string $term_source Source ID of the term.

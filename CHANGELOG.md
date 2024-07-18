@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.6] - 2024-07-18
+
 ### Added
 
 - Actions added to `LangInterface`:
@@ -428,7 +430,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.5...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.4.6...HEAD
+[0.4.6]: https://github.com/26b/unbabble/compare/0.4.5...0.4.6
 [0.4.5]: https://github.com/26b/unbabble/compare/0.4.4...0.4.5
 [0.4.4]: https://github.com/26b/unbabble/compare/0.4.3...0.4.4
 [0.4.3]: https://github.com/26b/unbabble/compare/0.4.2...0.4.3
