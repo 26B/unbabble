@@ -184,6 +184,9 @@ class LangInterface {
 	 * If the language is already set, nothing will happen and it will return `false`. Use the $force
 	 * argument to force the language change.
 	 *
+	 * @since Unreleased Added `ubb_post_language_set` action.
+	 * @since 0.0.1
+	 *
 	 * @param  int    $post_id  The post that language is being set for.
 	 * @param  string $language Language being set for post.
 	 * @param  bool   $force    Whether to force the language set. If false (default) and the
@@ -198,12 +201,13 @@ class LangInterface {
 			return false;
 		}
 
+		$old_language = self::get_post_language( $post_id );
+
 		if ( ! $force ) {
-			$existing_language = self::get_post_language( $post_id );
-			if ( $existing_language === $language ) {
+			if ( $old_language === $language ) {
 				return true;
 			}
-			if ( $existing_language !== null ) {
+			if ( $old_language !== null ) {
 				return false;
 			}
 		}
@@ -218,6 +222,19 @@ class LangInterface {
 
 		if ( is_int( $inserted ) ) {
 			\delete_transient( sprintf( 'ubb_%s_post_language', $post_id ) );
+
+			/**
+			 * Fires after a post's language is set.
+			 *
+			 * @since Unreleased
+			 *
+			 * @param int     $post_id      ID of the post.
+			 * @param string  $language     Language code of the post.
+			 * @param ?string $old_language Old language of the post.
+			 * @param bool    $force        Whether the language set was forced.
+			 */
+			do_action( 'ubb_post_language_set', $post_id, $language, $force, $old_language );
+
 			return true;
 		}
 
@@ -267,6 +284,7 @@ class LangInterface {
 	 *
 	 * A post's source, via a meta entry, is what links it to other posts (translations).
 	 *
+	 * @since Unreleased Added `ubb_post_source_set` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $post_id   Post to set source for.
@@ -276,8 +294,10 @@ class LangInterface {
 	 * @return bool True if source was set, false otherwise or if meta insert/update failed.
 	 */
 	public static function set_post_source( int $post_id, string $source_id, bool $force = false ) : bool {
+		$previous_source = self::get_post_source( $post_id );
+
 		if ( $force ) {
-			if ( $source_id === self::get_post_source( $post_id ) ) {
+			if ( $source_id === $previous_source ) {
 				return true;
 			}
 			$meta_id = update_post_meta( $post_id, 'ubb_source', $source_id );
@@ -292,6 +312,18 @@ class LangInterface {
 
 			// Update transient for post source.
 			\set_transient( sprintf( 'ubb_%s_post_source', $post_id ), $source_id, 30 );
+
+			/**
+			 * Fires after a post's source is set.
+			 *
+			 * @since Unreleased
+			 *
+			 * @param int     $post_id         ID of the post.
+			 * @param string  $source_id       Source ID of the post.
+			 * @param ?string $previous_source Previous source ID of the post.
+			 * @param bool    $force           Whether the source set was forced.
+			 */
+			do_action( 'ubb_post_source_set', $post_id, $source_id, $previous_source, $force );
 		}
 
 		return (bool) $meta_id;
@@ -300,6 +332,7 @@ class LangInterface {
 	/**
 	 * Returns the post's source ID.
 	 *
+	 * @since Unreleased Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
 	 * @param int $post_id ID of the post to get source for.
@@ -309,11 +342,25 @@ class LangInterface {
 		$transient_key = sprintf( 'ubb_%s_post_source', $post_id );
 		$source_id     = \get_transient( $transient_key );
 		if ( $source_id !== false ) {
-			return is_string( $source_id ) ? $source_id: null;
+			return ( is_string( $source_id ) && ! empty( $source_id ) ) ? $source_id : null;
 		}
 
 		$source_id = get_post_meta( $post_id, 'ubb_source', true );
-		$source_id = empty( $source_id ) ? null : $source_id;
+
+		/**
+		 * If the source_id is an empty string, delete it and return null.
+		 *
+		 * `get_post_meta` returns empty string when post id doesn't exist, so we are unable to
+		 * know if there is an actual empty string in the DB or not, so we try to delete it
+		 * either way.
+		 */
+		if ( is_string( $source_id ) && empty( $source_id ) ) {
+			\delete_post_meta( $post_id, 'ubb_source' );
+			$source_id = null;
+
+		} else {
+			$source_id = empty( $source_id ) ? null : $source_id;
+		}
 
 		\set_transient( $transient_key, $source_id, 30 );
 
@@ -342,6 +389,7 @@ class LangInterface {
 	/**
 	 * Returns a post's translations.
 	 *
+	 * @since Unreleased Change null check to empty check for $source_id to prevent errors from empty ubb_source's.
 	 * @since 0.0.1
 	 *
 	 * @param int $post_id ID of post to get translatiosn for.
@@ -354,7 +402,7 @@ class LangInterface {
 	 */
 	public static function get_post_translations( int $post_id ) : array {
 		$source_id = self::get_post_source( $post_id );
-		if ( $source_id === null ) {
+		if ( empty( $source_id ) ) {
 			return [];
 		}
 
@@ -379,6 +427,7 @@ class LangInterface {
 	 * `ubb_change_language_post_meta_translate_keys` filter, more in-depth description on the
 	 * filter documentation.
 	 *
+	 * @since Unreleased Add `ubb_post_language_change` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $post_id ID of the post being changed.
@@ -419,6 +468,19 @@ class LangInterface {
 		}
 
 		\delete_transient( sprintf( 'ubb_%s_post_language', $post_id ) );
+
+		/**
+		 * Fires after a post's language is changed.
+		 *
+		 * TODO: should this be the same action as the one in `set_post_language`?
+		 *
+		 * @since Unreleased
+		 *
+		 * @param int     $post_id  ID of the post.
+		 * @param string  $lang     New language of the post.
+		 * @param ?string $old_lang Old language of the post.
+		 */
+		do_action( 'ubb_post_language_change', $post_id, $lang, $old_lang );
 
 		// Update Terms.
 
@@ -468,6 +530,7 @@ class LangInterface {
 		$meta_keys_to_translate = apply_filters( 'ubb_change_language_post_meta_translate_keys', $default_meta, $post_id, $lang, $old_lang );
 		if ( ! self::translate_post_meta( $post_id, $lang, $meta_keys_to_translate ) ) {
 			// TODO: Failure state
+			// FIXME: language is changed but meta is not, what to do and return?
 			return false;
 		}
 
@@ -545,6 +608,7 @@ class LangInterface {
 	 *
 	 * Unlinks post from its translations.
 	 *
+	 * @since Unreleased Added `ubb_post_source_delete` action.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_id ID of the post to delete source.
@@ -561,6 +625,15 @@ class LangInterface {
 		// Delete transient for source.
 		\delete_transient( sprintf( 'ubb_%s_post_source', $post_id ) );
 
+		/**
+		 * Fires before a post's source is deleted.
+		 *
+		 * @since Unreleased
+		 *
+		 * @param int    $post_id     ID of the post.
+		 * @param string $post_source Source ID of the post.
+		 */
+		do_action( 'ubb_post_source_delete', $post_id, $post_source );
 
 		return delete_post_meta( $post_id, 'ubb_source' );
 	}
@@ -595,6 +668,9 @@ class LangInterface {
 	 * If the language is already set, nothing will happen and it will return `false`. Use the $force
 	 * argument to force the language change.
 	 *
+	 * @since Unreleased Added `ubb_term_language_set` action.
+	 * @since 0.0.1
+	 *
 	 * @param  int    $term_id  The term that language is being set for.
 	 * @param  string $language Language being set for term.
 	 * @param  bool   $force    Whether to force the language set. If false (default) and the
@@ -609,9 +685,9 @@ class LangInterface {
 			return false;
 		}
 
+		$old_language = self::get_term_language( $term_id );
 		if ( ! $force ) {
-			$existing_language = self::get_term_language( $term_id );
-			if ( $existing_language !== null ) {
+			if ( $old_language !== null ) {
 				return false;
 			}
 		}
@@ -626,6 +702,19 @@ class LangInterface {
 
 		if ( is_int( $inserted ) ) {
 			\delete_transient( sprintf( 'ubb_%s_term_language', $term_id ) );
+
+			/**
+			 * Fires after a term's language is set.
+			 *
+			 * @since Unreleased
+			 *
+			 * @param int     $term_id      ID of the term.
+			 * @param string  $language     Language code of the term.
+			 * @param ?string $old_language Old language of the term.
+			 * @param bool    $force        Whether the language set was forced.
+			 */
+			do_action( 'ubb_term_language_set', $term_id, $language, $force, $old_language );
+
 			return true;
 		}
 
@@ -664,6 +753,7 @@ class LangInterface {
 	 *
 	 * A term's source, via a meta entry, is what links it to other terms (translations).
 	 *
+	 * @since Unreleased Added `ubb_term_source_set` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $term_id   Post to set source for.
@@ -673,8 +763,9 @@ class LangInterface {
 	 * @return bool True if source was set, false otherwise or if meta insert/update failed.
 	 */
 	public static function set_term_source( int $term_id, string $source_id, bool $force = false ) : bool {
+		$previous_source = self::get_term_source( $term_id );
 		if ( $force ) {
-			if ( $source_id === self::get_term_source( $term_id ) ) {
+			if ( $source_id === $previous_source ) {
 				return true;
 			}
 			$meta_id = update_term_meta( $term_id, 'ubb_source', $source_id );
@@ -689,6 +780,18 @@ class LangInterface {
 
 			// Update transient for term source.
 			\set_transient( sprintf( 'ubb_%s_term_source', $term_id ), $source_id, 30 );
+
+			/**
+			 * Fires after a term's source is set.
+			 *
+			 * @since Unreleased
+			 *
+			 * @param int     $term_id         ID of the term.
+			 * @param string  $source_id       Source ID of the term.
+			 * @param ?string $previous_source Previous source ID of the term.
+			 * @param bool    $force           Whether the source set was forced.
+			 */
+			do_action( 'ubb_term_source_set', $term_id, $source_id, $previous_source, $force );
 		}
 
 		return (bool) $meta_id;
@@ -782,6 +885,7 @@ class LangInterface {
 	 *
 	 *  TODO: What to do when term language changes? How to handle post relationships?
 	 *
+	 * @since Unreleased Added `ubb_term_language_change` action.
 	 * @since 0.0.1
 	 *
 	 * @param int    $term_id ID of the term being changed.
@@ -791,10 +895,11 @@ class LangInterface {
 	public static function change_term_language( int $term_id, string $lang ) : bool {
 		global $wpdb;
 
+		$old_lang = self::get_term_language( $term_id );
 		if (
 			empty( $lang )
 			|| ! self::is_language_allowed( $lang )
-			|| $lang === self::get_term_language( $term_id )
+			|| $lang === $old_lang
 		) {
 			return false;
 		}
@@ -815,6 +920,19 @@ class LangInterface {
 		}
 
 		\delete_transient( sprintf( 'ubb_%s_term_language', $term_id ) );
+
+		/**
+		 * Fires after a term's language is changed.
+		 *
+		 * TODO: should this be the same action as the one in `set_term_language`?
+		 *
+		 * @since Unreleased
+		 *
+		 * @param int     $term_id  ID of the term.
+		 * @param string  $lang     New language of the term.
+		 * @param ?string $old_lang Old language of the term.
+		 */
+		do_action( 'ubb_term_language_change', $term_id, $lang, $old_lang );
 
 		// TODO: Update posts?
 		return true;
