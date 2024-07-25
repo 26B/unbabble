@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.7] - 2024-07-25
+
 ### Removed
 
 - Removed `check_term_slug_exists` method in `Terms\NewTerm.php`.
@@ -434,7 +436,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.6...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.4.7...HEAD
+[0.4.7]: https://github.com/26b/unbabble/compare/0.4.6...0.4.7
 [0.4.6]: https://github.com/26b/unbabble/compare/0.4.5...0.4.6
 [0.4.5]: https://github.com/26b/unbabble/compare/0.4.4...0.4.5
 [0.4.4]: https://github.com/26b/unbabble/compare/0.4.3...0.4.4

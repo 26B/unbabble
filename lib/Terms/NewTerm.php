@@ -7,7 +7,7 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 /**
  * Hooks related to new terms.
  *
- * @since Unreleased Removed `check_term_slug_exists` method.
+ * @since 0.4.7 Removed `check_term_slug_exists` method.
  * @since 0.0.1
  */
 class NewTerm {
@@ -15,7 +15,7 @@ class NewTerm {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Removed adding `check_term_slug_exists` to the `pre_insert_term` filter.
+	 * @since 0.4.7 Removed adding `check_term_slug_exists` to the `pre_insert_term` filter.
 	 * @since 0.0.1
 	 */
 	public function register() {
