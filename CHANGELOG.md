@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Constant `UBB_OPTIONS_AUTO_UPDATE` for automatically updating options.
+
+### Changed
+
+- Options in options page are now modifiable from the values set in the `ubb_options` filter.
+
 ## [0.4.6] - 2024-07-18
 
 ### Added

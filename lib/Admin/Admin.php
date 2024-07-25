@@ -140,17 +140,19 @@ class Admin {
 		usort( $wp_languages, fn ($a, $b) => $a['label'] <=> $b['label'] );
 
 		$data = [
-			'api_root'      => \esc_url_raw( \rest_url( Plugin::API_V1 ) ),
-			'admin_url'     => \remove_query_arg( 'lang', \admin_url() ),
-			'current_lang'  => LangInterface::get_current_language(),
-			'default_lang'  => LangInterface::get_default_language(),
-			'languages'     => LangInterface::get_languages(),
-			'languagesInfo' => Options::get_languages_info(),
-			'options'       => Options::get(),
-			'wpLanguages'   => $wp_languages,
-			'wpPostTypes'   => array_values( get_post_types() ),
-			'wpTaxonomies'  => array_values( get_taxonomies() ),
-			'post_type'     => $this->get_current_post_type(),
+			'api_root'          => \esc_url_raw( \rest_url( Plugin::API_V1 ) ), // TODO: can't have language in url when updating options.
+			'admin_url'         => \remove_query_arg( 'lang', \admin_url() ),
+			'current_lang'      => LangInterface::get_current_language(),
+			'default_lang'      => LangInterface::get_default_language(),
+			'languages'         => LangInterface::get_languages(),
+			'languagesInfo'     => Options::get_languages_info(),
+			'options'           => Options::get(),
+			'wpLanguages'       => $wp_languages,
+			'wpPostTypes'       => array_values( get_post_types() ),
+			'wpTaxonomies'      => array_values( get_taxonomies() ),
+			'post_type'         => $this->get_current_post_type(),
+			'optionsAutoUpdate' => defined( 'UBB_OPTIONS_AUTO_UPDATE' ) && UBB_OPTIONS_AUTO_UPDATE,
+			'optionsCanUpdate'  => Options::can_update(),
 		];
 
 		// Information to show when a post's translation is being created.

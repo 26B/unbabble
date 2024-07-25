@@ -20,6 +20,16 @@ class Options {
 				'permission_callback' => [ $this, 'permission_callback' ],
 			]
 		);
+
+		\register_rest_route(
+			$this->namespace,
+			'/options/update',
+			[
+				'methods'             => 'POST',
+				'callback'            => [ $this, 'update_options' ],
+				'permission_callback' => [ $this, 'permission_callback' ],
+			]
+		);
 	}
 
 	public function permission_callback( \WP_REST_Request $request ) : bool {
@@ -36,6 +46,32 @@ class Options {
 			return new \WP_REST_Response( [ 'errors' => $updated ], 500 );
 		}
 
-		return new \WP_REST_Response( null, 200 );
+		UnbabbleOptions::clear_static_cache();
+
+		return new \WP_REST_Response(
+			[
+				'options'   => UnbabbleOptions::get(),
+				'canUpdate' => UnbabbleOptions::can_update(),
+			],
+			200
+		);
+	}
+
+	public function update_options() {
+		$updated = UnbabbleOptions::update();
+		if ( ! $updated ) {
+			// TODO: errors
+			return new \WP_REST_Response( [ 'errors' => [] ], 500 );
+		}
+
+		UnbabbleOptions::clear_static_cache();
+
+		return new \WP_REST_Response(
+			[
+				'options'   => UnbabbleOptions::get(),
+				'canUpdate' => false,
+			],
+			200
+		);
 	}
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Flex, Button, SelectControl, Modal } from '@wordpress/components';
 
-const Types = ({
+const Types = ( {
 	title,
 	types,
 	setTypes,
@@ -10,49 +10,50 @@ const Types = ({
 	addLabel,
 	selectLabel,
 	addSelectedLabel,
-}) => {
-	const [showAddTypeModal, setShowAddTypeModal] = useState(false);
-	const [showRemoveTypeModal, setShowRemoveTypeModal] = useState(false);
-	const [typeToAdd, setTypeToAdd] = useState('');
-	const [typeToRemove, setTypeToRemove] = useState('');
+	readOnly,
+} ) => {
+	const [ showAddTypeModal, setShowAddTypeModal ] = useState( false );
+	const [ showRemoveTypeModal, setShowRemoveTypeModal ] = useState( false );
+	const [ typeToAdd, setTypeToAdd ] = useState( '' );
+	const [ typeToRemove, setTypeToRemove ] = useState( '' );
 
 	const removeType = () => {
-		setTypes(types.filter((type) => type !== typeToRemove));
-		setTypeToRemove('');
+		setTypes( types.filter( ( type ) => type !== typeToRemove ) );
+		setTypeToRemove( '' );
 	};
 
 	const addType = () => {
-		setTypes(types.concat([typeToAdd]));
-		setShowAddTypeModal(false);
+		setTypes( types.concat( [ typeToAdd ] ) );
+		setShowAddTypeModal( false );
 	};
 
 	const openAddTypeModal = () => {
-		setShowAddTypeModal(true);
-		setTypeToAdd('');
+		setShowAddTypeModal( true );
+		setTypeToAdd( '' );
 	};
 	const closeAddTypeModal = () => {
-		setShowAddTypeModal(false);
-		setTypeToAdd('');
+		setShowAddTypeModal( false );
+		setTypeToAdd( '' );
 	};
 
-	const openRemoveTypeModal = (type) => {
-		setShowRemoveTypeModal(true);
-		setTypeToRemove(type);
+	const openRemoveTypeModal = ( type ) => {
+		setShowRemoveTypeModal( true );
+		setTypeToRemove( type );
 	};
 	const closeRemoveTypeModal = () => {
-		setShowRemoveTypeModal(false);
-		setTypeToRemove('');
+		setShowRemoveTypeModal( false );
+		setTypeToRemove( '' );
 	};
 
 	return (
 		<>
-			<h3>{title}</h3>
+			<h3>{ title }</h3>
 			<Flex
 				direction="row"
-				style={{ width: '100%', justifyContent: 'normal' }}
+				style={ { width: '100%', justifyContent: 'normal' } }
 			>
 				<div
-					style={{
+					style={ {
 						display: 'grid',
 						flexWrap: 'wrap',
 						gap: '8px',
@@ -62,86 +63,97 @@ const Types = ({
 						background: 'white',
 						border: '2px solid #ccc',
 						borderRadius: '5px',
-					}}
+					} }
 				>
-					{types.map((type) => {
+					{ types.map( ( type ) => {
 						return (
 							<Flex
 								direction="row"
-								style={{
+								style={ {
 									gap: 32,
-								}}
-								key={type}
+								} }
+								key={ type }
 							>
-								<span>{type}</span>
-								<Button
-									variant="tertiary"
-									onClick={() => openRemoveTypeModal(type)}
-									isSmall
-									isDestructive
-								>
-									Remove
-								</Button>
+								<span>{ type }</span>
+								{ ! readOnly && (
+									<Button
+										variant="tertiary"
+										onClick={ () =>
+											openRemoveTypeModal( type )
+										}
+										isSmall
+										isDestructive
+									>
+										Remove
+									</Button>
+								) }
 							</Flex>
 						);
-					})}
-					{types.length === 0 && <span>None selected.</span>}
+					} ) }
+					{ types.length === 0 && <span>None selected.</span> }
 				</div>
 				<div
-					style={{
+					style={ {
 						display: 'grid',
 						gap: 8,
 						alignSelf: 'baseline',
-					}}
+					} }
 				>
-					<Button variant="secondary" onClick={openAddTypeModal}>
-						{addLabel}
+					<Button
+						variant="secondary"
+						onClick={ openAddTypeModal }
+						disabled={ readOnly }
+					>
+						{ addLabel }
 					</Button>
 				</div>
-				{showAddTypeModal && (
-					<Modal title={addLabel} onRequestClose={closeAddTypeModal}>
+				{ showAddTypeModal && (
+					<Modal
+						title={ addLabel }
+						onRequestClose={ closeAddTypeModal }
+					>
 						<SelectControl
-							value={typeToAdd}
-							onChange={(selection) => {
-								setTypeToAdd(selection);
-							}}
+							value={ typeToAdd }
+							onChange={ ( selection ) => {
+								setTypeToAdd( selection );
+							} }
 						>
-							<option value="">{selectLabel}</option>
-							{allTypes
-								.filter((type) => !types.includes(type))
-								.map((type) => (
-									<option value={type} key={type}>
-										{type}
+							<option value="">{ selectLabel }</option>
+							{ allTypes
+								.filter( ( type ) => ! types.includes( type ) )
+								.map( ( type ) => (
+									<option value={ type } key={ type }>
+										{ type }
 									</option>
-								))}
+								) ) }
 						</SelectControl>
-						{typeToAdd && (
-							<Button variant="secondary" onClick={addType}>
-								{addSelectedLabel}
+						{ typeToAdd && (
+							<Button variant="secondary" onClick={ addType }>
+								{ addSelectedLabel }
 							</Button>
-						)}
+						) }
 					</Modal>
-				)}
-				{showRemoveTypeModal && typeToRemove && (
+				) }
+				{ showRemoveTypeModal && typeToRemove && (
 					<Modal
 						title="Removing Language"
-						onRequestClose={closeRemoveTypeModal}
+						onRequestClose={ closeRemoveTypeModal }
 					>
 						<p>
-							Are you sure you want to remove{' '}
-							<b>{typeToRemove}</b>?
+							Are you sure you want to remove{ ' ' }
+							<b>{ typeToRemove }</b>?
 						</p>
-						<Button variant="secondary" onClick={removeType}>
+						<Button variant="secondary" onClick={ removeType }>
 							Remove
 						</Button>
 						<Button
 							variant="secondary"
-							onClick={closeRemoveTypeModal}
+							onClick={ closeRemoveTypeModal }
 						>
 							Cancel
 						</Button>
 					</Modal>
-				)}
+				) }
 			</Flex>
 		</>
 	);
