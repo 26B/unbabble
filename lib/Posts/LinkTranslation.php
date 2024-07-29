@@ -149,7 +149,8 @@ class LinkTranslation {
 	public function get_possible_links( WP_Post $post, string $post_lang, int $page, ?string $search ) : array {
 		global $wpdb;
 		$translations_table    = ( new PostTable() )->get_table_name();
-		$allowed_languages_str = implode( "','", LangInterface::get_languages() );
+		$languages             = LangInterface::get_languages();
+		$allowed_languages_str = implode( "','", $languages );
 		$per_page              = 10;
 		if ( $page < 1 ) {
 			$page = 1;
@@ -160,34 +161,46 @@ class LinkTranslation {
 			$search_filter = $wpdb->prepare( "AND P.post_title LIKE %s", '%' . $wpdb->esc_like( $search ) . '%' );
 		}
 
+		$instr = [];
+		foreach ( $languages as $lang ) {
+			$instr[] = "INSTR(locale_info, '{$lang}') != 0 as {$lang}";
+		}
+		$instr = implode( ', ', $instr );
+
 		// FIXME: if there are any posts with multiple ubb_sources (bug), it can cause the post to show up in the list multiple times.
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT SQL_CALC_FOUND_ROWS
-				MIN(A.post_id) as post_id,
-				GROUP_CONCAT( CONCAT(A.post_id, 0x1F, locale, 0x1F, A.post_title) SEPARATOR 0x1D ) as group_info
+				"SELECT SQL_CALC_FOUND_ROWS post_id, group_info
 				FROM (
-					SELECT PT.post_id, P.post_title, locale, IFNULL(meta_value, PT.post_id) AS source
-					FROM {$translations_table} AS PT
-					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
-					INNER JOIN {$wpdb->posts} as P ON (PT.post_id = P.ID)
-					WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
-					AND PT.locale IN ('{$allowed_languages_str}')
-					{$search_filter}
-				) AS A
-				WHERE locale != %s
-				AND source NOT IN (
-					SELECT IFNULL(meta_value, PT.post_id) AS source
-					FROM {$translations_table} AS PT
-					LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
-					WHERE locale = %s
-				) GROUP BY source
-				ORDER BY group_info
+					SELECT
+						post_id,
+						source,
+						locale_info,
+						{$instr},
+						group_info
+					FROM (
+						SELECT
+							MIN(A.post_id) as post_id,
+							source,
+							GROUP_CONCAT( locale SEPARATOR 0x1D ) as locale_info,
+							GROUP_CONCAT( CONCAT(A.post_title, 0x1F, A.post_id, 0x1F, locale) SEPARATOR 0x1D ) as group_info
+						FROM (
+							SELECT PT.post_id, IFNULL(nullif(P.post_title, ''), '(Empty title)') as post_title, locale, IFNULL(meta_value, PT.post_id) AS source
+							FROM {$translations_table} AS PT
+							LEFT JOIN {$wpdb->postmeta} AS PM ON (PT.post_id = PM.post_id AND meta_key = 'ubb_source')
+							INNER JOIN {$wpdb->posts} as P ON (PT.post_id = P.ID)
+							WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
+							AND PT.locale IN ('{$allowed_languages_str}')
+							{$search_filter}
+						) as A
+						GROUP BY source
+					) AS B
+				) AS C
+				WHERE {$post_lang} = 0
+				ORDER BY group_info ASC
 				LIMIT %d
 				OFFSET %d",
 				$post->post_type,
-				$post_lang,
-				$post_lang,
 				$per_page,
 				$per_page * ( $page - 1 )
 			)
@@ -202,7 +215,7 @@ class LinkTranslation {
 				if ( count( $post_info ) !== 3 ) {
 					continue;
 				}
-				$source_posts[] = [ 'ID' => $post_info[0], 'lang' => $post_info[1], 'title' => $post_info[2] ];
+				$source_posts[] = [ 'title' => $post_info[0], 'ID' => $post_info[1], 'lang' => $post_info[2] ];
 			}
 
 			$options[] = [

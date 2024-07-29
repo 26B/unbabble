@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { linkablePosts } from '../services/requests';
 
-const useLinkablePosts = (postId, page) => {
+const useLinkablePosts = (postId, page, fecthOnUse = true ) => {
 	const [data, setData] = useState();
 	const [isLoading, setIsLoading] = useState(true);
 	const [isError, setIsError] = useState(false);
@@ -17,7 +17,9 @@ const useLinkablePosts = (postId, page) => {
 	};
 
 	useEffect(() => {
-		fetch(page);
+		if (fecthOnUse) {
+			fetch(page);
+		}
 	}, [postId, page]);
 
 	return { data, refetch: fetch, isLoading, isError };
