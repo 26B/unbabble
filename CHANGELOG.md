@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Checks for empty edit links, and non existent post/terms, when redirecting edit post/term links for the correct language.
+
 ### Changed
 
 - Improved query for possible sources to link to, via the API.
