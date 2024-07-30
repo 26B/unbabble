@@ -16,6 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Options in options page are now modifiable from the values set in the `ubb_options` filter.
 - API rest url when Unbabble is set to directory routing no longer has the language directory applied.
 
+## [0.4.8] - 2024-07-30
+
+### Added
+
+- Checks for empty edit links, and non existent post/terms, when redirecting edit post/term links for the correct language.
+
+### Changed
+
+- Improved query for possible sources to link to, via the API.
+- Delay fetching of possible sources in the post edit metabox until modal is opened.
+
+## [0.4.7] - 2024-07-25
+
+### Removed
+
+- Removed `check_term_slug_exists` method in `Terms\NewTerm.php`.
+
 ## [0.4.6] - 2024-07-18
 
 ### Added
@@ -439,7 +456,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.6...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.4.8...HEAD
+[0.4.8]: https://github.com/26b/unbabble/compare/0.4.7...0.4.8
+[0.4.7]: https://github.com/26b/unbabble/compare/0.4.6...0.4.7
 [0.4.6]: https://github.com/26b/unbabble/compare/0.4.5...0.4.6
 [0.4.5]: https://github.com/26b/unbabble/compare/0.4.4...0.4.5
 [0.4.4]: https://github.com/26b/unbabble/compare/0.4.3...0.4.4
