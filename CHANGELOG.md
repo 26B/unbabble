@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Improved query for possible sources to link to, via the API.
+- Delay fetching of possible sources in the post edit metabox until modal is opened.
+
 ## [0.4.7] - 2024-07-25
 
 ### Removed
