@@ -58,6 +58,10 @@ class Options {
 	}
 
 	public function update_options() {
+		if ( ! UnbabbleOptions::can_update() ) {
+			return new \WP_REST_Response( [ 'errors' => [] ], 404 );
+		}
+
 		$updated = UnbabbleOptions::update();
 		if ( ! $updated ) {
 			// TODO: errors

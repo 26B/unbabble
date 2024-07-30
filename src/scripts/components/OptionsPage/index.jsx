@@ -18,10 +18,7 @@ const OptionsPage = ( {} ) => {
 		options?.allowed_languages.map( ( language ) => {
 			return {
 				language,
-				hidden: getUBBSetting(
-					'options',
-					[]
-				)?.hidden_languages?.includes( language ),
+				hidden: options?.hidden_languages?.includes( language ),
 			};
 		} )
 	);
@@ -46,10 +43,7 @@ const OptionsPage = ( {} ) => {
 			data?.allowed_languages.map( ( language ) => {
 				return {
 					language,
-					hidden: getUBBSetting(
-						'options',
-						[]
-					)?.hidden_languages?.includes( language ),
+					hidden: data?.hidden_languages?.includes( language ),
 				};
 			} )
 		);

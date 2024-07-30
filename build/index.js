@@ -1604,7 +1604,7 @@ const OptionsPage = ({}) => {
   const [languages, setLanguages] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(options?.allowed_languages.map(language => {
     return {
       language,
-      hidden: (0,_services_settings__WEBPACK_IMPORTED_MODULE_5__["default"])('options', [])?.hidden_languages?.includes(language)
+      hidden: options?.hidden_languages?.includes(language)
     };
   }));
   const [defaultLanguage, setDefaultLanguage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(options?.default_language);
@@ -1621,7 +1621,7 @@ const OptionsPage = ({}) => {
     setLanguages(data?.allowed_languages.map(language => {
       return {
         language,
-        hidden: (0,_services_settings__WEBPACK_IMPORTED_MODULE_5__["default"])('options', [])?.hidden_languages?.includes(language)
+        hidden: data?.hidden_languages?.includes(language)
       };
     }));
     setDefaultLanguage(data?.default_language);

@@ -256,21 +256,27 @@ class QueryVar {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param string $url
-	 * @param string $path
+	 * @param string      $url
+	 * @param string      $path
+	 * @param string|null $scheme
 	 * @return string
 	 */
-	public function home_url( string $url, string $path ) : string {
+	public function home_url( string $url, string $path, ?string $scheme ) : string {
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
 		 * language.
 		 *
 		 * @since 0.0.1
-		 * @param bool   $stop_url_change Whether to change the home url or not.
-		 * @param string $url             Home url.
-		 * @param string $path            Url path.
+		 * @param bool        $stop_url_change Whether to change the home url or not.
+		 * @param string      $url             Home url.
+		 * @param string      $path            Url path.
+		 * @param string|null $scheme          Url scheme.
 		 */
-		if ( apply_filters( 'ubb_home_url', false, $url, $path ) ) {
+		if ( apply_filters( 'ubb_home_url', false, $url, $path, $scheme ) ) {
+			return $url;
+		}
+
+		if ( $scheme === 'rest' ) {
 			return $url;
 		}
 
@@ -337,28 +343,5 @@ class QueryVar {
 		}
 
 		return add_query_arg( 'lang', $curr_lang, $url );
-	}
-
-	/**
-	 * Return rest url without the lang query var.
-	 *
-	 * @since 0.0.0
-	 *
-	 * @param string $url     REST URL.
-	 * @param string $path    REST route.
-	 * @param mixed  $blog_id Blog ID.
-	 * @param string $scheme  Sanitization scheme.
-	 * @return string
-	 */
-	public function rest_url( string $url, string $path, $blog_id, string $scheme ) : string {
-		\add_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
-		\add_filter( 'ubb_apply_lang_to_rest_url', '__return_false' );
-
-		$rest_url = \get_rest_url( $blog_id, $path, $scheme );
-
-		\remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
-		\remove_filter( 'ubb_apply_lang_to_rest_url', '__return_false' );
-
-		return $rest_url;
 	}
 }
