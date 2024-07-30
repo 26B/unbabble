@@ -103,7 +103,29 @@ class Redirector {
 			return;
 		}
 
-		wp_safe_redirect( add_query_arg( 'lang', $post_lang, get_edit_post_link( $_REQUEST['post'], '&' ) ) );
+		$edit_post_link = get_edit_post_link( $_REQUEST['post'], '&' );
+		if ( ! empty( $edit_post_link ) ) {
+			wp_safe_redirect( add_query_arg( 'lang', $post_lang, $edit_post_link ) );
+			exit;
+		}
+
+		$post = get_post( $_REQUEST['post'] );
+		if ( empty( $post ) || ! isset( $post->post_type ) ) {
+			wp_safe_redirect( admin_url() );
+			exit;
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				array_filter(
+					[
+						'lang'      => $post_lang,
+						'post_type' => $post->post_type === 'post' ? '' : $post->post_type,
+					],
+				),
+				'edit.php'
+			)
+		);
 		exit;
 	}
 
@@ -136,7 +158,30 @@ class Redirector {
 			return;
 		}
 
-		wp_safe_redirect( add_query_arg( 'lang', $term_lang, get_edit_term_link( $_REQUEST['tag_ID'], '', '&' ) ) );
+		$edit_term_link = get_edit_term_link( $_REQUEST['tag_ID'], '', '&' );
+		if ( ! empty( $edit_term_link ) ) {
+			wp_safe_redirect( add_query_arg( 'lang', $term_lang, $edit_term_link ) );
+			exit;
+		}
+
+		$term = get_term( $_REQUEST['tag_ID'] );
+		if ( empty( $term ) || ! isset( $term->taxonomy ) ) {
+			wp_safe_redirect( admin_url() );
+			exit;
+		}
+
+		wp_safe_redirect(
+			add_query_arg(
+				array_filter(
+					[
+						'lang'      => $term_lang,
+						'taxonomy'  => $term->taxonomy === 'post_tag' ? '' : $term->taxonomy,
+						'post_type' => $_REQUEST['post_type'] ?? '',
+					],
+				),
+				'edit-tags.php'
+			)
+		);
 		exit;
 	}
 }
