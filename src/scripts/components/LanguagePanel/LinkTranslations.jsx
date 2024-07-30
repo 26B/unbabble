@@ -121,23 +121,12 @@ const SearchBar = ( { search, setSearch, refetch, disabled } ) => {
 	);
 };
 
-const LinkTranslations = ( { postId, refetchLangs } ) => {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const { data, refetch, isLoading, isError } = useLinkablePosts( postId, 1, false );
+const LinkModal = ( { postId, refetchLangs, close } ) => {
+	const { data, refetch, isLoading, isError } = useLinkablePosts( postId, 1 );
 	const [ page, setPage ] = useState( 1 );
 	const [ totalPages, setTotalPages ] = useState( data?.pages || 1 );
 	const [ search, setSearch ] = useState( '' );
 
-	const openModal = () => {
-		if ( isLoading ) {
-			refetch( 1 );
-		}
-		setIsModalOpen( true );
-	};
-
-	const closeModal = () => {
-		setIsModalOpen( false );
-	};
 	const previousPage = () => {
 		if ( page <= 1 ) {
 			return;
@@ -163,97 +152,117 @@ const LinkTranslations = ( { postId, refetchLangs } ) => {
 		setTotalPages( data?.pages || 1 );
 	}
 
+	return (
+		<Modal
+			title="Link to existing posts:"
+			onRequestClose={ close }
+			size="large"
+		>
+			<div
+				style={ {
+					display: 'grid',
+					flexWrap: 'wrap',
+					gap: '8px',
+				} }
+			>
+				<Notice
+					status="warning"
+					isDismissible={ false }
+					politeness="polite"
+				>
+					{ ' ' }
+					You will unlink from the post's current translations if you
+					link to another.
+				</Notice>
+				<SearchBar
+					search={ search }
+					setSearch={ setSearch }
+					refetch={ fetchSearch }
+					disabled={ isLoading }
+				/>
+				<div
+					style={ {
+						position: 'relative',
+						minHeight: '50px',
+					} }
+				>
+					{ data?.options && data.options.length !== 0 && (
+						<VStack expanded>
+							{ data.options.map( ( option ) => (
+								<LinkOption
+									key={ `link-option-${ option.source }` }
+									{ ...option }
+									postId={ postId }
+									refetchLangs={ refetchLangs }
+								/>
+							) ) }
+						</VStack>
+					) }
+					{ isLoading && <Loading overlay /> }
+					{ ! isLoading &&
+						data?.options &&
+						data.options.length === 0 && (
+							<div>No results found.</div>
+						) }
+					{ isError && 'ERROR!!!' }
+				</div>
+			</div>
+			<div
+				style={ {
+					position: 'sticky',
+					display: 'flex',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					width: '100%',
+					marginTop: 20,
+				} }
+			>
+				<Button
+					variant="secondary"
+					onClick={ previousPage }
+					disabled={ page < 2 }
+				>
+					Previous Page
+				</Button>
+				<span style={ { display: 'flex', gap: 5 } }>
+					<strong>{ page }</strong>
+					<span>/</span>
+					<span>{ totalPages }</span>
+				</span>
+				<Button
+					variant="secondary"
+					onClick={ nextPage }
+					disabled={ page >= totalPages }
+				>
+					Next Page
+				</Button>
+			</div>
+		</Modal>
+	);
+};
+
+const LinkTranslations = ( { postId, refetchLangs } ) => {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+
+	const openModal = () => {
+		setIsModalOpen( true );
+	};
+
+	const closeModal = () => {
+		setIsModalOpen( false );
+	};
+
 	// TODO: Only permit linking if there are no translations.
 	// TODO: Add footnote under unlink: you must first unlink to link to other translations.
 
 	return (
 		<>
 			{ isModalOpen && (
-				<Modal
-					title="Link to existing posts:"
-					onRequestClose={ closeModal }
-					size="large"
-				>
-					<div
-						style={ {
-							display: 'grid',
-							flexWrap: 'wrap',
-							gap: '8px',
-						} }
-					>
-						<Notice
-							status="warning"
-							isDismissible={ false }
-							politeness="polite"
-						>
-							{ ' ' }
-							You will unlink from the post's current translations
-							if you link to another.
-						</Notice>
-						<SearchBar
-							search={ search }
-							setSearch={ setSearch }
-							refetch={ fetchSearch }
-							disabled={ isLoading }
-						/>
-						<div
-							style={ {
-								position: 'relative',
-								minHeight: '50px',
-							} }
-						>
-							{ data?.options && data.options.length !== 0 && (
-								<VStack expanded>
-									{ data.options.map( ( option ) => (
-										<LinkOption
-											key={ `link-option-${ option.source }` }
-											{ ...option }
-											postId={ postId }
-											refetchLangs={ refetchLangs }
-										/>
-									) ) }
-								</VStack>
-							) }
-							{ isLoading && <Loading overlay /> }
-							{ ! isLoading &&
-								data?.options &&
-								data.options.length === 0 && (
-									<div>No results found.</div>
-								) }
-							{ isError && 'ERROR!!!' }
-						</div>
-					</div>
-					<div
-						style={ {
-							position: 'sticky',
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-							width: '100%',
-							marginTop: 20,
-						} }
-					>
-						<Button
-							variant="secondary"
-							onClick={ previousPage }
-							disabled={ page < 2 }
-						>
-							Previous Page
-						</Button>
-						<span style={ { display: 'flex', gap: 5 } }>
-							<strong>{ page }</strong>
-							<span>/</span>
-							<span>{ totalPages }</span>
-						</span>
-						<Button
-							variant="secondary"
-							onClick={ nextPage }
-							disabled={ page >= totalPages }
-						>
-							Next Page
-						</Button>
-					</div>
-				</Modal>
+				<LinkModal
+					close={ closeModal }
+					postId={ postId }
+					refetchLangs={ refetchLangs }
+				/>
 			) }
 			<Button
 				style={ { boxSizing: 'border-box' } }
