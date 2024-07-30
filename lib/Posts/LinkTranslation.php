@@ -137,7 +137,7 @@ class LinkTranslation {
 	/**
 	 * Get possible links for post $post_id.
 	 *
-	 * @since Unreleased Changed query to improve efficiency.
+	 * @since 0.4.8 Changed query to improve efficiency.
 	 * @since 0.4.5 Add search argument and search filter to query.
 	 * @since 0.1.0
 	 *

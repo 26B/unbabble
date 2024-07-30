@@ -75,7 +75,7 @@ class Redirector {
 	/**
 	 * Redirect if the current language is not the correct one for the current post.
 	 *
-	 * @since Unreleased Add checks for bad edit link and/or unknown post, and redirects for those cases.
+	 * @since 0.4.8 Add checks for bad edit link and/or unknown post, and redirects for those cases.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -136,7 +136,7 @@ class Redirector {
 	/**
 	 * Redirect if the current language is not the correct one for the current term.
 	 *
-	 * @since Unreleased Add checks for bad edit link and/or unknown term, and redirects for those cases.
+	 * @since 0.4.8 Add checks for bad edit link and/or unknown term, and redirects for those cases.
 	 * @since 0.4.2 Don't redirect when term lang is not in allowed languages to allow the user to fix it.
 	 * @since 0.0.1
 	 *

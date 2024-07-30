@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.8] - 2024-07-30
+
 ### Added
 
 - Checks for empty edit links, and non existent post/terms, when redirecting edit post/term links for the correct language.
@@ -445,7 +447,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.7...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.4.8...HEAD
+[0.4.8]: https://github.com/26b/unbabble/compare/0.4.7...0.4.8
 [0.4.7]: https://github.com/26b/unbabble/compare/0.4.6...0.4.7
 [0.4.6]: https://github.com/26b/unbabble/compare/0.4.5...0.4.6
 [0.4.5]: https://github.com/26b/unbabble/compare/0.4.4...0.4.5
