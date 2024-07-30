@@ -14,9 +14,19 @@ class Options {
 
 	static private $options = null;
 
+	/**
+	 * Register hooks.
+	 *
+	 * @since Unreleased Added conditions for registering the update action.
+	 * @since 0.0.11
+	 *
+	 * @return null
+	 */
 	public function register() : void {
-		// TODO: we should check if any filters are set for ubb_options. We should have a function to check this and the constant are true.
-		if ( defined( 'UBB_OPTIONS_AUTO_UPDATE' ) && UBB_OPTIONS_AUTO_UPDATE ) {
+		if (
+			\has_filter( 'ubb_options' )
+			&& defined( 'UBB_OPTIONS_AUTO_UPDATE' ) && UBB_OPTIONS_AUTO_UPDATE
+		) {
 			\add_action( 'wp_loaded', [ self::class, 'update' ] );
 		}
 	}
@@ -79,6 +89,14 @@ class Options {
 		return $options;
 	}
 
+	/**
+	 * Validates the options.
+	 *
+	 * @since 0.0.11
+	 *
+	 * @param array $options
+	 * @return array
+	 */
 	public static function validate( array $options ) : array {
 		$validator = new Validator(
 			[
@@ -116,7 +134,7 @@ class Options {
 	 * Updates the Unbabble options if the value returned from the filter `ubb_options` is
 	 * different from the saved options.
 	 *
-	 * @since Unreleased Added boolean return.
+	 * @since Unreleased Added boolean return. Refactor fetch of options from filter into a separate method.
 	 * @since 0.4.5 Force 'nav_menu' and 'nav_menu_item' to be translatable if one of them is.
 	 * @since 0.0.11
 	 *
@@ -303,6 +321,13 @@ class Options {
 		return $standard;
 	}
 
+	/**
+	 * Fetch options set on the `ubb_options` filter.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return array|bool|\WP_Error
+	 */
 	public static function get_filter_options() : array|bool|\WP_Error {
 
 		/**
@@ -365,22 +390,42 @@ class Options {
 		return $filter_options;
 	}
 
-
+	/**
+	 * Returns whether the options can be updated via the filter options.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return bool
+	 */
 	public static function can_update() : bool {
 		$filter_options = self::get_filter_options();
 		if ( is_wp_error( $filter_options ) || ! is_array( $filter_options ) ) {
 			return false;
 		}
 
-
 		$options = self::get();
 		return $options !== $filter_options;
 	}
 
+	/**
+	 * Clear the static cache for options.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return null
+	 */
 	public static function clear_static_cache() {
 		self::$options = null;
 	}
 
+	/**
+	 * Build the options array from the API values.
+	 *
+	 * @since 0.2.0
+	 *
+	 * @param array $options
+	 * @return array
+	 */
 	private static function build_options_from_api( array $options ) : array {
 		$current_options = self::get();
 		$new_options     = [];

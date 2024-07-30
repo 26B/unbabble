@@ -18,6 +18,7 @@ class RoutingResolver {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Added one more argument to the hook `rest_url`.
 	 * @since 0.0.3
 	 */
 	public function register() {
@@ -215,6 +216,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `home_url`.
 	 *
+	 * @since Unreleased Added $scheme argument.
 	 * @since 0.0.3
 	 *
 	 * @param string      $url

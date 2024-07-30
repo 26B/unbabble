@@ -254,6 +254,7 @@ class QueryVar {
 	/**
 	 * Adds directory to home_url.
 	 *
+	 * @since Unreleased Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
 	 * @param string      $url
@@ -262,6 +263,10 @@ class QueryVar {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path, ?string $scheme ) : string {
+		if ( $scheme === 'rest' ) {
+			return $url;
+		}
+
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
 		 * language.
@@ -273,10 +278,6 @@ class QueryVar {
 		 * @param string|null $scheme          Url scheme.
 		 */
 		if ( apply_filters( 'ubb_home_url', false, $url, $path, $scheme ) ) {
-			return $url;
-		}
-
-		if ( $scheme === 'rest' ) {
 			return $url;
 		}
 

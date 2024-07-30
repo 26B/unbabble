@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Options in options page are now modifiable from the values set in the `ubb_options` filter.
+- API rest url when Unbabble is set to directory routing no longer has the language directory applied.
 
 ## [0.4.6] - 2024-07-18
 
