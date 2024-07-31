@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Check for empty transient value when fetching term language.
+
+### Fixed
+
+- Term language set when term has no language.
+
 ## [0.4.8] - 2024-07-30
 
 ### Added

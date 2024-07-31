@@ -724,6 +724,9 @@ class LangInterface {
 	/**
 	 * Returns a term's language.
 	 *
+	 * @since Unreleased Added check for empty $term_lang transient value.
+	 * @since 0.0.1
+	 *
 	 * @param  int    $term_id
 	 * @return ?string String if the term has a language, null otherwise.
 	 */
@@ -732,7 +735,7 @@ class LangInterface {
 		$transient_key = sprintf( 'ubb_%s_term_language', $term_id );
 		$term_lang     = \get_transient( $transient_key );
 		if ( $term_lang !== false ) {
-			return is_string( $term_lang ) ? $term_lang : null;
+			return is_string( $term_lang ) && ! empty( $term_lang ) ? $term_lang : null;
 		}
 
 		$table_name = ( new TermTable() )->get_table_name();
