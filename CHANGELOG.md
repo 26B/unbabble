@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Check for empty transient value when fetching term language.
 
+### Changed
+
+- Improved get post language handling of empty values.
+
 ### Fixed
 
 - Term language set when term has no language.
