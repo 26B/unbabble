@@ -143,7 +143,11 @@ const Types = ( {
 							Are you sure you want to remove{ ' ' }
 							<b>{ typeToRemove }</b>?
 						</p>
-						<Button variant="secondary" onClick={ removeType }>
+						<Button
+							style={ { marginRight: 10 } }
+							variant="secondary"
+							onClick={ removeType }
+						>
 							Remove
 						</Button>
 						<Button

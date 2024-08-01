@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Constant `UBB_OPTIONS_AUTO_UPDATE` for automatically updating options.
+- Constant `UBB_SETTINGS_READONLY` for read only settings in the backoffice settings page.
+- Internal option `ubb_settings_manual_changes` for keeping track if manual changes have been made to the settings.
 
 ### Changed
 

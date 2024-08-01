@@ -84,8 +84,8 @@ class Options {
 
 		return new \WP_REST_Response(
 			[
-				'options'   => UnbabbleOptions::get(),
-				'canUpdate' => UnbabbleOptions::can_update(),
+				'options'            => UnbabbleOptions::get(),
+				'has_manual_changes' => UnbabbleOptions::has_manual_changes(),
 			],
 			200
 		);
@@ -99,7 +99,7 @@ class Options {
 	 * @return \WP_REST_Response
 	 */
 	public function update_options() {
-		if ( ! UnbabbleOptions::can_update() ) {
+		if ( ! UnbabbleOptions::has_filter_settings() ) {
 			return new \WP_REST_Response( [ 'errors' => [] ], 404 );
 		}
 
@@ -113,8 +113,8 @@ class Options {
 
 		return new \WP_REST_Response(
 			[
-				'options'   => UnbabbleOptions::get(),
-				'canUpdate' => false,
+				'options'            => UnbabbleOptions::get(),
+				'has_manual_changes' => UnbabbleOptions::has_manual_changes(),
 			],
 			200
 		);

@@ -23,10 +23,7 @@ class Options {
 	 * @return null
 	 */
 	public function register() : void {
-		if (
-			\has_filter( 'ubb_options' )
-			&& defined( 'UBB_OPTIONS_AUTO_UPDATE' ) && UBB_OPTIONS_AUTO_UPDATE
-		) {
+		if ( \has_filter( 'ubb_options' ) ) {
 			\add_action( 'wp_loaded', [ self::class, 'update' ] );
 		}
 	}
@@ -134,7 +131,7 @@ class Options {
 	 * Updates the Unbabble options if the value returned from the filter `ubb_options` is
 	 * different from the saved options.
 	 *
-	 * @since Unreleased Added boolean return. Refactor fetch of options from filter into a separate method.
+	 * @since Unreleased Added boolean return. Refactor fetch of options from filter into a separate method. Add update for manual changes option.
 	 * @since 0.4.5 Force 'nav_menu' and 'nav_menu_item' to be translatable if one of them is.
 	 * @since 0.0.11
 	 *
@@ -153,13 +150,16 @@ class Options {
 
 		$options = self::get();
 		if ( $options === $filter_options ) {
-			return false;
+			\update_option( 'ubb_settings_manual_changes', false );
+			return true;
 		}
 
 		if ( ! \update_option( 'ubb_options', $filter_options ) ) {
 			\add_action( 'admin_notices', [ new Admin(), 'options_update_failed_notice' ], 0 );
 			return false;
 		}
+
+		\update_option( 'ubb_settings_manual_changes', false );
 
 		/**
 		 * Fires after the Unbabble options have been updated in the database after a difference
@@ -176,6 +176,16 @@ class Options {
 		return true;
 	}
 
+	/**
+	 * Updates the Unbabble options via the API.
+	 *
+	 * @since Unreleased Add update for manual changes option.
+	 * @since 0.2.0
+	 *
+	 * @param \WP_REST_Request $request
+	 *
+	 * @return array|bool
+	 */
 	public static function update_via_api( \WP_REST_Request $request ) {
 		$body = json_decode( $request->get_body(), true );
 		$new_options = self::build_options_from_api( $body );
@@ -193,6 +203,8 @@ class Options {
 		if ( ! \update_option( 'ubb_options', $new_options ) ) {
 			return []; //TODO: errors
 		}
+
+		\update_option( 'ubb_settings_manual_changes', true );
 
 		return true;
 	}
@@ -391,20 +403,23 @@ class Options {
 	}
 
 	/**
-	 * Returns whether the options can be updated via the filter options.
+	 * Returns whether there are settings passed via the filter.
 	 *
 	 * @since Unreleased
 	 *
 	 * @return bool
 	 */
-	public static function can_update() : bool {
-		$filter_options = self::get_filter_options();
-		if ( is_wp_error( $filter_options ) || ! is_array( $filter_options ) ) {
+	public static function has_filter_settings() : bool {
+		if ( ! \has_filter( 'ubb_options' ) ) {
 			return false;
 		}
 
-		$options = self::get();
-		return $options !== $filter_options;
+		$filter_options = self::get_filter_options();
+		if ( \is_wp_error( $filter_options ) || ! is_array( $filter_options ) ) {
+			return false;
+		}
+
+		return $filter_options !== self::defaults();
 	}
 
 	/**
@@ -416,6 +431,17 @@ class Options {
 	 */
 	public static function clear_static_cache() {
 		self::$options = null;
+	}
+
+	/**
+	 * Returns whether there are manual changes to the settings.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return bool
+	 */
+	public static function has_manual_changes() : bool {
+		return (bool) \get_option( 'ubb_settings_manual_changes', false );
 	}
 
 	/**

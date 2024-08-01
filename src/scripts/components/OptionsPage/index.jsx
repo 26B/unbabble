@@ -10,6 +10,34 @@ import getUBBSetting from '../../services/settings';
 import { submitOptions } from '../../services/requests';
 import { updateOptions } from '../../services/requests';
 
+const Buttons = ( { submit, update, hasFilterSettings, hasManualChanges } ) => (
+	<>
+		<Button className="button button-primary" onClick={ submit }>
+			Save
+		</Button>
+		{ hasFilterSettings && (
+			<Button
+				className="button button-primary"
+				onClick={ update }
+				disabled={ ! hasManualChanges || ! hasFilterSettings }
+			>
+				Reset to filter options
+			</Button>
+		) }
+	</>
+);
+
+const HighlightText = ( { text } ) => (
+	<span
+		style={ {
+			backgroundColor: 'rgb(235,235,235)',
+			padding: '2px 3px',
+		} }
+	>
+		{ text }
+	</span>
+);
+
 const OptionsPage = ( {} ) => {
 	const [ options, setOptions ] = useState( getUBBSetting( 'options', [] ) );
 	const [ postTypes, setPostTypes ] = useState( options?.post_types );
@@ -31,10 +59,11 @@ const OptionsPage = ( {} ) => {
 	} );
 
 	const [ notice, setNotice ] = useState( null );
-	const autoUpdate = getUBBSetting( 'optionsAutoUpdate', false );
-	const [ canUpdate, setCanUpdate ] = useState(
-		getUBBSetting( 'optionsCanUpdate', false )
+	const readOnly = getUBBSetting( 'settings_read_only', false );
+	const [ hasManualChanges, setHasManualChanges ] = useState(
+		getUBBSetting( 'settings_manual_changes', false )
 	);
+	const hasFilterSettings = getUBBSetting( 'settings_has_filter', false );
 
 	const setValues = ( data ) => {
 		setPostTypes( data?.post_types );
@@ -69,8 +98,8 @@ const OptionsPage = ( {} ) => {
 					setOptions( response.data.options );
 					setValues( response.data.options );
 				}
-				if ( response?.data?.canUpdate !== undefined ) {
-					setCanUpdate( response.data.canUpdate );
+				if ( response?.data?.has_manual_changes !== undefined ) {
+					setHasManualChanges( response.data.has_manual_changes );
 				}
 				setNotice( 'success' );
 			} )
@@ -87,8 +116,8 @@ const OptionsPage = ( {} ) => {
 					setOptions( response.data.options );
 					setValues( response.data.options );
 				}
-				if ( response?.data?.canUpdate !== undefined ) {
-					setCanUpdate( response.data.canUpdate );
+				if ( response?.data?.has_manual_changes !== undefined ) {
+					setHasManualChanges( response.data.has_manual_changes );
 				}
 
 				setNotice( 'success' );
@@ -105,72 +134,64 @@ const OptionsPage = ( {} ) => {
 					style={ { width: '100%', justifyContent: 'normal' } }
 				>
 					<h1>Unbabble Settings</h1>
-					{ ! autoUpdate && (
-						<>
-							<Button
-								className="button button-primary"
-								onClick={ submit }
-							>
-								Save
-							</Button>
-							<Button
-								className="button button-primary"
-								onClick={ update }
-								disabled={ ! canUpdate }
-							>
-								Syncronize
-							</Button>
-						</>
+					{ ! readOnly && (
+						<Buttons
+							submit={ submit }
+							update={ update }
+							hasFilterSettings={ hasFilterSettings }
+							hasManualChanges={ hasManualChanges }
+						/>
 					) }
 				</Flex>
-				{ notice === 'success' && (
-					<Notice status="success" onRemove={ () => setNotice( '' ) }>
-						Options have been updated.
-					</Notice>
-				) }
-				{ notice !== null && typeof notice === 'object' && (
-					<Notice status="error" onRemove={ () => setNotice( '' ) }>
-						An error has occured while trying to update.
-					</Notice>
-				) }
-				{ autoUpdate && (
-					<Notice status="info" isDismissible={ false }>
-						The options are read-only because they are in
-						auto-update mode via the filter{ ' ' }
-						<span
-							style={ {
-								backgroundColor: 'rgb(235,235,235)',
-								padding: '2px 3px',
-							} }
+				<div style={ { display: 'grid', gap: '10px' } }>
+					{ readOnly && (
+						<Notice status="info" isDismissible={ false }>
+							The settings are read-only due to the constant{ ' ' }
+							<HighlightText text="UBB_SETTINGS_READONLY" />.
+						</Notice>
+					) }
+					{ ! hasManualChanges && (
+						<Notice status="info" isDismissible={ false }>
+							Settings are being automatically updated via the
+							filter <HighlightText text="ubb_options" />.
+						</Notice>
+					) }
+					{ hasManualChanges && hasFilterSettings && (
+						<Notice status="info" isDismissible={ false }>
+							Settings have been manually edited and are no longer
+							being automatically updated.
+						</Notice>
+					) }
+					{ notice === 'success' && (
+						<Notice
+							status="success"
+							onRemove={ () => setNotice( '' ) }
 						>
-							ubb_options
-						</span>
-						. If this is a mistake, please remove, or set as false,
-						the constant{ ' ' }
-						<span
-							style={ {
-								backgroundColor: 'rgb(235,235,235)',
-								padding: '2px 3px',
-							} }
+							Settings have been updated.
+						</Notice>
+					) }
+					{ notice !== null && typeof notice === 'object' && (
+						<Notice
+							status="error"
+							onRemove={ () => setNotice( '' ) }
 						>
-							UBB_OPTIONS_AUTO_UPDATE
-						</span>
-						.
-					</Notice>
-				) }
+							An error has occured while trying to update.
+						</Notice>
+					) }
+				</div>
 				<Languages
 					languages={ languages }
 					setLanguages={ setLanguages }
 					defaultLanguage={ defaultLanguage }
 					setDefaultLanguage={ setDefaultLanguage }
-					readOnly={ autoUpdate }
+					readOnly={ readOnly }
 				/>
 				<Routing
 					languages={ languages }
 					defaultLanguage={ defaultLanguage }
 					routing={ routing }
 					setRouting={ setRouting }
-					readOnly={ autoUpdate }
+					readOnly={ readOnly }
 				/>
 				<Types
 					title="Post Types"
@@ -180,7 +201,7 @@ const OptionsPage = ( {} ) => {
 					types={ postTypes }
 					setTypes={ setPostTypes }
 					allTypes={ getUBBSetting( 'wpPostTypes', [] ) }
-					readOnly={ autoUpdate }
+					readOnly={ readOnly }
 				/>
 				<Types
 					title="Taxonomies"
@@ -190,16 +211,15 @@ const OptionsPage = ( {} ) => {
 					types={ taxonomies }
 					setTypes={ setTaxonomies }
 					allTypes={ getUBBSetting( 'wpTaxonomies', [] ) }
-					readOnly={ autoUpdate }
+					readOnly={ readOnly }
 				/>
-				{ ! autoUpdate && (
-					<Button
-						className="button button-primary"
-						style={ { marginTop: 24 } }
-						onClick={ submit }
-					>
-						Save
-					</Button>
+				{ ! readOnly && (
+					<Buttons
+						submit={ submit }
+						update={ update }
+						hasFilterSettings={ hasFilterSettings }
+						hasManualChanges={ hasManualChanges }
+					/>
 				) }
 			</form>
 		</>
