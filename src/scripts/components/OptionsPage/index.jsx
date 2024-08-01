@@ -7,12 +7,21 @@ import Types from './Types.jsx';
 import { Flex, Button, Notice } from '@wordpress/components';
 import getUBBSetting from '../../services/settings';
 
-import { submitOptions } from '../../services/requests';
-import { updateOptions } from '../../services/requests';
+import { submitOptions, updateOptions } from '../../services/requests';
 
-const Buttons = ( { submit, update, hasFilterSettings, hasManualChanges } ) => (
+const Buttons = ( {
+	isDirty,
+	submit,
+	update,
+	hasFilterSettings,
+	hasManualChanges,
+} ) => (
 	<>
-		<Button className="button button-primary" onClick={ submit }>
+		<Button
+			className="button button-primary"
+			onClick={ submit }
+			disabled={ ! isDirty }
+		>
 			Save
 		</Button>
 		{ hasFilterSettings && (
@@ -58,6 +67,7 @@ const OptionsPage = ( {} ) => {
 		router_options: options?.router_options,
 	} );
 
+	const [ isDirty, setIsDirty ] = useState( false );
 	const [ notice, setNotice ] = useState( null );
 	const readOnly = getUBBSetting( 'settings_read_only', false );
 	const [ hasManualChanges, setHasManualChanges ] = useState(
@@ -102,6 +112,7 @@ const OptionsPage = ( {} ) => {
 					setHasManualChanges( response.data.has_manual_changes );
 				}
 				setNotice( 'success' );
+				setIsDirty( false );
 			} )
 			.catch( ( error ) => setNotice( error.response.data.errors ) )
 			.then( () => window.scrollTo( 0, 0 ) );
@@ -121,9 +132,15 @@ const OptionsPage = ( {} ) => {
 				}
 
 				setNotice( 'success' );
+				setIsDirty( false );
 			} )
 			.catch( ( error ) => setNotice( error.response.data.errors ) )
 			.then( () => window.scrollTo( 0, 0 ) );
+	};
+
+	const setDirty = ( setState ) => ( value ) => {
+		setState( value );
+		setIsDirty( true );
 	};
 
 	return (
@@ -136,6 +153,7 @@ const OptionsPage = ( {} ) => {
 					<h1>Unbabble Settings</h1>
 					{ ! readOnly && (
 						<Buttons
+							isDirty={ isDirty }
 							submit={ submit }
 							update={ update }
 							hasFilterSettings={ hasFilterSettings }
@@ -150,7 +168,7 @@ const OptionsPage = ( {} ) => {
 							<HighlightText text="UBB_SETTINGS_READONLY" />.
 						</Notice>
 					) }
-					{ ! hasManualChanges && (
+					{ ! hasManualChanges && hasFilterSettings && (
 						<Notice status="info" isDismissible={ false }>
 							Settings are being automatically updated via the
 							filter <HighlightText text="ubb_options" />.
@@ -181,16 +199,16 @@ const OptionsPage = ( {} ) => {
 				</div>
 				<Languages
 					languages={ languages }
-					setLanguages={ setLanguages }
+					setLanguages={ setDirty( setLanguages ) }
 					defaultLanguage={ defaultLanguage }
-					setDefaultLanguage={ setDefaultLanguage }
+					setDefaultLanguage={ setDirty( setDefaultLanguage ) }
 					readOnly={ readOnly }
 				/>
 				<Routing
 					languages={ languages }
 					defaultLanguage={ defaultLanguage }
 					routing={ routing }
-					setRouting={ setRouting }
+					setRouting={ setDirty( setRouting ) }
 					readOnly={ readOnly }
 				/>
 				<Types
@@ -199,7 +217,7 @@ const OptionsPage = ( {} ) => {
 					selectLabel="Select a post type"
 					addSelectedLabel="Add selected post type"
 					types={ postTypes }
-					setTypes={ setPostTypes }
+					setTypes={ setDirty( setPostTypes ) }
 					allTypes={ getUBBSetting( 'wpPostTypes', [] ) }
 					readOnly={ readOnly }
 				/>
@@ -209,12 +227,13 @@ const OptionsPage = ( {} ) => {
 					selectLabel="Select a taxonomy"
 					addSelectedLabel="Add selected taxonomy"
 					types={ taxonomies }
-					setTypes={ setTaxonomies }
+					setTypes={ setDirty( setTaxonomies ) }
 					allTypes={ getUBBSetting( 'wpTaxonomies', [] ) }
 					readOnly={ readOnly }
 				/>
 				{ ! readOnly && (
 					<Buttons
+						isDirty={ isDirty }
 						submit={ submit }
 						update={ update }
 						hasFilterSettings={ hasFilterSettings }
