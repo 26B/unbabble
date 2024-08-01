@@ -23,9 +23,7 @@ class Options {
 	 * @return null
 	 */
 	public function register() : void {
-		if ( \has_filter( 'ubb_options' ) ) {
-			\add_action( 'wp_loaded', [ self::class, 'update' ] );
-		}
+		\add_action( 'wp_loaded', [ self::class, 'update' ] );
 	}
 
 	/**
