@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Term language set when term has no language.
+- Missing post type in url when creating a term translation to stay in the same post type Menu.
 
 ## [0.4.8] - 2024-07-30
 

@@ -32,6 +32,7 @@ class CreateTranslation {
 	/**
 	 * Redirect to new term creation page to make a new translation.
 	 *
+	 * @since Unreleased Add post type to create redirect.
 	 * @since 0.4.5 Add redirect for nav_menu translation create.
 	 * @since 0.0.1
 	 *
@@ -83,11 +84,14 @@ class CreateTranslation {
 		// TODO: Add something in the page to show that a translation is being saved. Use existence of ubb_source.
 		wp_safe_redirect(
 			add_query_arg(
-				[
-					'taxonomy'   => $taxonomy,
-					'lang'       => $lang_create,
-					'ubb_source' => $term_id,
-				],
+				array_filter(
+					[
+						'taxonomy'   => $taxonomy,
+						'lang'       => $lang_create,
+						'ubb_source' => $term_id,
+						'post_type'  => $_REQUEST['ubb_post_type'] ?? '',
+					]
+				),
 				admin_url( 'edit-tags.php' )
 			),
 			302,
