@@ -1,5 +1,8 @@
 # Unbabble
 
+> [!WARNING]
+> This plugin is under active development which could result in changes that require manual intervention on data as code developed on top of our API. We'll try to mitigate and provide information, as much as possible, but you should be aware of this in case you plan to use it in production.
+
 Our stab at translations in WordPress.
 
 This plugin aims to be several things which, hopefully, we'll be able to keep:
