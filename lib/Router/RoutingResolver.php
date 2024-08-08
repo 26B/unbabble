@@ -18,6 +18,7 @@ class RoutingResolver {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Added one more argument to the hook `rest_url`.
 	 * @since 0.0.3
 	 */
 	public function register() {
@@ -54,7 +55,7 @@ class RoutingResolver {
 
 		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
 
-		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 2 );
+		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 3 );
 
 		\add_filter( 'network_home_url', [ $this, 'network_home_url' ], 10, 3 );
 
@@ -215,22 +216,24 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `home_url`.
 	 *
+	 * @since Unreleased Added $scheme argument.
 	 * @since 0.0.3
 	 *
-	 * @param string $url
-	 * @param string $path
+	 * @param string      $url
+	 * @param string      $path
+	 * @param string|null $scheme
 	 * @return string
 	 */
-	public function home_url( string $url, string $path ) : string {
+	public function home_url( string $url, string $path, ?string $scheme ) : string {
 
 		// TODO: add docs.
-		if ( ! apply_filters( 'ubb_apply_lang_to_home_url', true, $url, $path ) ) {
+		if ( ! apply_filters( 'ubb_apply_lang_to_home_url', true, $url, $path, $scheme ) ) {
 			return $url;
 		}
 
 		$router = $this->get_current_router_object();
 		if ( $router !== null && method_exists( $router, 'home_url' ) ) {
-			return $router->home_url( $url, $path );
+			return $router->home_url( $url, $path, $scheme );
 		}
 		return $url;
 	}
