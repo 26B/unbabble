@@ -244,6 +244,9 @@ class LangInterface {
 	/**
 	 * Returns a post's language.
 	 *
+	 * @since Unreleased Improve handling of empty values.
+	 * @since 0.0.1
+	 *
 	 * @param  int    $post_id
 	 * @return ?string String if the post has a language, null otherwise.
 	 */
@@ -257,8 +260,10 @@ class LangInterface {
 
 		$transient_key = sprintf( 'ubb_%s_post_language', $post_id );
 		$post_lang     = \get_transient( $transient_key );
+
+		// If there is a transient value, return it.
 		if ( $post_lang !== false ) {
-			return ( is_string( $post_lang ) && ! empty( $post_lang ) ) ? $post_lang : null;
+			return $post_lang;
 		}
 
 		$table_name = ( new PostTable() )->get_table_name();
@@ -724,6 +729,9 @@ class LangInterface {
 	/**
 	 * Returns a term's language.
 	 *
+	 * @since Unreleased Improve handling of empty values.
+	 * @since 0.0.1
+	 *
 	 * @param  int    $term_id
 	 * @return ?string String if the term has a language, null otherwise.
 	 */
@@ -731,8 +739,10 @@ class LangInterface {
 		global $wpdb;
 		$transient_key = sprintf( 'ubb_%s_term_language', $term_id );
 		$term_lang     = \get_transient( $transient_key );
+
+		// If there is a transient value, return it.
 		if ( $term_lang !== false ) {
-			return is_string( $term_lang ) ? $term_lang : null;
+			return $term_lang;
 		}
 
 		$table_name = ( new TermTable() )->get_table_name();
@@ -743,6 +753,11 @@ class LangInterface {
 			),
 			1
 		);
+
+		// Make sure $term_lang is null if get_var returns empty string.
+		if ( empty( $term_lang ) ) {
+			$term_lang = null;
+		}
 
 		\set_transient( $transient_key, $term_lang, 30 );
 		return $term_lang;
