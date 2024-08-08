@@ -85,6 +85,7 @@ class LangMetaBox {
 	/**
 	 * Prints metabox for when an existing term is being edited.
 	 *
+	 * @since Unreleased Add hidden input with page's post type for create translation.
 	 * @since 0.4.3 Fixed issue with bad language check.
 	 * @since 0.4.2 Add new `print_language_select` argument. Check for bad language and stop showing create and link translations if so.
 	 * @since 0.0.1
@@ -190,12 +191,14 @@ class LangMetaBox {
 					<th scope="row"><label for="language">%1$s</label></th>
 					<td>
 					%2$s
+					<input type="hidden" name="ubb_post_type" value="%3$s"/>
 					<input type="submit" name="ubb_redirect_new" value="Save and Create" class="button"/>
 					<input type="submit" disabled name="ubb_copy_new" value="Save and Copy" class="button"/>
 					</td>
 				</tr>',
 				esc_html__( 'Create Translation', 'unbabble' ),
 				$this->print_language_select( 'ubb_create', '', $available_languages, '', '', false, false ),
+				$_REQUEST['post_type'] ?? '',
 			);
 		}
 
