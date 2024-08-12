@@ -43,7 +43,6 @@ class AdvancedCustomFieldsPro {
 	public function set_fields_as_translatable( array $fields, string $prefix = '' ) : array {
 		$field_keys = [];
 
-		// Store layouts for flexible content fields, sometimes
 		/**
 		 * Store layouts for flexible content fields. Some layout types are not stored inside
 		 * the flexible content field, but in a separate entry. This is the case for the block
