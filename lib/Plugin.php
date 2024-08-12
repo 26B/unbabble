@@ -230,11 +230,21 @@ class Plugin {
 		} );
 	}
 
+	/**
+	 * Define the integrations with other plugins.
+	 *
+	 * @since Unreleased Register ACF integration immediatly for field registration.
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
 	private function define_integrations() : void {
 		$this->define_integration_migrators();
+		$immediate_integrations = [
+			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
+		];
 		$admin_integrations = [
 			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
-			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
 		];
 		$integrations = [
 			Relevanssi::class   => 'relevanssi/relevanssi.php',
@@ -242,6 +252,12 @@ class Plugin {
 			YoastSEO::class     => 'wordpress-seo/wp-seo.php',
 			SearchWP::class     => 'searchwp/index.php',
 		];
+
+		foreach ( $immediate_integrations as $integration_class => $plugin_name ) {
+			if ( \is_plugin_active( $plugin_name ) ) {
+				( new $integration_class() )->register();
+			}
+		}
 
 		\add_action( 'admin_init', function() use ( $admin_integrations ) {
 			foreach ( $admin_integrations as $integration_class => $plugin_name ) {
