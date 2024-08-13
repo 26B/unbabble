@@ -24,6 +24,8 @@ class Options {
 	 */
 	public function register() : void {
 		\add_action( 'wp_loaded', [ self::class, 'update' ] );
+		\add_action( 'registered_post_type', [ self::class, 'registered_post_type' ], 10, 2 );
+		\add_action( 'registered_taxonomy', [ self::class, 'registered_taxonomy' ], 10, 3 );
 	}
 
 	/**
@@ -371,6 +373,14 @@ class Options {
 			return false;
 		}
 
+		if ( ! isset( $filter_options['post_types'] ) || ! is_array( $filter_options['post_types'] ) ) {
+			$filter_options['post_types'] = apply_filters( 'ubb_register_post_types', [] );
+		}
+
+		if ( ! isset( $filter_options['taxonomies'] ) || ! is_array( $filter_options['taxonomies'] ) ) {
+			$filter_options['taxonomies'] = apply_filters( 'ubb_register_taxonomies', [] );
+		}
+
 		$filter_options = \wp_parse_args( $filter_options, self::defaults() );
 
 		$filter_options = self::standardize( $filter_options );
@@ -538,5 +548,28 @@ class Options {
 
 		$ubb_options = maybe_unserialize( $options['ubb_options']->option_value ?? [] );
 		return empty( $ubb_options ) ? null : $ubb_options;
+	}
+
+	public static function registered_post_type( string $post_type, \WP_Post_Type $post_type_object ) : void {
+		if ( ! ( $post_type_object->ubb_translate ?? false ) ) {
+			return;
+		}
+
+		add_filter( 'ubb_register_post_types', function ( array $post_types ) use ( $post_type ) {
+			$post_types[] = $post_type;
+			return $post_types;
+		} );
+	}
+
+	public static function registered_taxonomy(  string $taxonomy, array|string $object_type, array $args ) : void {
+		error_log( print_r( $args, true ) );
+		if ( ! ( $args['ubb_translate'] ?? false ) ) {
+			return;
+		}
+
+		add_filter( 'ubb_register_taxonomies', function ( array $taxonomies ) use ( $taxonomy ) {
+			$taxonomies[] = $taxonomy;
+			return $taxonomies;
+		} );
 	}
 }
