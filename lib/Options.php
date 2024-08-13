@@ -562,7 +562,6 @@ class Options {
 	}
 
 	public static function registered_taxonomy(  string $taxonomy, array|string $object_type, array $args ) : void {
-		error_log( print_r( $args, true ) );
 		if ( ! ( $args['ubb_translate'] ?? false ) ) {
 			return;
 		}
