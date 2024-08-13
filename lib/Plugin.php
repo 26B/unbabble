@@ -174,6 +174,7 @@ class Plugin {
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
 			'terms_edit_filter'        => Terms\EditFilters::class,
+			'terms_quick_edit'         => Terms\QuickEdit::class,
 
 			'locale'        => Language\Locale::class,
 			'lang_packages' => Language\LanguagePacks::class,
