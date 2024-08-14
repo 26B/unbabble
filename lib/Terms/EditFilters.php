@@ -4,6 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use TwentySixB\WP\Plugin\Unbabble\Overrides\WP_Terms_List_Table_Override;
 use WP_Query;
 
 /**
@@ -43,6 +44,7 @@ class EditFilters {
 			\add_action( 'pre_get_terms', [ $this, 'pre_get_terms' ], 10, 1 );
 			\add_filter( 'terms_clauses', [ $this, 'filter_terms_without_language' ], 10, 3 );
 			\add_filter( 'ubb_use_term_lang_filter', '__return_false' );
+			\add_action( 'wp_list_table_class_name', [ $this, 'override_wp_list_table_class' ], 10, 2 );
 		}
 	}
 
@@ -213,5 +215,37 @@ class EditFilters {
 		 * @param array $args
 		 */
 		return \apply_filters( 'ubb_use_term_lang_missing_filter', true, $pieces, $taxonomies, $args );
+	}
+
+	/**
+	 * Overrides the WP_Terms_List_Table class to add a hidden input for the language filter.
+	 *
+	 * Necessary for keeping the language filter on when the search input is used.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param string $class_name
+	 * @param array $args
+	 * @return string
+	 */
+	public function override_wp_list_table_class( string $class_name, array $args ) : string {
+		if ( 'WP_Terms_List_Table' !== $class_name ) {
+			return $class_name;
+		}
+
+		if ( ! $args['screen'] instanceof \WP_Screen ) {
+			return $class_name;
+		}
+
+		if ( $args['screen']->base !== 'edit-tags' ) {
+			return $class_name;
+		}
+
+		$taxonomies = LangInterface::get_translatable_taxonomies();
+		if ( ! in_array( $args['screen']->taxonomy, $taxonomies, true ) ) {
+			return $class_name;
+		}
+
+		return WP_Terms_List_Table_Override::class;
 	}
 }
