@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Check for empty transient value when fetching term language.
 - Constant `UBB_SETTINGS_READONLY` for read only settings in the backoffice settings page.
 - Internal option `ubb_settings_manual_changes` for keeping track if manual changes have been made to the settings.
+- Allow for duplicate term slugs in different languages.
 
 ### Changed
 
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Term language set when term has no language.
 - Missing post type in url when creating a term translation to stay in the same post type Menu.
+- WordPress url variables where being lost when redirecting a term on its edit page.
 
 ## [0.4.8] - 2024-07-30
 
