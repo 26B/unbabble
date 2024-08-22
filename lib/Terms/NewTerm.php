@@ -64,10 +64,14 @@ class NewTerm {
 	 *
 	 * @since Unreleased
 	 *
-	 * @param object $duplicate_term
+	 * @param ?object $duplicate_term
 	 * @return object|null
 	 */
-	public function allow_duplicates_in_different_languages( object $duplicate_term ) : ?object {
+	public function allow_duplicates_in_different_languages( ?object $duplicate_term ) : ?object {
+		if ( $duplicate_term === null ) {
+			return null;
+		}
+
 		if ( ! isset( $duplicate_term->term_id ) ) {
 			return $duplicate_term;
 		}

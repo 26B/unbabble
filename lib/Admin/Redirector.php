@@ -170,10 +170,7 @@ class Redirector {
 			$query_args = $_REQUEST;
 			unset( $query_args['taxonomy'], $query_args['tag_ID'], $query_args['post_type'], $query_args['lang'] );
 			$query_args['lang'] = $term_lang;
-			foreach ( $query_args as $key => $value ) {
-				$edit_term_link = add_query_arg( $key, $value, $edit_term_link );
-			}
-
+			$edit_term_link = add_query_arg( $query_args, $edit_term_link );;
 			wp_safe_redirect( $edit_term_link );
 			exit;
 		}
