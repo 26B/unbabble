@@ -12,12 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Check for empty transient value when fetching term language.
 - Constant `UBB_SETTINGS_READONLY` for read only settings in the backoffice settings page.
 - Internal option `ubb_settings_manual_changes` for keeping track if manual changes have been made to the settings.
+- Setting Advanced Custom Fields fields as translatable automatically when they are registered.
 
 ### Changed
 
 - Improved get post language handling of empty values.
 - Options in options page are now modifiable from the values set in the `ubb_options` filter.
 - API rest url when Unbabble is set to directory routing no longer has the language directory applied.
+- Registering Advanced Custom Fields integration hooks immediately on Unbabble register instead of waiting for `admin_init`.
 
 ### Fixed
 
