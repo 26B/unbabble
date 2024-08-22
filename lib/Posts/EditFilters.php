@@ -4,7 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Overrides\WP_Posts_List_Table_Override;
+use TwentySixB\WP\Plugin\Unbabble\Overrides\WP_Posts_List_Table;
 use WP_Query;
 
 /**
@@ -206,6 +206,6 @@ class EditFilters {
 			return $class_name;
 		}
 
-		return WP_Posts_List_Table_Override::class;
+		return WP_Posts_List_Table::class;
 	}
 }

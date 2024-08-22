@@ -4,7 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Overrides\WP_Terms_List_Table_Override;
+use TwentySixB\WP\Plugin\Unbabble\Overrides\WP_Terms_List_Table;
 use WP_Query;
 
 /**
@@ -246,6 +246,6 @@ class EditFilters {
 			return $class_name;
 		}
 
-		return WP_Terms_List_Table_Override::class;
+		return WP_Terms_List_Table::class;
 	}
 }

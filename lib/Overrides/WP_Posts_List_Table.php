@@ -16,7 +16,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Overrides;
  *
  * @since Unreleased
  */
-class WP_Posts_List_Table_Override extends \WP_Posts_List_Table {
+class WP_Posts_List_Table extends \WP_Posts_List_Table {
 
 	/**
 	 * Adds the hidden "No Language" filter input and displays the search box.
