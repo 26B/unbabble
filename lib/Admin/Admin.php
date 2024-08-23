@@ -107,8 +107,6 @@ class Admin {
 		<?php
 	}
 
-
-
 	/**
 	 * Enqueues admin scripts.
 	 *

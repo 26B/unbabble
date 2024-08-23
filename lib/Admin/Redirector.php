@@ -136,6 +136,7 @@ class Redirector {
 	/**
 	 * Redirect if the current language is not the correct one for the current term.
 	 *
+	 * @since Unreleased Keep other query arguments in edit term link redirect.
 	 * @since 0.4.8 Add checks for bad edit link and/or unknown term, and redirects for those cases.
 	 * @since 0.4.2 Don't redirect when term lang is not in allowed languages to allow the user to fix it.
 	 * @since 0.0.1
@@ -166,7 +167,11 @@ class Redirector {
 		// Fetch edit term link and redirect to it with the correct language if it's valid.
 		$edit_term_link = get_edit_term_link( $_REQUEST['tag_ID'], '', '&' );
 		if ( ! empty( $edit_term_link ) ) {
-			wp_safe_redirect( add_query_arg( 'lang', $term_lang, $edit_term_link ) );
+			$query_args = $_REQUEST;
+			unset( $query_args['taxonomy'], $query_args['tag_ID'], $query_args['post_type'], $query_args['lang'] );
+			$query_args['lang'] = $term_lang;
+			$edit_term_link = add_query_arg( $query_args, $edit_term_link );;
+			wp_safe_redirect( $edit_term_link );
 			exit;
 		}
 

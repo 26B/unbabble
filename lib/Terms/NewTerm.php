@@ -19,8 +19,11 @@ class NewTerm {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		add_action( 'admin_init', [ $this, 'add_actions_for_term_create' ] );
-		add_action( 'rest_api_init', [ $this, 'add_actions_for_term_create' ] );
+		\add_action( 'admin_init', [ $this, 'add_actions_for_term_create' ] );
+		\add_action( 'rest_api_init', [ $this, 'add_actions_for_term_create' ] );
+
+		// Allow for duplicate term slugs in different languages.
+		\add_filter( 'wp_insert_term_duplicate_term_check', [ $this, 'allow_duplicates_in_different_languages' ], PHP_INT_MIN, 5 );
 	}
 
 	public function add_actions_for_term_create() : void {
@@ -52,5 +55,36 @@ class NewTerm {
 		}
 
 		LangInterface::set_term_language( $term_id, LangInterface::get_current_language() );
+	}
+
+	/**
+	 * Allow for duplicate terms in different languages.
+	 *
+	 * Stop WordPress from deleting a duplicate term if it's in a different language.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param ?object $duplicate_term
+	 * @return object|null
+	 */
+	public function allow_duplicates_in_different_languages( ?object $duplicate_term ) : ?object {
+		if ( $duplicate_term === null ) {
+			return null;
+		}
+
+		if ( ! isset( $duplicate_term->term_id ) ) {
+			return $duplicate_term;
+		}
+
+		$original_id   = $duplicate_term->term_id;
+		$original_lang = LangInterface::get_term_language( $original_id );
+		$lang_create   = $_POST['ubb_lang'] ?? '';
+
+		// Delete the term if it's the same language.
+		if ( $original_lang === $lang_create ) {
+			return $duplicate_term;
+		}
+
+		return null;
 	}
 }
