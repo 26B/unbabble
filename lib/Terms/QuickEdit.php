@@ -60,7 +60,7 @@ class QuickEdit {
 
 		$status = LangInterface::set_term_language( $term_id, $post_lang );
 		if ( $status === false ) {
-			// TODO:
+			// TODO: how to handle error here?
 			return;
 		}
 	}
