@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Term language set when term has no language.
 - Missing post type in url when creating a term translation to stay in the same post type Menu.
 - WordPress url variables where being lost when redirecting a term on its edit page.
+- Language not being set for post tags created in post quick edits.
 - No Language filter is now kept selected when using the search box for post types/taxonomies in their admin list.
 
 ## [0.4.8] - 2024-07-30
