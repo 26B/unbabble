@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved get post language handling of empty values.
 - Options in options page are now modifiable from the values set in the `ubb_options` filter.
 - API rest url when Unbabble is set to directory routing no longer has the language directory applied.
+- Hide post metabox actions when editing a Yoast's rewrite-republish copy.
 
 ### Fixed
 

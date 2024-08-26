@@ -5,6 +5,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use TwentySixB\WP\Plugin\Unbabble\Plugin;
+use TwentySixB\WP\Plugin\Unbabble\Posts;
 use WP_Post;
 use WP_Query;
 use WP_Screen;
@@ -139,20 +140,21 @@ class Admin {
 
 		$data = [
 			// TODO: change to snake case.
-			'api_root'                => \esc_url_raw( \rest_url( Plugin::API_V1 ) ),
-			'admin_url'               => \remove_query_arg( 'lang', \admin_url() ),
-			'current_lang'            => LangInterface::get_current_language(),
-			'default_lang'            => LangInterface::get_default_language(),
-			'languages'               => LangInterface::get_languages(),
-			'languagesInfo'           => Options::get_languages_info(),
-			'options'                 => Options::get(),
-			'wpLanguages'             => $wp_languages,
-			'wpPostTypes'             => array_values( get_post_types() ),
-			'wpTaxonomies'            => array_values( get_taxonomies() ),
-			'post_type'               => $this->get_current_post_type(),
-			'settings_manual_changes' => Options::has_manual_changes(),
-			'settings_has_filter'     => Options::has_filter_settings(),
-			'settings_read_only'      => defined( 'UBB_SETTINGS_READONLY' ) && UBB_SETTINGS_READONLY,
+			'api_root'                   => \esc_url_raw( \rest_url( Plugin::API_V1 ) ),
+			'admin_url'                  => \remove_query_arg( 'lang', \admin_url() ),
+			'current_lang'               => LangInterface::get_current_language(),
+			'default_lang'               => LangInterface::get_default_language(),
+			'languages'                  => LangInterface::get_languages(),
+			'languagesInfo'              => Options::get_languages_info(),
+			'options'                    => Options::get(),
+			'wpLanguages'                => $wp_languages,
+			'wpPostTypes'                => array_values( get_post_types() ),
+			'wpTaxonomies'               => array_values( get_taxonomies() ),
+			'post_type'                  => $this->get_current_post_type(),
+			'settings_manual_changes'    => Options::has_manual_changes(),
+			'settings_has_filter'        => Options::has_filter_settings(),
+			'settings_read_only'         => defined( 'UBB_SETTINGS_READONLY' ) && UBB_SETTINGS_READONLY,
+			'post_metabox_allow_actions' => Posts\LangMetaBox::allow_actions(),
 		];
 
 		// Information to show when a post's translation is being created.
