@@ -20,6 +20,9 @@ class YoastDuplicatePost {
 		\add_action( 'save_post', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
 		\add_action( 'edit_attachment', [ $this, 'copy_and_redirect' ], PHP_INT_MAX - 10 );
 
+		// Don't allow post metabox actions on rewrite republish copies.
+		\add_action( 'ubb_allow_metabox_actions', [ $this, 'allow_metabox_actions' ] );
+
 		// Skip WPML to Unbabble migration of ubb_source to meta for rewrite republish copies.
 		\add_filter( 'ubb_wpml_migrate_skip_source', [ $this, 'skip_wpml_migrate_source' ], 10, 3 );
 	}
@@ -398,6 +401,37 @@ class YoastDuplicatePost {
 		remove_filter( 'ubb_use_term_lang_filter', '__return_false' );
 
 		return true;
+	}
+
+	/**
+	 * Don't allow metabox actions when the post is a rewrite republish copy.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param bool $allow
+	 * @return bool
+	 */
+	public function allow_metabox_actions( bool $allow ) : bool {
+		$screen = get_current_screen();
+		if ( ! $screen instanceof \WP_Screen ) {
+			return $allow;
+		}
+
+		if ( $screen->base !== 'post' ) {
+			return $allow;
+		}
+
+		$post = get_post();
+		if ( ! $post instanceof WP_Post ) {
+			return $allow;
+		}
+
+		$dp_meta = get_post_meta( $post->ID, '_dp_is_rewrite_republish_copy', true );
+		if ( $dp_meta === '1' ) {
+			return false;
+		}
+
+		return $allow;
 	}
 
 	/**

@@ -19,6 +19,7 @@ const PostLanguage = ({
 	translatedLangs,
 	refetchLangs,
 	postId,
+	allowActions
 }) => {
 	const [isEditOpen, setIsEditOpen] = useState(false);
 	const [editLanguage, setEditLanguage] = useState(
@@ -110,16 +111,18 @@ const PostLanguage = ({
 						)}
 						{langLabel}
 					</span>
-					<Button
-						style={{ gridColumn: '2/2' }}
-						variant="link"
-						onClick={openEdit}
-					>
-						Edit
-					</Button>
+					{allowActions && (
+						<Button
+							style={{ gridColumn: '2/2' }}
+							variant="link"
+							onClick={openEdit}
+						>
+							Edit
+						</Button>
+					)}
 				</div>
 			)}
-			{isEditOpen && (
+			{allowActions && isEditOpen && (
 				<>
 					<FlexItem isBlock>
 						<Flex direction="column" align="stretch">

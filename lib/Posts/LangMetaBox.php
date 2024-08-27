@@ -168,4 +168,15 @@ class LangMetaBox {
 
 		return true;
 	}
+
+	/**
+	 * Returns whether metabox actions are allowed.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return bool
+	 */
+	public static function allow_actions() : bool {
+		return \apply_filters( 'ubb_allow_metabox_actions', true );
+	}
 }
