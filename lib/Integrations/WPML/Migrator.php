@@ -173,6 +173,7 @@ class Migrator {
 	/**
 	 * Migrates translation groups from WPML to Unbabble.
 	 *
+	 * @since Unreleased Two filters added to skip setting language and/or source.
 	 * @since 0.0.3
 	 *
 	 * @param string $sql
@@ -231,12 +232,47 @@ class Migrator {
 				if ( empty( $lang ) ) {
 					continue;
 				}
+
+				/**
+				 * Filters whether to skip the migration into Unbabble, setting language and
+				 * source, for a specific object (post/term).
+				 *
+				 * @since Unreleased
+				 *
+				 * @param bool   $skip Whether to skip the migration.
+				 * @param array  $row  Row data from WPML's icl_translations table.
+				 * @param string $type Content type, post or tax.
+				 * @param string $lang Locale code.
+				 */
+				if ( \apply_filters( 'ubb_wpml_migrate_skip', false, $row, $type, $lang ) ) {
+					continue;
+				}
+
 				if ( $type === 'post' ) {
 					// TODO: should we force it?
 					LangInterface::set_post_language( $row['object_id'], $lang, true );
-					LangInterface::set_post_source( $row['object_id'], $source_id, true );
 				} else {
 					LangInterface::set_term_language( $row['object_id'], $lang, true );
+				}
+
+				/**
+				 * Filters whether to skip setting of ubb_source for a specific object (post/term).
+				 *
+				 * @since Unreleased
+				 *
+				 * @param bool   $skip Whether to skip the migration.
+				 * @param array  $row  Row data from WPML's icl_translations table.
+				 * @param string $type Content type, post or tax.
+				 * @param string $lang Locale code.
+				 */
+				if ( \apply_filters( 'ubb_wpml_migrate_skip_source', false, $row, $type, $lang ) ) {
+					continue;
+				}
+
+				if ( $type === 'post' ) {
+					// TODO: should we force it?
+					LangInterface::set_post_source( $row['object_id'], $source_id, true );
+				} else {
 					LangInterface::set_term_source( $row['object_id'], $source_id, true );
 				}
 			}

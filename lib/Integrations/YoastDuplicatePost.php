@@ -22,6 +22,9 @@ class YoastDuplicatePost {
 
 		// Don't allow post metabox actions on rewrite republish copies.
 		\add_action( 'ubb_allow_metabox_actions', [ $this, 'allow_metabox_actions' ] );
+
+		// Skip WPML to Unbabble migration of ubb_source to meta for rewrite republish copies.
+		\add_filter( 'ubb_wpml_migrate_skip_source', [ $this, 'skip_wpml_migrate_source' ], 10, 3 );
 	}
 
 	public function exclude_ubb_source( array $meta_keys ) : array {
@@ -429,5 +432,43 @@ class YoastDuplicatePost {
 		}
 
 		return $allow;
+	}
+
+	/**
+	 * Skip WPML to Unbabble migration of ubb_source to meta for rewrite republish copies.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param bool   $skip
+	 * @param array  $row
+	 * @param string $type
+	 * @return bool
+	 */
+	public function skip_wpml_migrate_source( bool $skip, array $row, string $type ) : bool {
+
+		// If already skipped, ignored.
+		if ( $skip ) {
+			return $skip;
+		}
+
+		// If not a post, ignore.
+		if ( $type !== 'post' ) {
+			return $skip;
+		}
+
+		$post_id = $row['object_id'] ?? 0;
+		if ( ! $post_id ) {
+			return $skip;
+		}
+
+		// If not a rewrite republish copy, ignore.
+		$dp_meta = get_post_meta( $post_id, '_dp_is_rewrite_republish_copy', true );
+		error_log( print_r( $dp_meta, true ) );
+		if ( $dp_meta === '1' ) {
+			error_log( print_r( 'skip ' . $post_id, true ) );
+			return true;
+		}
+
+		return $skip;
 	}
 }
