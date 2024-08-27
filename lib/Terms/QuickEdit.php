@@ -7,14 +7,14 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 /**
  * Hooks related to quick edits and terms.
  *
- * @since Unreleased
+ * @since 0.5.0
  */
 class QuickEdit {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 */
 	public function register() : void {
 
@@ -25,7 +25,7 @@ class QuickEdit {
 	/**
 	 * Handle quick edit for new tags.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param int $term_id
 	 * @return void

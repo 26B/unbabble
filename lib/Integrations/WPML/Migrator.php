@@ -173,7 +173,7 @@ class Migrator {
 	/**
 	 * Migrates translation groups from WPML to Unbabble.
 	 *
-	 * @since Unreleased Two filters added to skip setting language and/or source.
+	 * @since 0.5.0 Two filters added to skip setting language and/or source.
 	 * @since 0.0.3
 	 *
 	 * @param string $sql
@@ -237,7 +237,7 @@ class Migrator {
 				 * Filters whether to skip the migration into Unbabble, setting language and
 				 * source, for a specific object (post/term).
 				 *
-				 * @since Unreleased
+				 * @since 0.5.0
 				 *
 				 * @param bool   $skip Whether to skip the migration.
 				 * @param array  $row  Row data from WPML's icl_translations table.
@@ -258,7 +258,7 @@ class Migrator {
 				/**
 				 * Filters whether to skip setting of ubb_source for a specific object (post/term).
 				 *
-				 * @since Unreleased
+				 * @since 0.5.0
 				 *
 				 * @param bool   $skip Whether to skip the migration.
 				 * @param array  $row  Row data from WPML's icl_translations table.

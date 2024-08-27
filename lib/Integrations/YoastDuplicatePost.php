@@ -406,7 +406,7 @@ class YoastDuplicatePost {
 	/**
 	 * Don't allow metabox actions when the post is a rewrite republish copy.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param bool $allow
 	 * @return bool
@@ -437,7 +437,7 @@ class YoastDuplicatePost {
 	/**
 	 * Skip WPML to Unbabble migration of ubb_source to meta for rewrite republish copies.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param bool   $skip
 	 * @param array  $row

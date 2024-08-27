@@ -104,7 +104,7 @@ class ChangeLanguage {
 	/**
 	 * Handle terms with duplicate slugs when language is changed.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param int $term_id
 	 * @param string $lang
@@ -172,7 +172,7 @@ class ChangeLanguage {
 	 *
 	 * TODO: should this be in another class?
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param array $messages
 	 * @return array

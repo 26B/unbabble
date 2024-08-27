@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-08-27
+
 ### Added
 
 - Check for empty transient value when fetching term language.
@@ -470,7 +472,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.8...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/26b/unbabble/compare/0.4.8...0.5.0
 [0.4.8]: https://github.com/26b/unbabble/compare/0.4.7...0.4.8
 [0.4.7]: https://github.com/26b/unbabble/compare/0.4.6...0.4.7
 [0.4.6]: https://github.com/26b/unbabble/compare/0.4.5...0.4.6

@@ -14,14 +14,14 @@ namespace TwentySixB\WP\Plugin\Unbabble\Overrides;
  * override method that inserts the language filter if needed, but otherwise keeps the default
  * behaviour of the method.
  *
- * @since Unreleased
+ * @since 0.5.0
  */
 class WP_Terms_List_Table extends \WP_Terms_List_Table {
 
 	/**
 	 * Adds the hidden "No Language" filter input and displays the search box.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param string $text     The 'submit' button label.
 	 * @param string $input_id ID attribute value for the search input field.

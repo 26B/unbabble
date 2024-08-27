@@ -376,7 +376,7 @@ class Directory {
 	/**
 	 * Adds directory to home_url.
 	 *
-	 * @since Unreleased Added $scheme argument. Stop if $scheme is 'rest'.
+	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
 	 * @param string      $url

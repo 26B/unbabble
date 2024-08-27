@@ -22,7 +22,7 @@ class Options {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Add register for options update route.
+	 * @since 0.5.0 Add register for options update route.
 	 * @since 0.2.0
 	 */
 	public function register() {
@@ -67,7 +67,7 @@ class Options {
 	/**
 	 * Submit options.
 	 *
-	 * @since Unreleased Improve response with new options and canUpdate.
+	 * @since 0.5.0 Improve response with new options and canUpdate.
 	 * @since 0.2.0
 	 *
 	 * @param \WP_REST_Request $request
@@ -94,7 +94,7 @@ class Options {
 	/**
 	 * Update options with filter values.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @return \WP_REST_Response
 	 */

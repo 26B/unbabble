@@ -182,7 +182,7 @@ class EditFilters {
 	 *
 	 * Necessary for keeping the language filter on when the search input is used.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param string $class_name
 	 * @param array $args

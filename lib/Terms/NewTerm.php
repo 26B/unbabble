@@ -62,7 +62,7 @@ class NewTerm {
 	 *
 	 * Stop WordPress from deleting a duplicate term if it's in a different language.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @param ?object $duplicate_term
 	 * @return object|null

@@ -244,7 +244,7 @@ class LangInterface {
 	/**
 	 * Returns a post's language.
 	 *
-	 * @since Unreleased Improve handling of empty values.
+	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1
 	 *
 	 * @param  int    $post_id
@@ -729,7 +729,7 @@ class LangInterface {
 	/**
 	 * Returns a term's language.
 	 *
-	 * @since Unreleased Improve handling of empty values.
+	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1
 	 *
 	 * @param  int    $term_id

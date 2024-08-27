@@ -172,7 +172,7 @@ class LangMetaBox {
 	/**
 	 * Returns whether metabox actions are allowed.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @return bool
 	 */
