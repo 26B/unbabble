@@ -32,6 +32,7 @@ class Redirector {
 	/**
 	 * Changes back-office language and redirects to new url.
 	 *
+	 * @since Unreleased Set lang param regardless of language not being default.
 	 * @since 0.0.1
 	 *
 	 * @param  string $new_lang
