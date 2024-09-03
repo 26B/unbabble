@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2024-09-03
+
 ### Changed
 
 - Lang url parameter set in language switch regardless of language not being default.
@@ -476,7 +478,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.0...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.1...HEAD
+[0.5.1]: https://github.com/26b/unbabble/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/26b/unbabble/compare/0.4.8...0.5.0
 [0.4.8]: https://github.com/26b/unbabble/compare/0.4.7...0.4.8
 [0.4.7]: https://github.com/26b/unbabble/compare/0.4.6...0.4.7
