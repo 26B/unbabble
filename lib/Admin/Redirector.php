@@ -58,10 +58,10 @@ class Redirector {
 			}
 		}
 
-		// Change `ubb_switch_lang` in query in url to `lang` if not default language.
+		// Change `ubb_switch_lang` in query in url to `lang`.
 		$path    = str_replace(
 			"ubb_switch_lang={$new_lang}",
-			$new_lang === LangInterface::get_default_language() ? '' : "lang={$new_lang}",
+			"lang={$new_lang}",
 			$uri
 		);
 		$new_url = home_url( $path );

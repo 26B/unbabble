@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Lang url parameter set in language switch regardless of language not being default.
+
 ## [0.5.0] - 2024-08-27
 
 ### Added
