@@ -376,6 +376,7 @@ class Directory {
 	/**
 	 * Adds directory to home_url.
 	 *
+	 * @since Unreleased Allow 'rest' schemes if in admin to fix Block Editor.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
@@ -385,7 +386,9 @@ class Directory {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path, ?string $scheme ) : string {
-		if ( $scheme === 'rest' ) {
+
+		// Allow directory in admin rest urls for correct Block Editor functionality.
+		if ( $scheme === 'rest' && ! is_admin() ) {
 			return $url;
 		}
 

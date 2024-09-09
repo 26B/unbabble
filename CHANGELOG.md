@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Set lang directory in REST url when in admin to fix Block Editor requests for posts/terms.
+
 ## [0.5.1] - 2024-09-03
 
 ### Changed
