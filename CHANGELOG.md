@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2024-09-09
+
 ### Fixed
 
 - Set lang directory in REST url when in admin to fix Block Editor requests for posts/terms.
@@ -482,7 +484,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.1...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.2...HEAD
+[0.5.2]: https://github.com/26b/unbabble/compare/0.5.1...0.5.2
 [0.5.1]: https://github.com/26b/unbabble/compare/0.5.0...0.5.1
 [0.5.0]: https://github.com/26b/unbabble/compare/0.4.8...0.5.0
 [0.4.8]: https://github.com/26b/unbabble/compare/0.4.7...0.4.8

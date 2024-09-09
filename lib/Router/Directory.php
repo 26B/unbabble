@@ -376,7 +376,7 @@ class Directory {
 	/**
 	 * Adds directory to home_url.
 	 *
-	 * @since Unreleased Allow 'rest' schemes if in admin to fix Block Editor.
+	 * @since 0.5.2 Allow 'rest' schemes if in admin to fix Block Editor.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
