@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Filter `ubb_possible_links_filter_sql` for adding to the query for possible post links.
+
+### Fixed
+
+- Transient issues for post/term languages
+- YoastDuplicatePost issues with cleaning possible `ubb_source` in rewrite republish posts and not showing them in the possible linking results.
+
 ## [0.5.2] - 2024-09-09
 
 ### Fixed

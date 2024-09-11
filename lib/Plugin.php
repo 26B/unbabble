@@ -243,6 +243,10 @@ class Plugin {
 			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
 		];
 
+		$rest_integrations = [
+			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+		];
+
 		$integrations = [
 			Relevanssi::class   => 'relevanssi/relevanssi.php',
 			ElasticPress::class => 'elasticpress/elasticpress.php',
@@ -260,6 +264,14 @@ class Plugin {
 
 		\add_action( 'cli_init', function() use ( $cli_integrations ) {
 			foreach ( $cli_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'rest_api_init', function() use ( $rest_integrations ) {
+			foreach ( $rest_integrations as $integration_class => $plugin_name ) {
 				if ( \is_plugin_active( $plugin_name ) ) {
 					( new $integration_class() )->register();
 				}

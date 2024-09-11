@@ -263,7 +263,7 @@ class LangInterface {
 
 		// If there is a transient value, return it.
 		if ( $post_lang !== false ) {
-			return $post_lang;
+			return empty( $post_lang ) ? null : $post_lang;
 		}
 
 		$table_name = ( new PostTable() )->get_table_name();
@@ -274,14 +274,14 @@ class LangInterface {
 			)
 		);
 
-		// Make sure $post_lang is null if get_var returns empty string.
+		// Make sure $post_lang is empty string (equal to null) if get_var returns an empty value.
 		if ( empty( $post_lang ) ) {
-			$post_lang = null;
+			$post_lang = '';
 		}
 
 		\set_transient( $transient_key, $post_lang, 30 );
 
-		return $post_lang;
+		return empty( $post_lang ) ? null : $post_lang;
 	}
 
 	/**
@@ -742,7 +742,7 @@ class LangInterface {
 
 		// If there is a transient value, return it.
 		if ( $term_lang !== false ) {
-			return $term_lang;
+			return empty( $term_lang ) ? null : $term_lang;
 		}
 
 		$table_name = ( new TermTable() )->get_table_name();
@@ -754,13 +754,14 @@ class LangInterface {
 			1
 		);
 
-		// Make sure $term_lang is null if get_var returns empty string.
+		// Make sure $term_lang is empty string (equal to null) when get_var returns an empty value.
 		if ( empty( $term_lang ) ) {
-			$term_lang = null;
+			$term_lang = '';
 		}
 
 		\set_transient( $transient_key, $term_lang, 30 );
-		return $term_lang;
+
+		return empty( $term_lang ) ? null : $term_lang;
 	}
 
 	/**
