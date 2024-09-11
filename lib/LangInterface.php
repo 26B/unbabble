@@ -754,7 +754,7 @@ class LangInterface {
 			1
 		);
 
-		// Make sure $term_lang is empty string (equal to null) when get_var returns an empty value.
+		// Make sure `$term_lang` is an empty string (equal to null) when `get_var` returns empty.
 		if ( empty( $term_lang ) ) {
 			$term_lang = '';
 		}
