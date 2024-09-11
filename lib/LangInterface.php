@@ -274,7 +274,7 @@ class LangInterface {
 			)
 		);
 
-		// Make sure $post_lang is empty string (equal to null) if get_var returns an empty value.
+		// Make sure `$post_lang` is an empty string (equal to null) if `get_var` returns empty.
 		if ( empty( $post_lang ) ) {
 			$post_lang = '';
 		}
