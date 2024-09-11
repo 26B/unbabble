@@ -11,7 +11,7 @@ class YoastDuplicatePost {
 	public function register() {
 
 		// Remove ubb_source from rewrite republish copies.
-		\add_filter( 'duplicate_post_excludelist_filter', [ $this, 'exclude_ubb_source' ] );
+		\add_filter( 'duplicate_post_excludelist_filter', [ $this, 'exclude_meta_keys' ] );
 
 		// Set language of rewrite republish copy to be the original's language.
 		\add_action( 'add_post_meta', [ $this, 'set_language_on_copy' ], 10, 3 );
@@ -33,7 +33,7 @@ class YoastDuplicatePost {
 		\add_action( 'wp_insert_post', [ $this, 'clean_republish_copies' ], 10, 2 );
 	}
 
-	public function exclude_ubb_source( array $meta_keys ) : array {
+	public function exclude_meta_keys( array $meta_keys ) : array {
 		return array_merge( $meta_keys, [ 'ubb_source' ] );
 	}
 
@@ -469,9 +469,7 @@ class YoastDuplicatePost {
 
 		// If not a rewrite republish copy, ignore.
 		$dp_meta = get_post_meta( $post_id, '_dp_is_rewrite_republish_copy', true );
-		error_log( print_r( $dp_meta, true ) );
 		if ( $dp_meta === '1' ) {
-			error_log( print_r( 'skip ' . $post_id, true ) );
 			return true;
 		}
 
@@ -516,6 +514,9 @@ class YoastDuplicatePost {
 			return;
 		}
 
-		delete_post_meta( $post_id, 'ubb_source' );
+		$meta_keys = $this->exclude_meta_keys( [] );
+		foreach ( $meta_keys as $meta_key ) {
+			\delete_post_meta( $post_id, $meta_key );
+		}
 	}
 }
