@@ -11,7 +11,7 @@ class YoastDuplicatePost {
 	public function register() {
 
 		// Remove ubb_source from rewrite republish copies.
-		\add_filter( 'duplicate_post_excludelist_filter', [ $this, 'exclude_ubb_source' ] );
+		\add_filter( 'duplicate_post_excludelist_filter', [ $this, 'exclude_meta_keys' ] );
 
 		// Set language of rewrite republish copy to be the original's language.
 		\add_action( 'add_post_meta', [ $this, 'set_language_on_copy' ], 10, 3 );
@@ -25,9 +25,15 @@ class YoastDuplicatePost {
 
 		// Skip WPML to Unbabble migration of ubb_source to meta for rewrite republish copies.
 		\add_filter( 'ubb_wpml_migrate_skip_source', [ $this, 'skip_wpml_migrate_source' ], 10, 3 );
+
+		// Hide rewrite republish posts from being linked in other posts.
+		\add_filter( 'ubb_possible_links_filter_sql', [ $this, 'hide_rewrite_republish_from_linking' ], 10, 2 );
+
+		// Remove ubb_source from rewrite republish copies when saved.
+		\add_action( 'wp_insert_post', [ $this, 'clean_republish_copies' ], 10, 2 );
 	}
 
-	public function exclude_ubb_source( array $meta_keys ) : array {
+	public function exclude_meta_keys( array $meta_keys ) : array {
 		return array_merge( $meta_keys, [ 'ubb_source' ] );
 	}
 
@@ -463,12 +469,54 @@ class YoastDuplicatePost {
 
 		// If not a rewrite republish copy, ignore.
 		$dp_meta = get_post_meta( $post_id, '_dp_is_rewrite_republish_copy', true );
-		error_log( print_r( $dp_meta, true ) );
 		if ( $dp_meta === '1' ) {
-			error_log( print_r( 'skip ' . $post_id, true ) );
 			return true;
 		}
 
 		return $skip;
+	}
+
+	/**
+	 * Hide rewrite republish posts from being linked in other posts.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param string $sql
+	 * @return string
+	 */
+	public function hide_rewrite_republish_from_linking( string $sql ) : string {
+		global $wpdb;
+
+		$sql .= " AND P.ID NOT IN (
+			SELECT post_id
+			FROM {$wpdb->postmeta}
+			WHERE meta_key = '_dp_is_rewrite_republish_copy'
+			AND meta_value = '1'
+		)";
+
+		return $sql;
+	}
+
+	/**
+	 * Remove ubb_source from rewrite republish copies when saved.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param int     $post_id
+	 * @param WP_Post $post
+	 */
+	public function clean_republish_copies( $post_id, $post ) : void {
+		$permissions_helper = new \Yoast\WP\Duplicate_Post\Permissions_Helper();
+		if (
+			! $post instanceof WP_Post
+			|| ! $permissions_helper->is_rewrite_and_republish_copy( $post )
+		) {
+			return;
+		}
+
+		$meta_keys = $this->exclude_meta_keys( [] );
+		foreach ( $meta_keys as $meta_key ) {
+			\delete_post_meta( $post_id, $meta_key );
+		}
 	}
 }
