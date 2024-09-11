@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Transient issues for post/term languages
+- Transient issues on post/term languages with `null` value conversion to `''`.
 - YoastDuplicatePost issues with cleaning possible `ubb_source` in rewrite republish posts and not showing them in the possible linking results.
 
 ## [0.5.2] - 2024-09-09
