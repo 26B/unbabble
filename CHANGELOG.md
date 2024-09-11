@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Filter `ubb_possible_links_filter_sql` for adding to the query for possible post links.
+- Filter `ubb_possible_links_filter_sql` to add to the query for possible post links.
 
 ### Fixed
 
