@@ -479,7 +479,7 @@ class YoastDuplicatePost {
 	/**
 	 * Hide rewrite republish posts from being linked in other posts.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.3
 	 *
 	 * @param string $sql
 	 * @return string
@@ -500,7 +500,7 @@ class YoastDuplicatePost {
 	/**
 	 * Remove ubb_source from rewrite republish copies when saved.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.3
 	 *
 	 * @param int     $post_id
 	 * @param WP_Post $post

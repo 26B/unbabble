@@ -169,7 +169,7 @@ class LinkTranslation {
 		/**
 		 * Filter for possible links query.
 		 *
-		 * @since Unreleased
+		 * @since 0.5.3
 		 *
 		 * @param string $sql
 		 * @return string
