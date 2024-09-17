@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Always add lang query arg to admin urls in Directory routing mode.
+
 ## [0.5.3] - 2024-09-11
 
 ### Added
