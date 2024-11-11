@@ -337,6 +337,7 @@ class LangInterface {
 	/**
 	 * Returns the post's source ID.
 	 *
+	 * @since 0.5.5 Remove delete since it was causing posts to get unlinked randomly.
 	 * @since 0.4.6 Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
@@ -353,14 +354,9 @@ class LangInterface {
 		$source_id = get_post_meta( $post_id, 'ubb_source', true );
 
 		/**
-		 * If the source_id is an empty string, delete it and return null.
-		 *
-		 * `get_post_meta` returns empty string when post id doesn't exist, so we are unable to
-		 * know if there is an actual empty string in the DB or not, so we try to delete it
-		 * either way.
+		 * If the source_id is an empty string, return null.
 		 */
 		if ( is_string( $source_id ) && empty( $source_id ) ) {
-			\delete_post_meta( $post_id, 'ubb_source' );
 			$source_id = null;
 
 		} else {
@@ -816,6 +812,7 @@ class LangInterface {
 	/**
 	 * Returns the term's source ID.
 	 *
+	 * @since 0.5.5 Remove delete since it was causing terms to get unlinked randomly.
 	 * @since 0.4.5 Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
@@ -832,14 +829,9 @@ class LangInterface {
 		$source_id = \get_term_meta( $term_id, 'ubb_source', true );
 
 		/**
-		 * If the source_id is an empty string, delete it and return null.
-		 *
-		 * `get_term_meta` returns empty string when term id doesn't exist, so we are unable to
-		 * know if there is an actual empty string in the DB or not, so we try to delete it
-		 * either way.
+		 * If the source_id is an empty string, return null.
 		 */
 		if ( is_string( $source_id ) && empty( $source_id ) ) {
-			\delete_term_meta( $term_id, 'ubb_source' );
 			$source_id = null;
 
 		} else {
