@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.6] - 2024-11-11
 
+### Changed
+
+- All REST scheme `home_url`'s now receive the directory url if needed, on Directory Routing.
+
 ### Removed
 
 - Remove filters added in [0.5.4].
