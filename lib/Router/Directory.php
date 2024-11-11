@@ -22,12 +22,22 @@ class Directory {
 	 * directory is removed and the lang query argument is added. This procedure needs to be done as
 	 * early as possible in order to avoid problems.
 	 *
+	 * @since 0.5.4 Add filter to remove directory from home_url during parse_request in class-wp.php.
 	 * @since 0.4.5 Remove check for directory, already done inside current_lang_from_uri.
 	 * @since 0.0.1
 	 *
 	 * @return void
 	 */
 	public function init() : void {
+
+		/**
+		 * Since the rest api does not have the directory in the url, we need to add a filter to
+		 * class-wp.php's parse_request method's filters in order to remove the directory from
+		 * home_url during the method so the rewrite rules path matching works for non main
+		 * sites in a WordPress network.
+		 */
+		add_filter( 'do_parse_request', [ $this, 'do_parse_request' ], PHP_INT_MAX );
+		add_action( 'parse_request', [ $this, 'parse_request' ] );
 
 		// Trailing slash to handle cases like homepage when url/uri does not have / at the end.
 		$request_uri = trailingslashit( $this->clean_path( $_SERVER['REQUEST_URI'] ) );
@@ -482,6 +492,32 @@ class Directory {
 		}
 
 		return add_query_arg( 'lang', $curr_lang, $url );
+	}
+
+	/**
+	 * Add filter to remove directory from home_url during parse_request in class-wp.php for
+	 * correct path matching in rewrite rules for non main sites in a WordPress network.
+	 *
+	 * @since 0.5.4
+	 * @param bool $bool
+	 * @return bool
+	 */
+	public function do_parse_request( $bool ) : bool {
+		if ( $bool ) {
+			add_filter( 'ubb_home_url', '__return_true' );
+		}
+		return $bool;
+	}
+
+	/**
+	 * Remove filter to remove directory from home_url during parse_request in class-wp.php for
+	 * correct path matching in rewrite rules for non main sites in a WordPress network.
+	 *
+	 * @since 0.5.4
+	 * @return void
+	 */
+	public function parse_request() : void {
+		remove_filter( 'ubb_home_url', '__return_true' );
 	}
 
 	/**
