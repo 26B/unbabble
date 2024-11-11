@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Always add lang query arg to admin urls in Directory routing mode.
+
 ### Fixed
 
 - REST API 404's on non-main sites in WordPress multisite network when directory routing was active and the lang query var passed was a non default language.

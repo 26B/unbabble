@@ -480,6 +480,7 @@ class Directory {
 	/**
 	 * Adds directory to admin url.
 	 *
+	 * @since Unreleased Add lang query arg regardless of the current language.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
@@ -487,10 +488,6 @@ class Directory {
 	 */
 	public function admin_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === LangInterface::get_default_language() ) {
-			return $url;
-		}
-
 		return add_query_arg( 'lang', $curr_lang, $url );
 	}
 
