@@ -378,6 +378,7 @@ class Directory {
 	/**
 	 * Adds directory to home_url.
 	 *
+	 * @since 0.5.4 Allow 'rest' schemes regardless.
 	 * @since 0.5.2 Allow 'rest' schemes if in admin to fix Block Editor.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
@@ -388,11 +389,6 @@ class Directory {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path, ?string $scheme ) : string {
-
-		// Allow directory in admin rest urls for correct Block Editor functionality.
-		if ( $scheme === 'rest' && ! is_admin() ) {
-			return $url;
-		}
 
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
