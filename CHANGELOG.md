@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.5] - 2024-11-11
+
 ### Removed
 
 - Post\Term `ubb_source` deletion when it returns empty. It was causing random unlinks.
@@ -509,7 +511,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.4...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.5...HEAD
+[0.5.5]: https://github.com/26b/unbabble/compare/0.5.4...0.5.5
 [0.5.4]: https://github.com/26b/unbabble/compare/0.5.3...0.5.4
 [0.5.3]: https://github.com/26b/unbabble/compare/0.5.2...0.5.3
 [0.5.2]: https://github.com/26b/unbabble/compare/0.5.1...0.5.2
