@@ -61,7 +61,7 @@ class Customize {
 	 * @return void
 	 */
 	public function nav_menu_lang_metaboxes() : void {
-		if ( isset( $_REQUEST['menu'] ) ) {
+		if ( isset( $_REQUEST['menu'] ) && ( $_REQUEST['action'] ?? '' ) !== 'delete') {
 			$menu_id = $_REQUEST['menu'];
 		} else {
 			$menu_id = get_user_option( 'nav_menu_recently_edited' );
