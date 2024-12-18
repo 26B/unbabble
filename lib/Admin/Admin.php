@@ -218,6 +218,7 @@ class Admin {
 	 *
 	 * Stop enqueuing scripts if the current screen is for an untranslatable post type.
 	 *
+	 * @since Unreleased Add WP_Block support and fix issue with bad return.
 	 * @since 0.4.0
 	 *
 	 * @return bool
@@ -229,9 +230,12 @@ class Admin {
 
 		if (
 			! $screen instanceof WP_Screen
-			|| $screen->base !== 'post'
+			|| (
+				$screen->base !== 'post'
+				&& ! ( LangInterface::is_post_type_translatable( 'wp_block' ) && $screen->base === 'site-editor' )
+			)
 		) {
-			return true;
+			return false;
 		}
 
 		$post_type = get_post_type();
