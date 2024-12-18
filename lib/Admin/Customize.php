@@ -54,6 +54,7 @@ class Customize {
 	/**
 	 * Add lang metaboxes to nav menu edit.
 	 *
+	 * @since Unreleased Fetch menu id from $_REQUEST only if the action is not delete.
 	 * @since 0.4.5 Add hidden input `ubb_source` for new menu's when linking.
 	 * @since 0.4.2 Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
 	 * @since 0.0.3
@@ -61,7 +62,7 @@ class Customize {
 	 * @return void
 	 */
 	public function nav_menu_lang_metaboxes() : void {
-		if ( isset( $_REQUEST['menu'] ) ) {
+		if ( isset( $_REQUEST['menu'] ) && ( $_REQUEST['action'] ?? '' ) !== 'delete') {
 			$menu_id = $_REQUEST['menu'];
 		} else {
 			$menu_id = get_user_option( 'nav_menu_recently_edited' );

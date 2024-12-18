@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fatal error when deleting a menu in the backoffice.
 - Correct wrong calls to `wpdb::prepare` without any placeholders.
 
 ## [0.5.6] - 2024-11-11
