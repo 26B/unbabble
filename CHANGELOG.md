@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Added support for WP Block site pattern editor.
+
 ### Fixed
 
 - Fatal error when deleting a menu in the backoffice.
