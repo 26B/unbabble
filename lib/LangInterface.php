@@ -573,11 +573,9 @@ class LangInterface {
 
 		$ids_str    = implode( ',', array_map( fn ( $post ) => $post->ID, $posts ) );
 		$post_langs = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT post_id, locale
-				FROM {$table_name}
-				WHERE post_id IN ({$ids_str})"
-			)
+			"SELECT post_id, locale
+			FROM {$table_name}
+			WHERE post_id IN ({$ids_str})"
 		);
 
 		$lang_list = [];
@@ -988,11 +986,9 @@ class LangInterface {
 		}
 
 		$term_langs = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT term_id, locale
-				FROM {$table_name}
-				WHERE term_id IN ({$ids_str})"
-			)
+			"SELECT term_id, locale
+			FROM {$table_name}
+			WHERE term_id IN ({$ids_str})"
 		);
 
 		$lang_list = [];
