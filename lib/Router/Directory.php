@@ -468,7 +468,7 @@ class Directory {
 	/**
 	 * Adds directory to admin url.
 	 *
-	 * @since Unreleased Add lang query arg regardless of the current language.
+	 * @since 0.5.7 Add lang query arg regardless of the current language.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
