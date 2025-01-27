@@ -542,6 +542,14 @@ class Options {
 		return empty( $ubb_options ) ? null : $ubb_options;
 	}
 
+	/**
+	 * Fetches the options value from the database via WPDB.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param  int $blog_id
+	 * @return array
+	 */
 	public static function get_via_wpdb( int $blog_id ) : array {
 		global $wpdb;
 		$blog_prefix = $wpdb->get_blog_prefix( $blog_id );
