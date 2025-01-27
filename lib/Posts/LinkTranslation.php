@@ -4,8 +4,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use WP_Error;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 
 /**
@@ -168,6 +166,19 @@ class LinkTranslation {
 		}
 		$instr = implode( ', ', $instr );
 
+		/**
+		 * Filter for possible links query.
+		 *
+		 * @since 0.5.3
+		 *
+		 * @param string $sql
+		 * @return string
+		 */
+		$link_filter = \apply_filters( 'ubb_possible_links_filter_sql', '' );
+		if ( empty( $link_filter ) || ! is_string( $link_filter ) ) {
+			$link_filter = '';
+		}
+
 		// FIXME: if there are any posts with multiple ubb_sources (bug), it can cause the post to show up in the list multiple times.
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
@@ -193,6 +204,7 @@ class LinkTranslation {
 							WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
 							AND PT.locale IN ('{$allowed_languages_str}')
 							{$search_filter}
+							{$link_filter}
 						) as A
 						GROUP BY source
 					) AS B

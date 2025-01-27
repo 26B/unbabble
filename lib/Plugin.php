@@ -174,6 +174,7 @@ class Plugin {
 			'terms_admin_notices'      => Terms\AdminNotices::class,
 			'terms_new_term'           => Terms\NewTerm::class,
 			'terms_edit_filter'        => Terms\EditFilters::class,
+			'terms_quick_edit'         => Terms\QuickEdit::class,
 
 			'locale'        => Language\Locale::class,
 			'lang_packages' => Language\LanguagePacks::class,
@@ -246,6 +247,16 @@ class Plugin {
 		$admin_integrations = [
 			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
 		];
+
+		// TODO: shouldn't happen but we should make sure that integration classes are not registed twice.
+		$cli_integrations = [
+			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+		];
+
+		$rest_integrations = [
+			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+		];
+
 		$integrations = [
 			Relevanssi::class   => 'relevanssi/relevanssi.php',
 			ElasticPress::class => 'elasticpress/elasticpress.php',
@@ -261,6 +272,22 @@ class Plugin {
 
 		\add_action( 'admin_init', function() use ( $admin_integrations ) {
 			foreach ( $admin_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'cli_init', function() use ( $cli_integrations ) {
+			foreach ( $cli_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'rest_api_init', function() use ( $rest_integrations ) {
+			foreach ( $rest_integrations as $integration_class => $plugin_name ) {
 				if ( \is_plugin_active( $plugin_name ) ) {
 					( new $integration_class() )->register();
 				}

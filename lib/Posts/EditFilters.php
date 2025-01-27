@@ -4,6 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use TwentySixB\WP\Plugin\Unbabble\Overrides\WP_Posts_List_Table;
 use WP_Query;
 
 /**
@@ -37,6 +38,7 @@ class EditFilters {
 		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
 			\add_filter( 'posts_where', [ $this, 'filter_posts_without_language' ], 10, 2 );
 			\add_filter( 'ubb_use_post_lang_filter', '__return_false' );
+			\add_action( 'wp_list_table_class_name', [ $this, 'override_wp_list_table_class' ], 10, 2 );
 		}
 	}
 
@@ -173,5 +175,37 @@ class EditFilters {
 		 * @param WP_Query $query
 		 */
 		return \apply_filters( 'ubb_use_post_lang_missing_filter', true, $query );
+	}
+
+	/**
+	 * Overrides the WP_Posts_List_Table class to add a hidden input for the language filter.
+	 *
+	 * Necessary for keeping the language filter on when the search input is used.
+	 *
+	 * @since 0.5.0
+	 *
+	 * @param string $class_name
+	 * @param array $args
+	 * @return string
+	 */
+	public function override_wp_list_table_class( string $class_name, array $args ) : string {
+		if ( 'WP_Posts_List_Table' !== $class_name ) {
+			return $class_name;
+		}
+
+		if ( ! $args['screen'] instanceof \WP_Screen ) {
+			return $class_name;
+		}
+
+		if ( $args['screen']->base !== 'edit' ) {
+			return $class_name;
+		}
+
+		$post_types = LangInterface::get_translatable_post_types();
+		if ( ! in_array( $args['screen']->post_type, $post_types, true ) ) {
+			return $class_name;
+		}
+
+		return WP_Posts_List_Table::class;
 	}
 }

@@ -17,7 +17,7 @@ class Options {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Added conditions for registering the update action.
+	 * @since 0.5.0 Added conditions for registering the update action.
 	 * @since 0.0.11
 	 *
 	 * @return null
@@ -129,7 +129,7 @@ class Options {
 	 * Updates the Unbabble options if the value returned from the filter `ubb_options` is
 	 * different from the saved options.
 	 *
-	 * @since Unreleased Added boolean return. Refactor fetch of options from filter into a separate method. Add update for manual changes option.
+	 * @since 0.5.0 Added boolean return. Refactor fetch of options from filter into a separate method. Add update for manual changes option.
 	 * @since 0.4.5 Force 'nav_menu' and 'nav_menu_item' to be translatable if one of them is.
 	 * @since 0.0.11
 	 *
@@ -177,7 +177,7 @@ class Options {
 	/**
 	 * Updates the Unbabble options via the API.
 	 *
-	 * @since Unreleased Add update for manual changes option.
+	 * @since 0.5.0 Add update for manual changes option.
 	 * @since 0.2.0
 	 *
 	 * @param \WP_REST_Request $request
@@ -334,7 +334,7 @@ class Options {
 	/**
 	 * Fetch options set on the `ubb_options` filter.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @return array|bool|\WP_Error
 	 */
@@ -403,7 +403,7 @@ class Options {
 	/**
 	 * Returns whether there are settings passed via the filter.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @return bool
 	 */
@@ -423,7 +423,7 @@ class Options {
 	/**
 	 * Clear the static cache for options.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @return null
 	 */
@@ -434,7 +434,7 @@ class Options {
 	/**
 	 * Returns whether there are manual changes to the settings.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.0
 	 *
 	 * @return bool
 	 */

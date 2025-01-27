@@ -18,6 +18,7 @@ let unsubscribeLinking = null;
 const Language = () => {
 	const postId = wp?.data?.select('core/editor')?.getCurrentPostId() ?? getQueryVar('post');
 	const { data, refetch, isLoading, isError, setIsLoading, setIsError } = useEditPost(postId);
+	const allowActions = getUBBSetting('post_metabox_allow_actions', true);
 
 	// Link post to source post if ubb_source is present in the URL.
 	useEffect(() => {
@@ -138,15 +139,15 @@ const Language = () => {
 				refetchLangs: refetch,
 			}}
 		>
-			<PostLanguage />
-			<ListTranslations />
-			{!badLanguage && untranslatedLangs.length > 0 && (
+			<PostLanguage allowActions={allowActions}	/>
+			<ListTranslations allowActions={allowActions} />
+			{allowActions && !badLanguage && untranslatedLangs.length > 0 && (
 				<>
 					<hr />
 					<CreateTranslations />
 				</>
 			)}
-			{!badLanguage && translatedLangs.length < 1 && (
+			{allowActions && !badLanguage && translatedLangs.length < 1 && (
 				<>
 					<hr />
 					<p
@@ -165,7 +166,7 @@ const Language = () => {
 					<LinkTranslations />
 				</>
 			)}
-			{translatedLangs.length > 0 && (
+			{allowActions && translatedLangs.length > 0 && (
 				<>
 					<hr />
 					<p

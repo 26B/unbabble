@@ -22,6 +22,8 @@ class Directory {
 	 * directory is removed and the lang query argument is added. This procedure needs to be done as
 	 * early as possible in order to avoid problems.
 	 *
+	 * @since 0.5.6 Remove previous filters.
+	 * @since 0.5.4 Add filter to remove directory from home_url during parse_request in class-wp.php.
 	 * @since 0.4.5 Remove check for directory, already done inside current_lang_from_uri.
 	 * @since 0.0.1
 	 *
@@ -376,7 +378,9 @@ class Directory {
 	/**
 	 * Adds directory to home_url.
 	 *
-	 * @since Unreleased Added $scheme argument. Stop if $scheme is 'rest'.
+	 * @since 0.5.4 Allow 'rest' schemes regardless.
+	 * @since 0.5.2 Allow 'rest' schemes if in admin to fix Block Editor.
+	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
 	 * @param string      $url
@@ -385,9 +389,6 @@ class Directory {
 	 * @return string
 	 */
 	public function home_url( string $url, string $path, ?string $scheme ) : string {
-		if ( $scheme === 'rest' ) {
-			return $url;
-		}
 
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
@@ -467,6 +468,7 @@ class Directory {
 	/**
 	 * Adds directory to admin url.
 	 *
+	 * @since 0.5.7 Add lang query arg regardless of the current language.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
@@ -474,10 +476,6 @@ class Directory {
 	 */
 	public function admin_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === LangInterface::get_default_language() ) {
-			return $url;
-		}
-
 		return add_query_arg( 'lang', $curr_lang, $url );
 	}
 

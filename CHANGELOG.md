@@ -9,22 +9,92 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Setting Advanced Custom Fields fields as translatable automatically when they are registered.
+
+### Changed
+
+- Registering Advanced Custom Fields integration hooks immediately on Unbabble register instead of waiting for `admin_init`.
+
+## [0.5.7] - 2024-12-19
+
+### Fixed
+
+- Fatal error when deleting a menu in the backoffice.
+- Correct wrong calls to `wpdb::prepare` without any placeholders.
+
+## [0.5.6] - 2024-11-11
+
+### Changed
+
+- All REST scheme `home_url`'s now receive the directory url if needed, on Directory Routing.
+
+### Removed
+
+- Remove filters added in [0.5.4].
+
+## [0.5.5] - 2024-11-11
+
+### Removed
+
+- Post\Term `ubb_source` deletion when it returns empty. It was causing random unlinks.
+
+## [0.5.4] - 2024-11-11
+
+### Changed
+
+- Always add lang query arg to admin urls in Directory routing mode.
+
+### Fixed
+
+- REST API 404's on non-main sites in WordPress multisite network when directory routing was active and the lang query var passed was a non default language.
+
+## [0.5.3] - 2024-09-11
+
+### Added
+
+- Filter `ubb_possible_links_filter_sql` to add to the query for possible post links.
+
+### Fixed
+
+- Transient issues on post/term languages with `null` value conversion to `''`.
+- `YoastDuplicatePost` issues with cleaning possible `ubb_source` in rewrite republish posts and not showing them in the possible linking results.
+
+## [0.5.2] - 2024-09-09
+
+### Fixed
+
+- Set lang directory in REST url when in admin to fix Block Editor requests for posts/terms.
+
+## [0.5.1] - 2024-09-03
+
+### Changed
+
+- Lang url parameter set in language switch regardless of language not being default.
+
+## [0.5.0] - 2024-08-27
+
+### Added
+
 - Check for empty transient value when fetching term language.
 - Constant `UBB_SETTINGS_READONLY` for read only settings in the backoffice settings page.
 - Internal option `ubb_settings_manual_changes` for keeping track if manual changes have been made to the settings.
-- Setting Advanced Custom Fields fields as translatable automatically when they are registered.
+- Allow for duplicate term slugs in different languages.
 
 ### Changed
 
 - Improved get post language handling of empty values.
 - Options in options page are now modifiable from the values set in the `ubb_options` filter.
 - API rest url when Unbabble is set to directory routing no longer has the language directory applied.
-- Registering Advanced Custom Fields integration hooks immediately on Unbabble register instead of waiting for `admin_init`.
+- Hide post metabox actions when editing a Yoast's rewrite-republish copy.
 
 ### Fixed
 
 - Term language set when term has no language.
 - Missing post type in url when creating a term translation to stay in the same post type Menu.
+- WordPress url variables where being lost when redirecting a term on its edit page.
+- Language not being set for post tags created in post quick edits.
+- No Language filter is now kept selected when using the search box for post types/taxonomies in their admin list.
+- Meta `ubb_source` no longer set for Yoast's rewrite republish posts when migrating via the WPML migrator.
 
 ## [0.4.8] - 2024-07-30
 
@@ -466,7 +536,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.4.8...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.7...HEAD
+[0.5.7]: https://github.com/26b/unbabble/compare/0.5.6...0.5.7
+[0.5.6]: https://github.com/26b/unbabble/compare/0.5.5...0.5.6
+[0.5.5]: https://github.com/26b/unbabble/compare/0.5.4...0.5.5
+[0.5.4]: https://github.com/26b/unbabble/compare/0.5.3...0.5.4
+[0.5.3]: https://github.com/26b/unbabble/compare/0.5.2...0.5.3
+[0.5.2]: https://github.com/26b/unbabble/compare/0.5.1...0.5.2
+[0.5.1]: https://github.com/26b/unbabble/compare/0.5.0...0.5.1
+[0.5.0]: https://github.com/26b/unbabble/compare/0.4.8...0.5.0
 [0.4.8]: https://github.com/26b/unbabble/compare/0.4.7...0.4.8
 [0.4.7]: https://github.com/26b/unbabble/compare/0.4.6...0.4.7
 [0.4.6]: https://github.com/26b/unbabble/compare/0.4.5...0.4.6

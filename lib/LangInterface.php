@@ -244,7 +244,7 @@ class LangInterface {
 	/**
 	 * Returns a post's language.
 	 *
-	 * @since Unreleased Improve handling of empty values.
+	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1
 	 *
 	 * @param  int    $post_id
@@ -263,7 +263,7 @@ class LangInterface {
 
 		// If there is a transient value, return it.
 		if ( $post_lang !== false ) {
-			return $post_lang;
+			return empty( $post_lang ) ? null : $post_lang;
 		}
 
 		$table_name = ( new PostTable() )->get_table_name();
@@ -274,14 +274,14 @@ class LangInterface {
 			)
 		);
 
-		// Make sure $post_lang is null if get_var returns empty string.
+		// Make sure `$post_lang` is an empty string (equal to null) if `get_var` returns empty.
 		if ( empty( $post_lang ) ) {
-			$post_lang = null;
+			$post_lang = '';
 		}
 
 		\set_transient( $transient_key, $post_lang, 30 );
 
-		return $post_lang;
+		return empty( $post_lang ) ? null : $post_lang;
 	}
 
 	/**
@@ -337,6 +337,7 @@ class LangInterface {
 	/**
 	 * Returns the post's source ID.
 	 *
+	 * @since 0.5.5 Remove delete since it was causing posts to get unlinked randomly.
 	 * @since 0.4.6 Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
@@ -353,14 +354,9 @@ class LangInterface {
 		$source_id = get_post_meta( $post_id, 'ubb_source', true );
 
 		/**
-		 * If the source_id is an empty string, delete it and return null.
-		 *
-		 * `get_post_meta` returns empty string when post id doesn't exist, so we are unable to
-		 * know if there is an actual empty string in the DB or not, so we try to delete it
-		 * either way.
+		 * If the source_id is an empty string, return null.
 		 */
 		if ( is_string( $source_id ) && empty( $source_id ) ) {
-			\delete_post_meta( $post_id, 'ubb_source' );
 			$source_id = null;
 
 		} else {
@@ -577,11 +573,9 @@ class LangInterface {
 
 		$ids_str    = implode( ',', array_map( fn ( $post ) => $post->ID, $posts ) );
 		$post_langs = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT post_id, locale
-				FROM {$table_name}
-				WHERE post_id IN ({$ids_str})"
-			)
+			"SELECT post_id, locale
+			FROM {$table_name}
+			WHERE post_id IN ({$ids_str})"
 		);
 
 		$lang_list = [];
@@ -729,7 +723,7 @@ class LangInterface {
 	/**
 	 * Returns a term's language.
 	 *
-	 * @since Unreleased Improve handling of empty values.
+	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1
 	 *
 	 * @param  int    $term_id
@@ -742,7 +736,7 @@ class LangInterface {
 
 		// If there is a transient value, return it.
 		if ( $term_lang !== false ) {
-			return $term_lang;
+			return empty( $term_lang ) ? null : $term_lang;
 		}
 
 		$table_name = ( new TermTable() )->get_table_name();
@@ -754,13 +748,14 @@ class LangInterface {
 			1
 		);
 
-		// Make sure $term_lang is null if get_var returns empty string.
+		// Make sure `$term_lang` is an empty string (equal to null) when `get_var` returns empty.
 		if ( empty( $term_lang ) ) {
-			$term_lang = null;
+			$term_lang = '';
 		}
 
 		\set_transient( $transient_key, $term_lang, 30 );
-		return $term_lang;
+
+		return empty( $term_lang ) ? null : $term_lang;
 	}
 
 	/**
@@ -815,6 +810,7 @@ class LangInterface {
 	/**
 	 * Returns the term's source ID.
 	 *
+	 * @since 0.5.5 Remove delete since it was causing terms to get unlinked randomly.
 	 * @since 0.4.5 Delete empty string `ubb_source`'s from the DB.
 	 * @since 0.0.1
 	 *
@@ -831,14 +827,9 @@ class LangInterface {
 		$source_id = \get_term_meta( $term_id, 'ubb_source', true );
 
 		/**
-		 * If the source_id is an empty string, delete it and return null.
-		 *
-		 * `get_term_meta` returns empty string when term id doesn't exist, so we are unable to
-		 * know if there is an actual empty string in the DB or not, so we try to delete it
-		 * either way.
+		 * If the source_id is an empty string, return null.
 		 */
 		if ( is_string( $source_id ) && empty( $source_id ) ) {
-			\delete_term_meta( $term_id, 'ubb_source' );
 			$source_id = null;
 
 		} else {
@@ -995,11 +986,9 @@ class LangInterface {
 		}
 
 		$term_langs = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT term_id, locale
-				FROM {$table_name}
-				WHERE term_id IN ({$ids_str})"
-			)
+			"SELECT term_id, locale
+			FROM {$table_name}
+			WHERE term_id IN ({$ids_str})"
 		);
 
 		$lang_list = [];
