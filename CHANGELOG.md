@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Setting Advanced Custom Fields fields as translatable automatically when they are registered.
+
+### Changed
+
+- Registering Advanced Custom Fields integration hooks immediately on Unbabble register instead of waiting for `admin_init`.
+
 ## [0.5.7] - 2024-12-19
 
 ### Fixed
