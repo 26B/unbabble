@@ -555,7 +555,7 @@ class Options {
 		$blog_prefix = $wpdb->get_blog_prefix( $blog_id );
 		$options     = $wpdb->get_var( "SELECT option_value FROM {$blog_prefix}options WHERE option_name = 'ubb_options' LIMIT 1" );
 		if ( empty( $options ) ) {
-			return self::DEFAULT;
+			return self::defaults();
 		}
 		return maybe_unserialize( $options );
 	}
