@@ -38,10 +38,23 @@ class QueryVar {
 			return $post_link;
 		}
 		$post_lang = LangInterface::get_post_language( $post_id );
-		if ( $post_lang ===  Options::get()['default_language'] ) {
+		if ( $post_lang ===  LangInterface::get_default_language() ) {
 			return remove_query_arg( 'lang', $post_link );
 		}
 		return add_query_arg( 'lang', $post_lang, $post_link );
+	}
+
+	/**
+	 * Applies language to the page's link given it's language.
+	 *
+	 * @since 0.1.1
+	 *
+	 * @param string $page_link
+	 * @param WP_Post|int|mixed $page
+	 * @return string
+	 */
+	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+		return $this->apply_lang_to_post_url( $page_link, $page );
 	}
 
 	/**
@@ -55,7 +68,7 @@ class QueryVar {
 	 */
 	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
 		$post_type = $post->post_type;
-		if ( ! in_array( $post_type, Options::get_allowed_post_types(), true ) ) {
+		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return $post_link;
 		}
 		return $this->apply_lang_to_post_url( $post_link, $post );
@@ -92,11 +105,12 @@ class QueryVar {
 			return $termlink;
 		}
 
-		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+		if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
 			return $termlink;
 		}
+
 		$term_lang = LangInterface::get_term_language( $term->term_id );
-		if ( $term_lang ===  Options::get()['default_language'] ) {
+		if ( $term_lang ===  LangInterface::get_default_language() ) {
 			return remove_query_arg( 'lang', $termlink );
 		}
 		return add_query_arg( 'lang', $term_lang, $termlink );
@@ -128,7 +142,7 @@ class QueryVar {
 		}
 
 		// Set language of homepage to the default language.
-		set_query_var( 'lang', Options::get()['default_language'] );
+		set_query_var( 'lang', LangInterface::get_default_language() );
 	}
 
 	/**
@@ -142,7 +156,7 @@ class QueryVar {
 	 */
 	public function post_type_archive_link( string $link, string $post_type ) : string {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
+		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $link;
 		}
 		return add_query_arg( 'lang', $curr_lang, $link );
@@ -240,28 +254,35 @@ class QueryVar {
 	/**
 	 * Adds directory to home_url.
 	 *
+	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
-	 * @param string $url
-	 * @param string $path
+	 * @param string      $url
+	 * @param string      $path
+	 * @param string|null $scheme
 	 * @return string
 	 */
-	public function home_url( string $url, string $path ) : string {
+	public function home_url( string $url, string $path, ?string $scheme ) : string {
+		if ( $scheme === 'rest' ) {
+			return $url;
+		}
+
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
 		 * language.
 		 *
 		 * @since 0.0.1
-		 * @param bool   $stop_url_change Whether to change the home url or not.
-		 * @param string $url             Home url.
-		 * @param string $path            Url path.
+		 * @param bool        $stop_url_change Whether to change the home url or not.
+		 * @param string      $url             Home url.
+		 * @param string      $path            Url path.
+		 * @param string|null $scheme          Url scheme.
 		 */
-		if ( apply_filters( 'ubb_home_url', false, $url, $path ) ) {
+		if ( apply_filters( 'ubb_home_url', false, $url, $path, $scheme ) ) {
 			return $url;
 		}
 
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
+		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $url;
 		}
 
@@ -288,11 +309,11 @@ class QueryVar {
 		switch_to_blog( $main_blog_id );
 		if ( Options::should_run_unbabble() ) {
 			if (
-				$curr_origin_lang !== Options::get()['default_language']
-				&& in_array( $curr_origin_lang, Options::get()['allowed_languages'] )
+				$curr_origin_lang !== LangInterface::get_default_language()
+				&& LangInterface::is_language_allowed( $curr_origin_lang )
 			) {
 				add_filter( 'ubb_current_lang', $fn = fn () => $curr_origin_lang );
-				$router_type = Options::get()['router'];
+				$router_type = Options::get_router();
 				if ( $router_type === 'directory' ) {
 					add_filter( 'ubb_home_url', '__return_true' );
 					$home_url = home_url( $path );
@@ -318,7 +339,7 @@ class QueryVar {
 	 */
 	public function admin_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
-		if ( $curr_lang === Options::get()['default_language'] ) {
+		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $url;
 		}
 

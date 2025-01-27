@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 class OptionsPage {
@@ -12,16 +13,49 @@ class OptionsPage {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		// Only show options page on debug mode for now.
-		if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+
+		// Show options page on debug mode or for admins.
+		if (
+			! \current_user_can( 'manage_options' )
+			&& ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG )
+		) {
 			return;
 		}
+
 		\add_action( 'admin_menu', [ $this, 'add_options_page' ] );
 		\add_action( 'admin_init', [ $this, 'add_options_to_page' ] );
 	}
 
 	public function add_options_page() {
-		\add_options_page( 'Unbabble', 'Unbabble', 'manage_options', 'unbabble', [ $this, 'page_output' ], null );
+		\add_menu_page(
+			'Unbabble',
+			'Unbabble',
+			'manage_options',
+			'unbabble_options',
+			[ $this, 'options_page_output' ],
+			'dashicons-translation',
+			100
+		);
+
+		\add_submenu_page(
+			'unbabble_options',
+			'Settings',
+			'Settings',
+			'manage_options',
+			'unbabble_options',
+			[ $this, 'options_page_output' ],
+			101
+		);
+
+		\add_submenu_page(
+			'unbabble_options',
+			'Actions',
+			'Actions',
+			'manage_options',
+			'unbabble_actions',
+			[ $this, 'actions_page_output' ],
+			101
+		);
 	}
 
 	public function add_options_to_page() {
@@ -42,30 +76,20 @@ class OptionsPage {
 		// TODO: Field for directory names.
 	}
 
-	public function page_output() {
+	public function options_page_output() {
 		?>
-		<h2>Unbabble Settings</h2>
-		<form action="options.php" method="post">
-			<?php
-			\settings_fields( 'ubb_options' );
-			\do_settings_sections( 'unbabble' );
-			?>
-			<input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
-		</form>
+		<div id="ubb-options-page"></div>
 		<?php
 	}
 
 	public function field_allowed_languages() {
-		$options = Options::get();
-		$langs   = array_map(
-			function ( $lang ) use ( $options ) {
-				return sprintf(
-					'<option value="%1$s" %2$s>%1$s</option>',
-					$lang,
-					\selected( in_array( $lang, $options['allowed_languages'], true ), true, false )
-				);
-			},
-			array_merge( [ 'en_US' ], get_available_languages() )
+		$langs = array_map(
+			fn ( $lang ) => sprintf(
+				'<option value="%1$s" %2$s>%1$s</option>',
+				$lang,
+				\selected( LangInterface::is_language_allowed( $lang ), true, false )
+			),
+			array_merge( [ 'en_US' ], \get_available_languages() )
 		);
 
 		printf(
@@ -77,16 +101,13 @@ class OptionsPage {
 	}
 
 	public function field_default_language() {
-		$options = Options::get();
 		$langs   = array_map(
-			function ( $lang ) use ( $options ) {
-				return sprintf(
-					'<option value="%1$s" %2$s>%1$s</option>',
-					$lang,
-					\selected( $lang, $options['default_language'], false )
-				);
-			},
-			is_array( $options['allowed_languages'] ) ? $options['allowed_languages'] : []
+			fn ( $lang ) => sprintf(
+				'<option value="%1$s" %2$s>%1$s</option>',
+				$lang,
+				\selected( $lang, LangInterface::get_default_language(), false )
+			),
+			LangInterface::get_languages()
 		);
 
 		printf(
@@ -97,6 +118,7 @@ class OptionsPage {
 		);
 	}
 
+	// TODO: move this to Options
 	public function validate_options( $input ) {
 		if ( empty( $input['allowed_languages'] ) ) {
 			$input['default_language'] = '';
@@ -110,14 +132,12 @@ class OptionsPage {
 
 	public function field_post_types() {
 		$post_types         = \get_post_types();
-		$allowed_post_types = Options::get_allowed_post_types();
 		$post_type_options  = '';
-
 		foreach ( $post_types as $post_type ) {
 			$post_type_options .= sprintf(
 				'<option value="%1$s" %2$s>%1$s</option>',
 				$post_type,
-				\selected( in_array( $post_type, $allowed_post_types, true ), true, false ),
+				\selected( LangInterface::is_post_type_translatable( $post_type ), true, false ),
 			);
 		}
 
@@ -132,14 +152,12 @@ class OptionsPage {
 
 	public function field_taxonomies() {
 		$taxonomies         = \get_taxonomies();
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		$taxonomies_options = '';
-
 		foreach ( $taxonomies as $taxonomy ) {
 			$taxonomies_options .= sprintf(
 				'<option value="%1$s" %2$s>%1$s</option>',
 				$taxonomy,
-				\selected( in_array( $taxonomy, $allowed_taxonomies, true ), true, false ),
+				\selected( LangInterface::is_taxonomy_translatable( $taxonomy ), true, false ),
 			);
 		}
 

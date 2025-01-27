@@ -18,9 +18,6 @@ class Redirector {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Handle language switching.
 		if ( is_admin() && isset( $_GET['ubb_switch_lang'] ) ) {
@@ -35,16 +32,16 @@ class Redirector {
 	/**
 	 * Changes back-office language and redirects to new url.
 	 *
+	 * @since 0.5.1 Set lang param regardless of language not being default.
 	 * @since 0.0.1
 	 *
 	 * @param  string $new_lang
 	 * @return void
 	 */
 	public function handle_language_switch_redirect( string $new_lang ) : void {
-		$options = Options::get();
 
 		// Validate new_lang.
-		if ( ! in_array( $new_lang, $options['allowed_languages'], true ) ) {
+		if ( ! LangInterface::is_language_allowed( $new_lang ) ) {
 			return;
 		}
 
@@ -62,10 +59,10 @@ class Redirector {
 			}
 		}
 
-		// Change `ubb_switch_lang` in query in url to `lang` if not default language.
+		// Change `ubb_switch_lang` in query in url to `lang`.
 		$path    = str_replace(
 			"ubb_switch_lang={$new_lang}",
-			$new_lang === $options['default_language'] ? '' : "lang={$new_lang}",
+			"lang={$new_lang}",
 			$uri
 		);
 		$new_url = home_url( $path );
@@ -79,6 +76,7 @@ class Redirector {
 	/**
 	 * Redirect if the current language is not the correct one for the current post.
 	 *
+	 * @since 0.4.8 Add checks for bad edit link and/or unknown post, and redirects for those cases.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -102,18 +100,46 @@ class Redirector {
 		if (
 			$post_lang === null
 			|| $post_lang === $current_lang
-			|| ! in_array( $post_lang, Options::get()['allowed_languages'], true )
+			|| ! LangInterface::is_language_allowed( $post_lang )
 		) {
 			return;
 		}
 
-		wp_safe_redirect( add_query_arg( 'lang', $post_lang, get_edit_post_link( $_REQUEST['post'], '&' ) ) );
+		// Fetch edit post link and redirect to it with the correct language if it's valid.
+		$edit_post_link = get_edit_post_link( $_REQUEST['post'], '&' );
+		if ( ! empty( $edit_post_link ) ) {
+			wp_safe_redirect( add_query_arg( 'lang', $post_lang, $edit_post_link ) );
+			exit;
+		}
+
+		// Fetch post and redirect to main admin page if the post is not found.
+		$post = get_post( $_REQUEST['post'] );
+		if ( empty( $post ) || ! isset( $post->post_type ) ) {
+			wp_safe_redirect( admin_url() );
+			exit;
+		}
+
+		// Redirect to the post type list page with the correct language.
+		wp_safe_redirect(
+			add_query_arg(
+				array_filter(
+					[
+						'lang'      => $post_lang,
+						'post_type' => $post->post_type === 'post' ? '' : $post->post_type,
+					],
+				),
+				'edit.php'
+			)
+		);
 		exit;
 	}
 
 	/**
 	 * Redirect if the current language is not the correct one for the current term.
 	 *
+	 * @since 0.5.0 Keep other query arguments in edit term link redirect.
+	 * @since 0.4.8 Add checks for bad edit link and/or unknown term, and redirects for those cases.
+	 * @since 0.4.2 Don't redirect when term lang is not in allowed languages to allow the user to fix it.
 	 * @since 0.0.1
 	 *
 	 * @return void
@@ -133,7 +159,43 @@ class Redirector {
 			return;
 		}
 
-		wp_safe_redirect( add_query_arg( 'lang', $term_lang, get_edit_term_link( $_REQUEST['tag_ID'], '', '&' ) ) );
+		// If the language is not in the allowed languages, do nothing so user can fix it.
+		$languages = LangInterface::get_languages();
+		if ( ! in_array( $term_lang, $languages, true ) ) {
+			return;
+		}
+
+		// Fetch edit term link and redirect to it with the correct language if it's valid.
+		$edit_term_link = get_edit_term_link( $_REQUEST['tag_ID'], '', '&' );
+		if ( ! empty( $edit_term_link ) ) {
+			$query_args = $_REQUEST;
+			unset( $query_args['taxonomy'], $query_args['tag_ID'], $query_args['post_type'], $query_args['lang'] );
+			$query_args['lang'] = $term_lang;
+			$edit_term_link = add_query_arg( $query_args, $edit_term_link );;
+			wp_safe_redirect( $edit_term_link );
+			exit;
+		}
+
+		// Fetch term and redirect to main admin page if the term is not found.
+		$term = get_term( $_REQUEST['tag_ID'] );
+		if ( empty( $term ) || ! isset( $term->taxonomy ) ) {
+			wp_safe_redirect( admin_url() );
+			exit;
+		}
+
+		// Redirect to the taxonomy list page with the correct language.
+		wp_safe_redirect(
+			add_query_arg(
+				array_filter(
+					[
+						'lang'      => $term_lang,
+						'taxonomy'  => $term->taxonomy === 'post_tag' ? '' : $term->taxonomy,
+						'post_type' => $_REQUEST['post_type'] ?? '',
+					],
+				),
+				'edit-tags.php'
+			)
+		);
 		exit;
 	}
 }

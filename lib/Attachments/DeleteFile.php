@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Attachments;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -18,7 +19,7 @@ class DeleteFile {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
+		if ( ! LangInterface::is_post_type_translatable( 'attachment' ) ) {
 			return;
 		}
 
@@ -38,7 +39,13 @@ class DeleteFile {
 	 * @return void
 	 */
 	public function set_hooks_for_file_deletion( int $post_id ) : void {
-		$meta  = wp_get_attachment_metadata( $post_id );
+		$meta = wp_get_attachment_metadata( $post_id );
+
+		// If the attachment has no metadata, ignore it.
+		if ( empty( $meta ) ) {
+			return;
+		}
+
 		$file  = $meta['file'];
 		$sizes = $meta['sizes'];
 		$files = [ $file ];

@@ -3,31 +3,26 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Language;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
- * Hooks related to the language of frontend.
+ * Hooks related to the locale.
  *
  * @since 0.0.1
  */
-class Frontend {
+class Locale {
 
 	/**
-	 * Register hooks.
+	 * Initialize hooks.
 	 *
-	 * @since 0.0.1
+	 * @since 0.2.3
 	 */
-	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
+	public function init() {
 		\add_filter( 'locale', [ $this, 'switch_locale'] );
 		\add_action( 'admin_bar_menu', [ $this, 'set_admin_bar_language'], PHP_INT_MIN );
 	}
 
 	/**
-	 * Switch the locale for the frontend.
+	 * Switch the locale.
 	 *
 	 * Necessary for loading the correct translations of the themes and plugins.
 	 *
@@ -40,12 +35,13 @@ class Frontend {
 		if ( is_admin() ) {
 			return $locale;
 		}
+
 		if ( apply_filters( 'ubb_stop_switch_locale', false, $locale ) ) {
 			return $locale;
 		}
 
 		$current = LangInterface::get_current_language();
-		if ( in_array( $current, get_available_languages(), true ) ) {
+		if ( $current === 'en_US' || in_array( $current, get_available_languages(), true ) ) {
 			return $current;
 		}
 		return $locale;

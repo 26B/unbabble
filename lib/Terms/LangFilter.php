@@ -4,7 +4,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Terms;
 
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
-use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
  * Hooks for filtering terms based on their language.
@@ -19,9 +18,6 @@ class LangFilter {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 		\add_filter( 'terms_clauses', [ $this, 'filter_terms_by_language' ], 10, 3 );
 	}
 
@@ -57,12 +53,10 @@ class LangFilter {
 		}
 
 		// Divide $taxonomies into taxonomies with and without language.
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		$taxonomies_w_lang  = [];
 		$taxonomies_wo_lang = [];
 		foreach ( $taxonomies as $taxonomy ) {
-			// TODO: maybe use intersect.
-			if ( ! in_array( $taxonomy, $allowed_taxonomies, true ) ) {
+			if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
 				$taxonomies_wo_lang[] = esc_sql( $taxonomy );
 				continue;
 			}

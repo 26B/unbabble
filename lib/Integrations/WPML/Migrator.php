@@ -19,7 +19,7 @@ class Migrator {
 	 */
 	public function register() : void {
 		if ( class_exists( 'WP_CLI' ) ) {
-			WP_CLI::add_command( 'unbabble migrate-wpml', [ $this, 'run' ] );
+			WP_CLI::add_command( 'ubb migrate-wpml', [ $this, 'run' ] );
 		}
 	}
 
@@ -37,6 +37,9 @@ class Migrator {
 	 * [--fresh]
 	 * : (Optional) Run a new migration.
 	 *
+	 * [--yes]
+	 * : (Optional) Skip confirmations.
+	 *
 	 * @since 0.0.3
 	 *
 	 * @param array $args
@@ -44,6 +47,10 @@ class Migrator {
 	 * @return void
 	 */
 	public function run( array $args, array $assoc_args ) : void {
+
+		// Don't hide any language during migration.
+		\add_filter( 'ubb_do_hidden_languages_filter', '__return_false' );
+
 		if ( ! $this->check_for_wpml_tables() ) {
 			WP_CLI::error( 'No WPML tables for migration.' );
 		}
@@ -71,13 +78,13 @@ class Migrator {
 
 		$offset = $this->get_migration_offset();
 		if ( $offset ) {
-			WP_CLI::warning( 'Continuing previous migration. Use `wp unbabble migrate-wpml restart` to start a new one.' );
+			WP_CLI::warning( 'Continuing previous migration. Use `wp ubb migrate-wpml restart` to start a new one.' );
 			$options['trid_offset'] = $offset;
 		}
 
 		$sql = $this->make_sql( $options );
 
-		WP_CLI::confirm( 'Run migration?' );
+		WP_CLI::confirm( 'Run migration?', $assoc_args );
 
 		$trids_migrated = $this->migrate( $sql );
 		if ( $trids_migrated === 0 ) {
@@ -98,7 +105,7 @@ class Migrator {
 	private function get_migration_pid() : int {
 		// TODO: How to check if shell_exec is permitted.
 		// FIXME: Only works for *nix systems.
-		$grep = shell_exec( 'ps aux | grep "unbabble migrate-wpml run\|unbabble migrate-wpml restart" | grep -v grep | awk \'{print $2}\'' );
+		$grep = shell_exec( 'ps aux | grep "ubb migrate-wpml run\|ubb migrate-wpml restart" | grep -v grep | awk \'{print $2}\'' );
 		$rows = explode( "\n", $grep );
 		if ( count( $rows ) < 1 ) {
 			return 0;
@@ -166,6 +173,7 @@ class Migrator {
 	/**
 	 * Migrates translation groups from WPML to Unbabble.
 	 *
+	 * @since 0.5.0 Two filters added to skip setting language and/or source.
 	 * @since 0.0.3
 	 *
 	 * @param string $sql
@@ -224,12 +232,47 @@ class Migrator {
 				if ( empty( $lang ) ) {
 					continue;
 				}
+
+				/**
+				 * Filters whether to skip the migration into Unbabble, setting language and
+				 * source, for a specific object (post/term).
+				 *
+				 * @since 0.5.0
+				 *
+				 * @param bool   $skip Whether to skip the migration.
+				 * @param array  $row  Row data from WPML's icl_translations table.
+				 * @param string $type Content type, post or tax.
+				 * @param string $lang Locale code.
+				 */
+				if ( \apply_filters( 'ubb_wpml_migrate_skip', false, $row, $type, $lang ) ) {
+					continue;
+				}
+
 				if ( $type === 'post' ) {
 					// TODO: should we force it?
 					LangInterface::set_post_language( $row['object_id'], $lang, true );
-					LangInterface::set_post_source( $row['object_id'], $source_id, true );
 				} else {
 					LangInterface::set_term_language( $row['object_id'], $lang, true );
+				}
+
+				/**
+				 * Filters whether to skip setting of ubb_source for a specific object (post/term).
+				 *
+				 * @since 0.5.0
+				 *
+				 * @param bool   $skip Whether to skip the migration.
+				 * @param array  $row  Row data from WPML's icl_translations table.
+				 * @param string $type Content type, post or tax.
+				 * @param string $lang Locale code.
+				 */
+				if ( \apply_filters( 'ubb_wpml_migrate_skip_source', false, $row, $type, $lang ) ) {
+					continue;
+				}
+
+				if ( $type === 'post' ) {
+					// TODO: should we force it?
+					LangInterface::set_post_source( $row['object_id'], $source_id, true );
+				} else {
 					LangInterface::set_term_source( $row['object_id'], $source_id, true );
 				}
 			}

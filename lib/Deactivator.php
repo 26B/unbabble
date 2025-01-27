@@ -28,7 +28,7 @@ class Deactivator {
 			] );
 
 			foreach ( $sites as $site ) {
-				\switch_to_blog( $site['blog_id'] );
+				\switch_to_blog( $site->blog_id );
 				static::single_deactivate( $network_wide );
 			}
 

@@ -64,3 +64,11 @@ Thumbs.db
 *.bak
 *.swp
 *.orig
+
+# PHPUnit Files #
+#################
+.phpunit.result.cache
+
+# JS #
+######
+*.js.map

@@ -18,9 +18,10 @@ class SetLanguage {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! in_array( 'attachment', Options::get_allowed_post_types(), true ) ) {
+		if ( ! LangInterface::is_post_type_translatable( 'attachment' ) ) {
 			return;
 		}
+
 		\add_action( 'add_attachment', [ $this, 'set_language_on_attachment' ] );
 	}
 

@@ -18,9 +18,6 @@ class Routing {
 	 * @since 0.0.3
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Fix non-empty queries for non-default language homepage.
 		add_action( 'parse_request', [ $this, 'remove_lang_from_empty_queries' ] );

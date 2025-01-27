@@ -17,11 +17,13 @@ class Customize {
 	/**
 	 * Register hooks.
 	 *
+	 * @since 0.4.5 Add check for translatable nav_menu.
 	 * @since 0.0.3
 	 */
 	public function register() {
-		global $pagenow;
-		if ( ! Options::should_run_unbabble() ) {
+
+		// Only register customize hooks if nav_menu is translatable.
+		if ( ! LangInterface::is_taxonomy_translatable( 'nav_menu' ) ) {
 			return;
 		}
 
@@ -32,50 +34,69 @@ class Customize {
 
 		// Options saving and loading.
 		$theme   = get_option( 'stylesheet' );
-		$options = ['page_on_front','show_on_front','page_for_posts', "theme_mods_$theme" ];
-		foreach ( $options as $option_name ) {
-			add_filter( "pre_option_{$option_name}", [ $this, 'pre_get_option_proxy' ], 10, 2 );
-			add_filter( "pre_update_option_{$option_name}", [ $this, 'pre_update_option_proxy' ], 10, 3 );
-		}
+		add_filter( 'ubb_proxy_options', fn ( $options ) => array_merge(
+			$options,
+			[ 'page_on_front','show_on_front','page_for_posts', "theme_mods_$theme" ]
+		) );
 
 		// Set menu language when created.
 		add_action( 'create_nav_menu', [ $this, 'set_menu_lang' ], 10, 2 );
 
 		// Add script for language metabox for nav menu.
-		if ( $pagenow === 'nav-menus.php' && ( $_GET['action'] ?? '' ) !== 'locations' ) {
-			add_action( 'admin_footer', array( $this, 'nav_menu_lang_metaboxes' ), 10 );
-		}
+		add_action( 'init', function () {
+			global $pagenow;
+			if ( $pagenow === 'nav-menus.php' && ( $_GET['action'] ?? '' ) !== 'locations' ) {
+				add_action( 'admin_footer', array( $this, 'nav_menu_lang_metaboxes' ), 10 );
+			}
+		} );
 	}
 
 	/**
 	 * Add lang metaboxes to nav menu edit.
 	 *
+	 * @since 0.5.7 Fetch menu id from $_REQUEST only if the action is not delete.
+	 * @since 0.4.5 Add hidden input `ubb_source` for new menu's when linking.
+	 * @since 0.4.2 Added surrounding <table> and <tbody> to the term meta box. Changed ob_get_flush to ob_get_clean.
 	 * @since 0.0.3
 	 *
 	 * @return void
 	 */
 	public function nav_menu_lang_metaboxes() : void {
-		if ( isset( $_REQUEST['menu'] ) ) {
+		if ( isset( $_REQUEST['menu'] ) && ( $_REQUEST['action'] ?? '' ) !== 'delete') {
 			$menu_id = $_REQUEST['menu'];
 		} else {
 			$menu_id = get_user_option( 'nav_menu_recently_edited' );
 		}
 
-		if ( empty( $menu_id ) ) {
+		// If menu id is empty and ubb_source is not set, return.
+		if ( empty( $_GET['ubb_source'] ?? false ) && empty( $menu_id ) ) {
 			return;
 		}
 
-		// TODO: Using term meta box has its problems, refactor into a better system of metaboxing.
-		ob_start();
-		( new Terms\LangMetaBox() )->edit_term_language_metabox( get_term( $menu_id ) );
-		$term_meta_box = ob_get_flush();
+		// Add hidden ubb_source for new menu's.
+		if ( empty( $menu_id ) ) {
+			$html = sprintf(
+				'<input type="hidden" id="ubb_source" name="ubb_source" value="%s">',
+				esc_sql( $_GET['ubb_source'] )
+			);
 
-		$html  = '<div class="ubb-menu-settings">';
-		$html .= '<h3>' . __( 'Language' ) . '</h3>';
-		$html .= $term_meta_box;
-		$html .= '</div>';
+		// Otherwise add normal language metabox.
+		} else {
+			// TODO: Using term meta box has its problems, refactor into a better system of metaboxing.
+			ob_start();
+			( new Terms\LangMetaBox() )->edit_term_language_metabox( get_term( $menu_id ) );
+			$term_meta_box = ob_get_clean();
 
-		$html = str_replace( [ "\t", "\n" ], '', $html );
+			$html  = '<div class="ubb-menu-settings">';
+			$html .= '<h3>' . __( 'Language' ) . '</h3>';
+			$html .= '<table><tbody>';
+			$html .= $term_meta_box;
+			$html .= '</tbody></table>';
+			$html .= '</div>';
+
+			$html = str_replace( [ "\t", "\n" ], '', $html );
+		}
+
 		?>
 		<script type="text/javascript">
 			jQuery(document).ready(function () {
@@ -118,6 +139,8 @@ class Customize {
 			! in_array(
 				$parsed_args['name'],
 				[
+					'page_on_front',
+					'page_for_posts',
 					'_customize-dropdown-pages-page_on_front',
 					'_customize-dropdown-pages-page_for_posts'
 				]
@@ -127,63 +150,18 @@ class Customize {
 			return $output;
 		}
 
+
 		// Get pages filtered by current language.
 		$query = new WP_Query(
 			[
-				'post_type'   => 'page',
-				'post_status' => 'publish',
-				'fields'      => 'ids',
+				'post_type'      => 'page',
+				'post_status'    => 'publish',
+				'fields'         => 'ids',
+				'posts_per_page' => -1
 			]
 		);
 		$parsed_args['include']         = $query->get_posts();
 		$parsed_args['__ubb_filtering'] = true;
 		return wp_dropdown_pages( $parsed_args );
-	}
-
-	/**
-	 * Proxy loading of option.
-	 *
-	 * Always try to load the option from the proxy, even with the default language. This handles
-	 * cases when default language is changed and the values would otherwise be mixed up.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param mixed  $pre_option
-	 * @param string $option
-	 * @return mixed
-	 */
-	public function pre_get_option_proxy( $pre_option, string $option ) {
-		$curr_lang = LangInterface::get_current_language();
-		$ubb_wp_options = get_option( 'ubb_wp_options', [] );
-		return $ubb_wp_options[ $curr_lang ][ $option ] ?? $pre_option;
-	}
-
-	/**
-	 * Proxy updating of option.
-	 *
-	 * Also updates the base WordPress option when the language is the default. This is to keep the
-	 * default information in the core WordPress incase Unbabble is deactivated/uninstalled.
-	 *
-	 * @since 0.0.3
-	 *
-	 * @param mixed $value
-	 * @param mixed $old_value
-	 * @param string $option
-	 * @return mixed
-	 */
-	public function pre_update_option_proxy( $value, $old_value, string $option ) {
-		$curr_lang = LangInterface::get_current_language();
-
-		$ubb_wp_options = get_option( 'ubb_wp_options', [] );
-		$ubb_wp_options[ $curr_lang ][ $option ] = $value;
-		update_option( 'ubb_wp_options', $ubb_wp_options );
-
-		// Update base WordPress option too in case of default language.
-		if ( $curr_lang === Options::get()['default_language'] ) {
-			return $value;
-		}
-
-		// Return old value so the value does not get updated.
-		return $old_value;
 	}
 }

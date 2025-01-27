@@ -5,6 +5,12 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\AdvancedCustomFieldsPro;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
+use TwentySixB\WP\Plugin\Unbabble\CLI;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\ElasticPress;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\Relevanssi;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\SearchWP;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastSEO;
+use WP_CLI;
 
 /**
  * The core plugin class.
@@ -18,6 +24,9 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations;
  * @since 0.0.1
  */
 class Plugin {
+
+	// TODO: move to a more appropriate place.
+	const API_V1 = 'unbabble/v1';
 
 	/**
 	 * The unique identifier of this plugin.
@@ -50,6 +59,30 @@ class Plugin {
 	}
 
 	/**
+	 * Initialize the plugin.
+	 *
+	 * Dependencies and hooks that need to be added as early as possible.
+	 *
+	 * @since 0.2.2
+	 *
+	 * @return void
+	 */
+	public function init() : void {
+		$components = [
+			'router_resolver' => Router\RoutingResolver::class,
+			'locale'          => Language\Locale::class,
+		];
+
+		if ( ! Options::should_run_unbabble() ) {
+			$components = [];
+		}
+
+		foreach ( $components as $component ) {
+			( new $component() )->init();
+		}
+	}
+
+	/**
 	 * Run the loader to execute all the hooks with WordPress.
 	 *
 	 * Load the dependencies, define the locale, and set the hooks for the
@@ -61,6 +94,7 @@ class Plugin {
 		$this->set_locale();
 		$this->define_plugin_hooks();
 		$this->define_api_routes();
+		$this->define_commands();
 		$this->define_integrations();
 	}
 
@@ -103,69 +137,166 @@ class Plugin {
 	/**
 	 * Register all of the hooks related to the plugin's base functionality.
 	 *
+	 * @since 0.4.2 - Added Terms Edit Filters.
 	 * @since  0.0.1
 	 * @access private
 	 */
 	private function define_plugin_hooks() {
 		$components = [
-			'admin'             => new Admin\Admin( $this ),
-			'lang_cookie'       => new Admin\LangCookie( $this ),
-			'options_page'      => new Admin\OptionsPage( $this ),
-			'language_switcher' => new Admin\LanguageSwitcher( $this ),
-			'redirector'        => new Admin\Redirector( $this ),
-			'customize'         => new Admin\Customize( $this ),
+			'admin'             => Admin\Admin::class,
+			'lang_cookie'       => Admin\LangCookie::class,
+			'options_page'      => Admin\OptionsPage::class,
+			'language_switcher' => Admin\LanguageSwitcher::class,
+			'redirector'        => Admin\Redirector::class,
+			'customize'         => Admin\Customize::class,
+			'options_proxy'     => Admin\OptionsProxy::class,
 
-			'multisite_blog_switch' => new Multisite\BlogSwitch( $this ),
+			'multisite_blog_switch' => Multisite\BlogSwitch::class,
 
-			'api_header'     => new API\Header( $this ),
-			'api_query_vars' => new API\QueryVar( $this ),
+			'api_header'     => API\Header::class,
+			'api_query_vars' => API\QueryVar::class,
 
-			'attachments_set_language' => new Attachments\SetLanguage( $this ),
-			'attachments_delete_file' => new Attachments\DeleteFile( $this ),
+			'attachments_set_language' => Attachments\SetLanguage::class,
+			'attachments_delete_file'  => Attachments\DeleteFile::class,
 
-			'posts_create_translation' => new Posts\CreateTranslation( $this ),
-			'posts_link_translation'   => new Posts\LinkTranslation( $this ),
-			'posts_language_filter'    => new Posts\LangFilter( $this ),
-			'posts_change_language'    => new Posts\ChangeLanguage( $this ),
-			'posts_language_metabox'   => new Posts\LangMetaBox( $this ),
-			'posts_admin_notices'      => new Posts\AdminNotices( $this ),
+			'posts_create_translation' => Posts\CreateTranslation::class,
+			'posts_link_translation'   => Posts\LinkTranslation::class,
+			'posts_language_filter'    => Posts\LangFilter::class,
+			'posts_change_language'    => Posts\ChangeLanguage::class,
+			'posts_language_metabox'   => Posts\LangMetaBox::class,
+			'posts_admin_notices'      => Posts\AdminNotices::class,
+			'posts_bulk_edit'          => Posts\BulkEdit::class,
+			'posts_edit_filter'        => Posts\EditFilters::class,
 
-			'terms_language_metabox'   => new Terms\LangMetaBox( $this ),
-			'terms_create_translation' => new Terms\CreateTranslation( $this ),
-			'terms_link_translation'   => new Terms\LinkTranslation( $this ),
-			'terms_change_language'    => new Terms\ChangeLanguage( $this ),
-			'terms_language_filter'    => new Terms\LangFilter( $this ),
-			'terms_admin_notices'      => new Terms\AdminNotices( $this ),
-			'terms_new_term'           => new Terms\NewTerm( $this ),
+			'terms_language_metabox'   => Terms\LangMetaBox::class,
+			'terms_create_translation' => Terms\CreateTranslation::class,
+			'terms_link_translation'   => Terms\LinkTranslation::class,
+			'terms_change_language'    => Terms\ChangeLanguage::class,
+			'terms_language_filter'    => Terms\LangFilter::class,
+			'terms_admin_notices'      => Terms\AdminNotices::class,
+			'terms_new_term'           => Terms\NewTerm::class,
+			'terms_edit_filter'        => Terms\EditFilters::class,
+			'terms_quick_edit'         => Terms\QuickEdit::class,
 
-			'router_resolver'  => new Router\RoutingResolver( $this ),
-			'router_routing'   => new Router\Routing( $this ),
+			'locale'        => Language\Locale::class,
+			'lang_packages' => Language\LanguagePacks::class,
 
-			'lang_frontend' => new Language\Frontend( $this ),
-			'lang_packages' => new Language\LanguagePacks( $this ),
+			'options' => Options::class,
+
+			'router_routing'   => Router\Routing::class,
+			'router_resolver'  => Router\RoutingResolver::class,
 
 			// TODO: Filter the query for attaching an attachment.
 		];
 
+		// TODO: add filter to remove components.
+
+		if ( ! Options::should_run_unbabble() ) {
+			\add_action( 'admin_notices', [ ( new Admin\Admin() ), 'idle_notice' ], PHP_INT_MAX );
+			$components = [ 'options' => Options::class ];
+		}
+
 		foreach ( $components as $component ) {
-			$component->register();
+			if ( method_exists( $component, 'register' ) ) {
+				( new $component() )->register();
+			}
 		}
 	}
 
 	private function define_api_routes() : void {
+		if ( ! Options::should_run_unbabble() ) {
+			return;
+		}
+
 		add_action( 'rest_api_init', function () {
-			$namespace = 'unbabble/v1';
+			$namespace = self::API_V1;
 			( new API\Actions\HiddenContent( $this, $namespace ) )->register();
+			( new API\Gutenberg\Post( $this, $namespace ) )->register();
+			( new API\Options( $this, $namespace ) )->register();
 		} );
 	}
 
+	private function define_commands() : void {
+		$commands = [
+			CLI\Post::class        => 'ubb post',
+			CLI\Term::class        => 'ubb term',
+			CLI\Options::class     => 'ubb options',
+			CLI\Hidden\Post::class => 'ubb post hidden',
+			CLI\Hidden\Term::class => 'ubb term hidden',
+		];
+		\add_action( 'init', function () use ( $commands ) {
+			foreach ( $commands as $cli_class => $command_name ) {
+				if ( class_exists( 'WP_CLI' ) ) {
+					WP_CLI::add_command( $command_name, $cli_class );
+				}
+			}
+		} );
+	}
+
+	/**
+	 * Define the integrations with other plugins.
+	 *
+	 * @since Unreleased Register ACF integration immediatly for field registration.
+	 * @since 0.0.1
+	 *
+	 * @return void
+	 */
 	private function define_integrations() : void {
 		$this->define_integration_migrators();
-		$integrations = [
-			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
+		$immediate_integrations = [
 			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
 		];
-		\add_action( 'admin_init', function() use ( $integrations ) {
+		$admin_integrations = [
+			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
+		];
+
+		// TODO: shouldn't happen but we should make sure that integration classes are not registed twice.
+		$cli_integrations = [
+			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+		];
+
+		$rest_integrations = [
+			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+		];
+
+		$integrations = [
+			Relevanssi::class   => 'relevanssi/relevanssi.php',
+			ElasticPress::class => 'elasticpress/elasticpress.php',
+			YoastSEO::class     => 'wordpress-seo/wp-seo.php',
+			SearchWP::class     => 'searchwp/index.php',
+		];
+
+		foreach ( $immediate_integrations as $integration_class => $plugin_name ) {
+			if ( \is_plugin_active( $plugin_name ) ) {
+				( new $integration_class() )->register();
+			}
+		}
+
+		\add_action( 'admin_init', function() use ( $admin_integrations ) {
+			foreach ( $admin_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'cli_init', function() use ( $cli_integrations ) {
+			foreach ( $cli_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'rest_api_init', function() use ( $rest_integrations ) {
+			foreach ( $rest_integrations as $integration_class => $plugin_name ) {
+				if ( \is_plugin_active( $plugin_name ) ) {
+					( new $integration_class() )->register();
+				}
+			}
+		} );
+
+		\add_action( 'init', function() use ( $integrations ) {
 			foreach ( $integrations as $integration_class => $plugin_name ) {
 				if ( \is_plugin_active( $plugin_name ) ) {
 					( new $integration_class() )->register();

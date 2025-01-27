@@ -18,9 +18,6 @@ class ChangeLanguage {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Priority needs to be before the set post language when post is first saved.
 		\add_action( 'save_post', [ $this, 'change_language' ], PHP_INT_MAX - 10 );

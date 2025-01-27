@@ -18,10 +18,6 @@ class LanguageSwitcher {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		if ( is_admin() ) {
 			add_action( 'admin_bar_menu', [ $this, 'add_switcher_backoffice_admin_bar' ], PHP_INT_MAX - 10 );
 		}
@@ -36,14 +32,21 @@ class LanguageSwitcher {
 	 * @return void
 	 */
 	public function add_switcher_backoffice_admin_bar( \WP_Admin_Bar $wp_admin_bar ) : void {
-		$options = Options::get();
-		$current = LangInterface::get_current_language();
-
-		// TODO: This shouldn't happen. Should always be array.
-		$allowed_languages = is_array( $options['allowed_languages'] ) ? $options['allowed_languages'] : [];
+		$current        = LangInterface::get_current_language();
+		$languages_info = Options::get_languages_info();
+		$current_label  = $current;
+		if ( isset( $languages_info[ $current ] ) ) {
+			$current_label = $languages_info[ $current ]['native_name'];
+		}
 
 		$langs = [];
-		foreach ( $allowed_languages as $allowed_lang ) {
+		foreach ( LangInterface::get_languages() as $allowed_lang ) {
+
+			// Don't show the current language in the list.
+			if ( $allowed_lang === $current ) {
+				continue;
+			}
+
 			// TODO: Better way of handling this.
 			if (
 				( ! isset( $_REQUEST['post'] ) || ! is_numeric( $_REQUEST['post'] ) )
@@ -56,37 +59,33 @@ class LanguageSwitcher {
 				$url = $this->make_switch_post_url( $_REQUEST['post'], $allowed_lang );
 			}
 
-			$langs[] = sprintf(
-				'<li><a class="ab-item" style="min-width:36px" href="%1$s" %2$s>%3$s</a></li>',
-				$url,
-				\selected( $allowed_lang, $current, false ),
-				$allowed_lang
-			);
+			$lang_label = $allowed_lang;
+			if ( isset( $languages_info[ $allowed_lang ] ) ) {
+				$lang_label = $languages_info[ $allowed_lang ][ 'native_name' ];
+			}
+
+			$langs[ $lang_label ] = [ $allowed_lang, $url ];
 		}
 
-		$html = sprintf(
-			'<ul><li class="menupop">
-				%1$s
-				<div class="ab-sub-wrapper">
-				<ul class="ab-submenu">
-				%2$s
-				</ul>
-				</div>
-			</li></ul>',
-			$current,
-			implode( '', $langs )
-		);
-
 		$wp_admin_bar->add_node(
-			(object) [
-				'id'     => 'ubb_lang_switcher',
-				'title'  => $html,
-				'parent' => '',
-				'href'   => '',
-				'group'  => '',
-				'meta'   => [],
+			[
+				'id'    => 'ubb_lang_switcher',
+				'title' => "<span style='display: inline-block; vertical-align: middle; margin-right: 5px; height: 24px;' class='dashicons-before dashicons-translation'></span>{$current_label}",
 			]
 		);
+
+		foreach ( $langs as $lang_label => $lang_info ) {
+			list( $lang_code, $url ) = $lang_info;
+
+			$node = [
+				'parent' => 'ubb_lang_switcher',
+				'id'     => 'ubb_lang_switcher-' . $lang_code,
+				'title'  => $lang_label,
+				'href'   => $url,
+			];
+
+			$wp_admin_bar->add_node( $node );
+		}
 	}
 
 	/**

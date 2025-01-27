@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\API;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -17,9 +18,6 @@ class QueryVar {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 		\add_filter( 'rest_pre_dispatch', [ $this, 'set_lang_query_var' ], 1, 3 );
 	}
 
@@ -39,7 +37,7 @@ class QueryVar {
 	public function set_lang_query_var( mixed $result, \WP_REST_Server $server, \WP_REST_Request $request ) {
 		$lang = str_replace( '-', '_', esc_sql( $request->get_param( 'lang' ) ) );
 		if (
-			in_array( $lang, Options::get()['allowed_languages'], true )
+			LangInterface::is_language_allowed( $lang )
 			&& empty( get_query_var( 'lang', '' ) )
 		) {
 			set_query_var( 'lang', $lang );

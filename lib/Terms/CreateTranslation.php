@@ -20,9 +20,6 @@ class CreateTranslation {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
 
 		// Redirect to create new translation.
 		\add_action( 'saved_term', [ $this, 'redirect_to_new' ], PHP_INT_MAX, 4 );
@@ -35,6 +32,8 @@ class CreateTranslation {
 	/**
 	 * Redirect to new term creation page to make a new translation.
 	 *
+	 * @since 0.5.0 Add post type to create redirect.
+	 * @since 0.4.5 Add redirect for nav_menu translation create.
 	 * @since 0.0.1
 	 *
 	 * @param int    $term_id
@@ -46,7 +45,7 @@ class CreateTranslation {
 	public function redirect_to_new( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
 		if (
 			! $update
-			|| ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true )
+			|| ! LangInterface::is_taxonomy_translatable( $taxonomy )
 			|| ! ( $_POST['ubb_redirect_new'] ?? false )
 		) {
 			return;
@@ -56,7 +55,7 @@ class CreateTranslation {
 		$lang_create = $_POST['ubb_create'] ?? '';
 		if (
 			empty( $lang_create )
-			|| ! in_array( $lang_create, Options::get()['allowed_languages'] )
+			|| ! LangInterface::is_language_allowed( $lang_create )
 			// TODO: check if term_id has this language already
 		) {
 			// TODO: What else to do when this happens.
@@ -64,14 +63,35 @@ class CreateTranslation {
 			return;
 		}
 
+		// Check if create is for menu's and handle differently.
+		if ( LangInterface::is_taxonomy_translatable( 'nav_menu' ) && $term_id === (int) ( $_POST['menu'] ?? '' ) ) {
+			wp_safe_redirect(
+				add_query_arg(
+					[
+						'action'     => 'edit',
+						'menu'       => 0,
+						'lang'       => $lang_create,
+						'ubb_source' => $term_id,
+					],
+					admin_url( 'nav-menus.php' )
+				),
+				302,
+				'Unbabble'
+			);
+			exit;
+		}
+
 		// TODO: Add something in the page to show that a translation is being saved. Use existence of ubb_source.
 		wp_safe_redirect(
 			add_query_arg(
-				[
-					'taxonomy'   => $taxonomy,
-					'lang'       => $lang_create,
-					'ubb_source' => $term_id,
-				],
+				array_filter(
+					[
+						'taxonomy'   => $taxonomy,
+						'lang'       => $lang_create,
+						'ubb_source' => $term_id,
+						'post_type'  => $_REQUEST['ubb_post_type'] ?? '',
+					]
+				),
 				admin_url( 'edit-tags.php' )
 			),
 			302,
@@ -92,10 +112,9 @@ class CreateTranslation {
 	 * @return void
 	 */
 	public function set_new_source( int $term_id, int $tt_id, string $taxonomy, bool $update ) : void {
-		$allowed_taxonomies = Options::get_allowed_taxonomies();
 		if (
 			$update
-			|| ! in_array( $taxonomy, $allowed_taxonomies, true )
+			|| ! LangInterface::is_taxonomy_translatable( $taxonomy )
 			|| ! isset( $_POST['ubb_source'] )
 			|| ! is_numeric( $_POST['ubb_source'] )
 		) {
@@ -103,12 +122,12 @@ class CreateTranslation {
 		}
 
 		$src_term = get_term( \sanitize_text_field( $_POST['ubb_source'] ), $taxonomy );
-		if ( $src_term === null || ! in_array( $src_term->taxonomy, $allowed_taxonomies, true ) ) {
+		if ( $src_term === null || ! LangInterface::is_taxonomy_translatable( $src_term->taxonomy ) ) {
 			return;
 		}
 
 		$original_source = LangInterface::get_term_source( $src_term->term_id );
-		if ( $original_source === null ) {
+		if ( empty( $original_source ) ) {
 			$original_source = LangInterface::get_new_term_source_id();
 			LangInterface::set_term_source( $src_term->term_id, $original_source );
 		}
@@ -122,7 +141,7 @@ class CreateTranslation {
 		if ( ! $update ) {
 			return;
 		}
-		if ( ! in_array( $taxonomy, Options::get_allowed_taxonomies(), true ) ) {
+		if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
 			return;
 		}
 		if ( ! ( $_POST['ubb_save_create'] ?? false ) ) {
@@ -134,7 +153,7 @@ class CreateTranslation {
 		$lang_create = $_POST['ubb_create'] ?? '';
 		if (
 			empty( $lang_create )
-			|| ! in_array( $lang_create, Options::get()['allowed_languages'] )
+			|| ! LangInterface::is_language_allowed( $lang_create )
 			// TODO: check if term_id has this language already
 		) {
 			// TODO: What else to do when this happens.
@@ -165,7 +184,6 @@ class CreateTranslation {
 		}
 
 		$source_id = LangInterface::get_term_source( $term_id );
-		error_log( print_r( 'Source -' . $source_id, true ) );
 
 		// If first translations. set source on the original term.
 		if ( ! $source_id ) {
@@ -183,7 +201,6 @@ class CreateTranslation {
 			return;
 		}
 
-		error_log( print_r( get_edit_term_link( $new_term_id, $taxonomy, '&' ), true ) );
 		wp_safe_redirect( get_edit_term_link( $new_term_id, $taxonomy, '&' ) . "&lang={$lang_create}", 302, 'Unbabble' );
 		exit;
 	}

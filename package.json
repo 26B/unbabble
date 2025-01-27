@@ -1,41 +1,51 @@
 {
-  "name": "unbabble",
-  "version": "0.0.0",
-  "description": "Unbabble WordPress Plugin interfaces.",
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "build": "wp-scripts build",
-    "check-engines": "wp-scripts check-engines",
-    "check-licenses": "wp-scripts check-licenses",
-    "format": "wp-scripts format",
-    "lint:css": "wp-scripts lint-style",
-    "lint:js": "wp-scripts lint-js",
-    "lint:md:docs": "wp-scripts lint-md-docs",
-    "lint:md:js": "wp-scripts lint-md-js",
-    "lint:pkg-json": "wp-scripts lint-pkg-json",
-    "packages-update": "wp-scripts packages-update",
-    "plugin-zip": "wp-scripts plugin-zip",
-    "start": "wp-scripts start",
-    "test:e2e": "wp-scripts test-e2e",
-    "test:unit": "wp-scripts test-unit-js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/26B/unbabble.git"
-  },
-  "keywords": [
-    "wordpress",
-    "wp-plugin"
-  ],
-  "author": "26B",
-  "license": "AGPL-3.0",
-  "bugs": {
-    "url": "https://github.com/26B/unbabble/issues"
-  },
-  "homepage": "https://github.com/26B/unbabble#readme",
-  "devDependencies": {
-    "@wordpress/scripts": "^22.3.0"
-  }
+	"name": "unbabble",
+	"version": "0.0.0",
+	"description": "Unbabble WordPress Plugin interfaces.",
+	"directories": {
+		"lib": "lib"
+	},
+	"scripts": {
+		"build": "wp-scripts build",
+		"check-engines": "wp-scripts check-engines",
+		"check-licenses": "wp-scripts check-licenses",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"lint:md:docs": "wp-scripts lint-md-docs",
+		"lint:md:js": "wp-scripts lint-md-js",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start",
+		"test:e2e": "wp-scripts test-e2e",
+		"test:unit": "wp-scripts test-unit-js",
+		"wp-env": "wp-env",
+		"wp-env:start": "wp-env start",
+		"wp-env:stop": "wp-env stop",
+		"wp-env:update": "wp-env start --update",
+		"composer": "wp-env run cli --env-cwd=wp-content/plugins/unbabble composer",
+		"wp": "wp-env run cli --env-cwd=wp-content/plugins/unbabble wp"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/26B/unbabble.git"
+	},
+	"keywords": [
+		"wordpress",
+		"wp-plugin"
+	],
+	"author": "26B",
+	"license": "AGPL-3.0",
+	"bugs": {
+		"url": "https://github.com/26B/unbabble/issues"
+	},
+	"homepage": "https://github.com/26B/unbabble#readme",
+	"devDependencies": {
+		"@wordpress/env": "^10.3.0",
+		"@wordpress/scripts": "^27.0.0"
+	},
+	"dependencies": {
+		"@wordpress/icons": "^10.3.0"
+	}
 }

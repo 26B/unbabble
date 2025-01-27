@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Language;
 
+use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 
 /**
@@ -17,10 +18,6 @@ class LanguagePacks {
 	 * @since 0.0.1
 	 */
 	public function register() {
-		if ( ! Options::should_run_unbabble() ) {
-			return;
-		}
-
 		\add_action( 'admin_init', [ $this, 'install_lang_packs' ] );
 	}
 
@@ -42,7 +39,7 @@ class LanguagePacks {
 			return;
 		}
 
-		$allowed_languages      = Options::get()['allowed_languages'];
+		$allowed_languages      = LangInterface::get_languages();
 		$installed_languages    = array_merge( [ 'en_US' ], \get_available_languages() );
 		$missing_language_packs = array_diff( $allowed_languages, $installed_languages );
 		if ( empty( $missing_language_packs ) ) {
@@ -55,5 +52,9 @@ class LanguagePacks {
 				error_log( "Failure to download language pack for language {$lang_code}." );
 			}
 		}
+
+		// TODO: if the language is not recognized by WordPress, remove from options.
+		// TODO: Add notices.
+		// TODO: Keep an option with the list of languages on WordPress. in LangInterface get_languages, check if its in this option. Remove if not.
 	}
 }
