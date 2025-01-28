@@ -511,6 +511,7 @@ class Options {
 	/**
 	 * Fetches the options value from the database.
 	 *
+	 * @since Unreleased Check plugin is active when the blog is currently switched.
 	 * @since 0.4.1
 	 *
 	 * @param  ?int $blog_id
@@ -518,7 +519,14 @@ class Options {
 	 */
 	private static function fetch_options_value( ?int $blog_id = null ) : mixed {
 		global $wpdb;
+
 		if ( $blog_id === null || ! \is_multisite() ) {
+
+			// If the blog is switched currently, check if the plugin is active.
+			if ( \is_multisite() && \ms_is_switched() && ! \is_plugin_active( 'unbabble/unbabble.php' ) ) {
+				return null;
+			}
+
 			return \get_option( 'ubb_options' );
 		}
 
@@ -540,23 +548,5 @@ class Options {
 
 		$ubb_options = maybe_unserialize( $options['ubb_options']->option_value ?? [] );
 		return empty( $ubb_options ) ? null : $ubb_options;
-	}
-
-	/**
-	 * Fetches the options value from the database via WPDB.
-	 *
-	 * @since Unreleased
-	 *
-	 * @param  int $blog_id
-	 * @return array
-	 */
-	public static function get_via_wpdb( int $blog_id ) : array {
-		global $wpdb;
-		$blog_prefix = $wpdb->get_blog_prefix( $blog_id );
-		$options     = $wpdb->get_var( "SELECT option_value FROM {$blog_prefix}options WHERE option_name = 'ubb_options' LIMIT 1" );
-		if ( empty( $options ) ) {
-			return self::defaults();
-		}
-		return maybe_unserialize( $options );
 	}
 }
