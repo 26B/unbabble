@@ -8,14 +8,14 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 /**
  * For hooks related to multisite and blog switching.
  *
- * @since 0.0.3
+ * @since Unreleased
  */
 class BlogSwitch {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since 0.0.3
+	 * @since Unreleased
 	 */
 	public function register() {
 		if ( ! Options::should_run_unbabble() || ! is_multisite() ) {
@@ -28,7 +28,7 @@ class BlogSwitch {
 	/**
 	 * Set the language correctly when switching and restoring the current blog.
 	 *
-	 * @since 0.0.3
+	 * @since Unreleased
 	 *
 	 * @param int    $new_blog_id
 	 * @param int    $prev_blog_id
@@ -36,50 +36,98 @@ class BlogSwitch {
 	 * @return void
 	 */
 	public function switch_blog( int $new_blog_id, int $prev_blog_id, string $context ) : void {
-		global $ubb_switch_stack;
-
 		if ( $context === 'switch' ) {
-			// Figure out language of where we came from (if $_GET['lang'] is present use that, otherwise fetch via options.)
-			if ( isset( $_GET['lang'] ) ) {
-				$lang = $_GET['lang'];
-			} else if ( is_admin() && isset( $_COOKIE['ubb_lang'] ) ) {
-				$lang = $_COOKIE['ubb_lang'];
-			} else {
-				$lang = $this->get_default_lang_from_blog( $prev_blog_id );
-			}
-
-			// TODO: what if lang is null or empty string?
-			if ( ! isset( $ubb_switch_stack ) ) {
-				$ubb_switch_stack = [];
-			}
-
-			// Save language in stack.
-			$ubb_switch_stack[] = $lang;
-
-			// Set language according to previous language.
-			if ( ! LangInterface::set_current_language( $lang ) ) {
-				LangInterface::set_current_language( Options::get()['default_language'] );
-			}
+			$this->handle_switch( $new_blog_id, $prev_blog_id );
 
 		} else if ( $context === 'restore' ) {
-			$lang = array_pop( $ubb_switch_stack );
-			if ( $lang === null ) {
-				set_query_var( 'lang', false );
-			} else {
-				LangInterface::set_current_language( $lang );
-			}
+			$this->handle_restore();
 		}
 	}
 
 	/**
-	 * Get the default language from a blog.
+	 * Handle switching the blog.
 	 *
-	 * @since 0.0.3
+	 * @since Unreleased
+	 *
+	 * @param int $new_blog_id
+	 * @param int $prev_blog_id
+	 * @return void
+	 */
+	private function handle_switch( int $new_blog_id, int $prev_blog_id ) : void {
+		global $ubb_switch_stack;
+
+		// Put previous language into the stack.
+		$lang = $this->get_lang_for_stack( $prev_blog_id );
+		if ( ! isset( $ubb_switch_stack ) ) {
+			$ubb_switch_stack = [];
+		}
+
+		// Save language in stack.
+		$ubb_switch_stack[] = $lang;
+
+		// Set language to the new blog.
+		$new_options = Options::get_via_wpdb( $new_blog_id );
+
+		// If the previous language is in the new blog's languages, set it.
+		if ( in_array( $lang, LangInterface::get_languages( $new_options ), true ) ) {
+			\set_query_var( 'lang', $lang );
+
+		} else {
+
+			// If the language is not in the new blog's languages, set it to the default language of the new blog.
+			\set_query_var( 'lang', $new_options['default_language'] );
+		}
+	}
+
+	/**
+	 * Handle restoring the blog.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
+	private function handle_restore() : void {
+		global $ubb_switch_stack;
+
+		$lang = array_pop( $ubb_switch_stack );
+		if ( $lang === null ) {
+			\set_query_var( 'lang', false );
+
+		} else {
+			\set_query_var( 'lang', $lang );
+		}
+	}
+
+	/**
+	 * Get the language for the stack.
+	 *
+	 * @since Unreleased
 	 *
 	 * @param int $blog_id
 	 * @return string
 	 */
-	private function get_default_lang_from_blog( int $blog_id ) : string {
-		return Options::get_via_wpdb( $blog_id )['default_language'];
+	private function get_lang_for_stack( int $blog_id ) : string {
+		$prev_options = Options::get_via_wpdb( $blog_id );
+
+		// Figure out language of where we came from.
+		$lang = get_query_var( 'lang', null );
+
+		if ( empty( $lang ) && isset( $_GET['lang'] ) ) {
+			$lang = $_GET['lang'];
+		}
+
+		if ( empty( $lang ) && is_admin() ) {
+			$lang = $_COOKIE['ubb_lang'] ?? null;
+		}
+
+		// If the language is not set or is not in the previous blog's languages, set it to the previous blog's default language.
+		if (
+			empty( $lang )
+			|| ! in_array( $lang, LangInterface::get_languages( $prev_options ), true )
+		) {
+			$lang = $prev_options['default_language'] ?? null;
+		}
+
+		return $lang;
 	}
 }

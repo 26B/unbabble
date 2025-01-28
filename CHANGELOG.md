@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Setting Advanced Custom Fields fields as translatable automatically when they are registered.
+- Multisite language handling when the blog is switched.
+- Options method to fetch them from another multisite blog via a query.
 
 ### Changed
 

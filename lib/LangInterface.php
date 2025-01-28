@@ -20,12 +20,28 @@ class LangInterface {
 	/**
 	 * Returns an array of the available languages.
 	 *
+	 * @since Unreleased Add argument for options to override the current Options::get().
 	 * @since 0.0.11
 	 *
+	 * @param ?array $options Array of Unbabble's options, by default null and the options are fetched via the Options class.
 	 * @return array
 	 */
-	public static function get_languages() : array {
-		$options           = Options::get();
+	public static function get_languages( ?array $options = null ) : array {
+
+		// If options are passed, standardize and validate them.
+		if ( is_array( $options ) ) {
+			$options = Options::standardize( $options );
+			$errors = Options::validate( $options );
+			if ( ! empty( $errors ) ) {
+				$options = null;
+			}
+		}
+
+		// If options are not passed or are invalid, get the current ones.
+		if ( ! is_array( $options ) ) {
+			$options = Options::get();
+		}
+
 		$allowed_languages = $options['allowed_languages'];
 
 		// Don't filter languages on admin.
@@ -120,10 +136,7 @@ class LangInterface {
 			$lang = $_COOKIE['ubb_lang'] ?? null;
 		}
 
-		if ( ! isset( $lang ) ) {
-			$lang = self::get_default_language();
-
-		} else if ( ! self::is_language_allowed( $lang ) ) {
+		if ( ! isset( $lang ) || ! self::is_language_allowed( $lang ) ) {
 			$lang = self::get_default_language();
 		}
 
