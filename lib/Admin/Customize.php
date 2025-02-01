@@ -160,7 +160,7 @@ class Customize {
 				'posts_per_page' => -1
 			]
 		);
-		$parsed_args['include']         = $query->get_posts();
+		$parsed_args['include']         = $query->posts ?? [];
 		$parsed_args['__ubb_filtering'] = true;
 		return wp_dropdown_pages( $parsed_args );
 	}
