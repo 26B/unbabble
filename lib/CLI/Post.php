@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\CLI;
 
+use TwentySixB\WP\Plugin\Unbabble\Cache\Keys;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use WP_CLI;
 
@@ -100,6 +101,11 @@ class Post extends Command {
 		$status = LangInterface::set_post_language( $post_id, $target_language, true );
 		if ( ! $status ) {
 			WP_CLI::error( "Failed to change language." );
+		}
+
+		if ( $post_language === null ) {
+			// Delete the posts with missing language transient since it's no longer missing.
+			delete_transient( sprintf( Keys::POST_TYPE_MISSING_LANGUAGE, get_post_type( $post_id ) ) );
 		}
 
 		WP_CLI::success( "Language changed to {$target_language}." );

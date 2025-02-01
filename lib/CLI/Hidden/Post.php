@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\CLI\Hidden;
 
+use TwentySixB\WP\Plugin\Unbabble\Cache\Keys;
 use TwentySixB\WP\Plugin\Unbabble\CLI\Command;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
@@ -238,6 +239,9 @@ class Post extends Command {
 			$success_lines = $lines;
 			foreach ( $success_post_type as $post_type => $count ) {
 				$success_lines[ $post_type ] = [ $post_type, $count ];
+
+				// Delete the posts with missing language transient since it's no longer missing.
+				delete_transient( sprintf( Keys::POST_TYPE_MISSING_LANGUAGE, $post_type ) );
 			}
 			self::log_color( '%4' . __( 'Successful updates', 'unbabble' ) . '%N' );
 			$this->format_lines_and_log( $success_lines, 2 );

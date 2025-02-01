@@ -2,6 +2,7 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use TwentySixB\WP\Plugin\Unbabble\Cache\Keys;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
@@ -86,29 +87,37 @@ class AdminNotices {
 			return;
 		}
 
-		$allowed_languages  = implode( "','", LangInterface::get_languages() );
-		$translations_table = ( new PostTable() )->get_table_name();
-		$bad_posts          = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT ID
-				FROM {$wpdb->posts} as P
-				WHERE ID NOT IN (
-					SELECT post_id
-					FROM {$translations_table} as PT
-					WHERE PT.locale IN ('{$allowed_languages}')
-				) AND post_type = %s AND post_status != 'auto-draft'",
-				esc_sql( $post_type )
-			)
-		);
+		// Check if the cache exists.
+		$cache_key       = sprintf( Keys::POST_TYPE_MISSING_LANGUAGE, $post_type );
+		$bad_posts_count = get_transient( $cache_key );
+		if ( ! is_numeric( $bad_posts_count ) ) {
+			$allowed_languages  = implode( "','", LangInterface::get_languages() );
+			$translations_table = ( new PostTable() )->get_table_name();
+			$bad_posts          = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT ID
+					FROM {$wpdb->posts} as P
+					WHERE ID NOT IN (
+						SELECT post_id
+						FROM {$translations_table} as PT
+						WHERE PT.locale IN ('{$allowed_languages}')
+					) AND post_type = %s AND post_status != 'auto-draft'",
+					esc_sql( $post_type )
+				)
+			);
 
-		if ( count( $bad_posts ) === 0 ) {
+			$bad_posts_count = count( $bad_posts );
+			set_transient( $cache_key, $bad_posts_count, 30 );
+		}
+
+		if ( $bad_posts_count === 0 ) {
 			return;
 		}
 
 		$message = _n(
 			'There is %1$s post without language or with an unknown language. <a href="%2$s">See post</a>',
 			'There are %1$s posts without language or with an unknown language. <a href="%2$s">See posts</a>',
-			count( $bad_posts ),
+			$bad_posts_count,
 			'unbabble'
 		);
 
@@ -121,7 +130,7 @@ class AdminNotices {
 			'<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>',
 			sprintf(
 				$message,
-				count( $bad_posts ),
+				$bad_posts_count,
 				$url
 			)
 		);

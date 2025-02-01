@@ -227,16 +227,21 @@ class Admin {
 			$screen = get_current_screen();
 		}
 
-		if (
-			! $screen instanceof WP_Screen
-			|| $screen->base !== 'post'
-		) {
+		if ( ! $screen instanceof WP_Screen ) {
+			return false;
+		}
+
+		if ( $screen->base === 'toplevel_page_' . 'unbabble_options' ) {
 			return true;
+		}
+
+		if ( $screen->base !== 'post' ) {
+			return false;
 		}
 
 		$post_type = get_post_type();
 		if ( ! $post_type ) {
-			return true;
+			return false;
 		}
 
 		return LangInterface::is_post_type_translatable( get_post_type() );

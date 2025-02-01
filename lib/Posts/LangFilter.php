@@ -63,13 +63,13 @@ class LangFilter {
 		 * Check if all the post_types in the query are translatable. If so, we don't need to do
 		 * a UNION with all the untranslatable posts.
 		 */
+		$query_fully_translatable = true;
 		$post_types = $query->get( 'post_type', null );
 		if ( ! empty( $post_types ) ) {
 			if ( ! is_array( $post_types ) ) {
 				$post_types = [ $post_types ];
 			}
 
-			$query_fully_translatable = true;
 			foreach ( $post_types as $post_type ) {
 				if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
 					$query_fully_translatable = false;

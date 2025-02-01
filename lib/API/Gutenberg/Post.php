@@ -3,6 +3,7 @@
 namespace TwentySixB\WP\Plugin\Unbabble\API\Gutenberg;
 
 use Throwable;
+use TwentySixB\WP\Plugin\Unbabble\Cache\Keys;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Plugin;
@@ -146,6 +147,9 @@ class Post {
 				if ( ! LangInterface::set_post_language( $post_id, $new_language ) ) {
 					return new WP_REST_Response( null, 400 );
 				}
+
+				// Delete the posts with missing language transient since it's no longer missing.
+				delete_transient( sprintf( Keys::POST_TYPE_MISSING_LANGUAGE, get_post_type( $post_id ) ) );
 
 			} else {
 				if ( ! LangInterface::change_post_language( $post_id, $new_language ) ) {

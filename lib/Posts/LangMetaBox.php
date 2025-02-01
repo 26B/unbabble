@@ -2,7 +2,9 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Posts;
 
+use FCG\Lib\Website\WP\Lang;
 use TwentySixB\WP\Plugin\Unbabble\Admin\Admin;
+use TwentySixB\WP\Plugin\Unbabble\Cache\Keys;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use WP_Post;
@@ -115,10 +117,6 @@ class LangMetaBox {
 			return;
 		}
 
-		// if ( ! $this->verify_nonce( 'ubb_language_metabox', 'ubb_language_metabox_nonce' ) ) {
-		// 	return;
-		// }
-
 		if (
 			get_post_type( $post_id ) === 'revision'
 			|| isset( $_POST['ubb_copy_new'] ) // Don't set post language when copying to a translation.
@@ -130,6 +128,11 @@ class LangMetaBox {
 
 		if ( ! isset( $_POST['ubb_lang'] ) ) {
 			return;
+		}
+
+		// Delete the posts with missing language transient if the post didn't have a language before.
+		if ( empty( LangInterface::get_post_language( $post_id ) ) ) {
+			delete_transient( sprintf( Keys::POST_TYPE_MISSING_LANGUAGE, $post_type ) );
 		}
 
 		// Sanitize the user input.

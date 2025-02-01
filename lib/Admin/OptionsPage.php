@@ -47,15 +47,16 @@ class OptionsPage {
 			101
 		);
 
-		\add_submenu_page(
-			'unbabble_options',
-			'Actions',
-			'Actions',
-			'manage_options',
-			'unbabble_actions',
-			[ $this, 'actions_page_output' ],
-			101
-		);
+		// Broken rn.
+		// \add_submenu_page(
+		// 	'unbabble_options',
+		// 	'Actions',
+		// 	'Actions',
+		// 	'manage_options',
+		// 	'unbabble_actions',
+		// 	[ $this, 'actions_page_output' ],
+		// 	101
+		// );
 	}
 
 	public function add_options_to_page() {

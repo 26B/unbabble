@@ -69,18 +69,17 @@ class EditFilters {
 			return $views;
 		}
 
-		// TODO: Improve query, we don't need the valid count.
 		$posts_count = $wpdb->get_results(
-			"SELECT IF(UBB.locale IN ('{$allowed_languages}'), 'VALID', 'INVALID') as good_locale, COUNT( * ) as count
+			"SELECT COUNT( * ) as count
 				FROM {$wpdb->posts} AS P
 				LEFT JOIN {$post_lang_table} AS UBB ON (P.ID = UBB.post_id)
 				WHERE P.post_type = '{$post_type}'
-				GROUP BY good_locale",
-			OBJECT_K
+				AND ( UBB.locale IS NULL
+					OR UBB.locale NOT IN ('{$allowed_languages}'))",
+			ARRAY_A
 		);
 
-		$valid_count   = $posts_count['VALID']->count ?? 0;
-		$invalid_count = $posts_count['INVALID']->count ?? 0;
+		$invalid_count = $posts_count[0]['count'] ?? 0;
 
 		$url = \add_query_arg( 'ubb_empty_lang_filter', '', 'edit.php' );
 		if ( $post_type !== 'post' ) {
