@@ -46,19 +46,48 @@ class LangFilter {
 				{$wpdb->posts}.ID IN (
 					%s
 				)
-			)",
-			$this->get_lang_filter_where_query()
+			)", // TODO: move the union part here as a differen check condition, ID IN for translatable post types and a .post_type IN for untranslatable post types.
+			$this->get_lang_filter_where_query( $query )
 		);
 
 		return $where;
 	}
 
-	public function get_lang_filter_where_query() : string {
+	public function get_lang_filter_where_query( WP_Query $query ) : string {
 		global $wpdb;
 
+		$current_lang    = \esc_sql( LangInterface::get_current_language() );
+		$post_lang_table = ( new PostTable() )->get_table_name();
+
+		/**
+		 * Check if all the post_types in the query are translatable. If so, we don't need to do
+		 * a UNION with all the untranslatable posts.
+		 */
+		$post_types = $query->get( 'post_type', null );
+		if ( ! empty( $post_types ) ) {
+			if ( ! is_array( $post_types ) ) {
+				$post_types = [ $post_types ];
+			}
+
+			$query_fully_translatable = true;
+			foreach ( $post_types as $post_type ) {
+				if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
+					$query_fully_translatable = false;
+					break;
+				}
+			}
+		}
+
+		$filter_query = "SELECT post_id
+			FROM {$post_lang_table} AS PT
+			WHERE locale = '{$current_lang}'";
+
+		// If all post types are translatable, we don't need to do a UNION.
+		if ( $query_fully_translatable ) {
+			return $filter_query;
+		}
+
 		// TODO: Deal with untranslatable post types.
-		$current_lang            = \esc_sql( LangInterface::get_current_language() );
-		$post_lang_table         = ( new PostTable() )->get_table_name();
 		$translatable_post_types = implode( "','", LangInterface::get_translatable_post_types() );
 
 		/**
@@ -67,10 +96,7 @@ class LangFilter {
 		 *
 		 * Should we only show untranslatable posts that have the default language or NULL.
 		 */
-		return "SELECT post_id
-			FROM {$post_lang_table} AS PT
-			WHERE locale = '{$current_lang}'
-			UNION
+		return $filter_query . " UNION
 			SELECT ID
 			FROM {$wpdb->posts}
 			WHERE post_type NOT IN ('{$translatable_post_types}')";
