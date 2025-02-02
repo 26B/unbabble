@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Registering Advanced Custom Fields integration hooks immediately on Unbabble register instead of waiting for `admin_init`.
+- Improved Posts language filter queries.
 
 ## [0.5.7] - 2024-12-19
 
