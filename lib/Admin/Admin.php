@@ -218,6 +218,7 @@ class Admin {
 	 *
 	 * Stop enqueuing scripts if the current screen is for an untranslatable post type.
 	 *
+	 * @since Unreleased Fix bad enqueueing of scripts. Allow only for translatable post types and the options page.
 	 * @since 0.4.0
 	 *
 	 * @return bool
@@ -227,19 +228,29 @@ class Admin {
 			$screen = get_current_screen();
 		}
 
-		if (
-			! $screen instanceof WP_Screen
-			|| $screen->base !== 'post'
-		) {
+		// If the screen is not available, don't enqueue the scripts.
+		if ( ! $screen instanceof WP_Screen ) {
+			return false;
+		}
+
+		// If the screen is the Unbabble settings page, enqueue the scripts.
+		if ( $screen->base === 'toplevel_page_unbabble_options' ) {
 			return true;
 		}
 
+		// If the screen is not a post, don't enqueue the scripts.
+		if ( $screen->base !== 'post' ) {
+			return false;
+		}
+
+		// If there is no post type, don't enqueue the scripts.
 		$post_type = get_post_type();
 		if ( ! $post_type ) {
-			return true;
+			return false;
 		}
 
-		return LangInterface::is_post_type_translatable( get_post_type() );
+		// Enqueue the scripts if the post type is translatable.
+		return LangInterface::is_post_type_translatable( $post_type );
 	}
 
 	/**
