@@ -87,13 +87,13 @@ class LangFilter {
 			if ( empty( $post_types ) ) {
 				$untranslatable_post_types = array_diff( get_post_types(), $translatable_post_types );
 
-			// Otherwise, we want to filter only the post types passed.
 			} else {
+				// Otherwise, we want to filter only the post types passed.
 				$untranslatable_post_types = array_diff( $post_types, $translatable_post_types );
 			}
 
 			if ( ! empty( $untranslatable_post_types ) ) {
-				$post_types_str = implode( "','", $untranslatable_post_types );
+				$post_types_str           = implode( "','", $untranslatable_post_types );
 				$untranslatable_condition = "OR {$wpdb->posts}.post_type IN ('{$post_types_str}')";
 			}
 		}
