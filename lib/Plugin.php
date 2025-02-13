@@ -234,7 +234,7 @@ class Plugin {
 	/**
 	 * Define the integrations with other plugins.
 	 *
-	 * @since Unreleased Register ACF integration immediatly for field registration.
+	 * @since 0.5.8 Register ACF integration immediatly for field registration.
 	 * @since 0.0.1
 	 *
 	 * @return void

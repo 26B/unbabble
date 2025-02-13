@@ -218,7 +218,7 @@ class Admin {
 	 *
 	 * Stop enqueuing scripts if the current screen is for an untranslatable post type.
 	 *
-	 * @since Unreleased Fix bad enqueueing of scripts. Allow only for translatable post types and the options page.
+	 * @since 0.5.8 Fix bad enqueueing of scripts. Allow only for translatable post types and the options page.
 	 * @since 0.4.0
 	 *
 	 * @return bool

@@ -33,7 +33,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Sets ACF fields as translatable according to their type.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array  $fields
 	 * @param string $prefix
@@ -142,7 +142,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a relationship field is translatable.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $field
 	 *
@@ -161,7 +161,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a post object field is translatable.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $field
 	 *
@@ -180,7 +180,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if an image field is translatable.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $field
 	 *
@@ -196,7 +196,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a file field is translatable.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $field
 	 *
@@ -212,7 +212,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a gallery field is translatable.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $field
 	 *
@@ -228,7 +228,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a taxonomy field is translatable.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $field
 	 *

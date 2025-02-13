@@ -27,7 +27,7 @@ class LangFilter {
 	/**
 	 * Adds where clauses to query in order to filters posts by language, if necessary.
 	 *
-	 * @since Unreleased Moved the where condition to a separate method.
+	 * @since 0.5.8 Moved the where condition to a separate method.
 	 * @since 0.4.2 Remove posts with bad language filter check. Now done directly via the filter `ubb_use_post_lang_filter` hook.
 	 * @since 0.0.1
 	 *
@@ -55,7 +55,7 @@ class LangFilter {
 	/**
 	 * Get the query for filtering posts by language.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $post_types
 	 * @return string
@@ -117,7 +117,7 @@ class LangFilter {
 	 * This query is used to filter posts by language when the upper query does not have a
 	 * post type column, like we do in WP_Query.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.8
 	 *
 	 * @param array $post_types
 	 * @return string
