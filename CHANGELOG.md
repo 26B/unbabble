@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed issues with scripts being enqueued when not needed.
 - Fix missing action entry in $_POST on ajax call for new term.
 
 ## [0.5.7] - 2024-12-19
