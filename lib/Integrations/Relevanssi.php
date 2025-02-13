@@ -14,7 +14,7 @@ class Relevanssi {
 			" AND ( relevanssi.doc IN (
 				%s
 			) )",
-			( new LangFilter() )->get_lang_filter_where_query()
+			( new LangFilter() )->get_lang_filter_union_query()
 		);
 		return $query_restrictions;
 	}

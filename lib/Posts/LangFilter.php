@@ -27,6 +27,7 @@ class LangFilter {
 	/**
 	 * Adds where clauses to query in order to filters posts by language, if necessary.
 	 *
+	 * @since Unreleased Moved the where condition to a separate method.
 	 * @since 0.4.2 Remove posts with bad language filter check. Now done directly via the filter `ubb_use_post_lang_filter` hook.
 	 * @since 0.0.1
 	 *
@@ -41,39 +42,120 @@ class LangFilter {
 			return $where;
 		}
 
-		$where .= sprintf(
-			" AND (
-				{$wpdb->posts}.ID IN (
-					%s
-				)
-			)",
-			$this->get_lang_filter_where_query()
-		);
+		$post_types = $query->get( 'post_type', null );
+		if ( ! is_array( $post_types ) ) {
+			$post_types = [ $post_types ];
+		}
+
+		$where .= $this->get_lang_filter_where_query( array_filter( $post_types ) );
 
 		return $where;
 	}
 
-	public function get_lang_filter_where_query() : string {
+	/**
+	 * Get the query for filtering posts by language.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param array $post_types
+	 * @return string
+	 */
+	public function get_lang_filter_where_query( array $post_types = [] ) : string {
 		global $wpdb;
 
-		// TODO: Deal with untranslatable post types.
 		$current_lang            = \esc_sql( LangInterface::get_current_language() );
 		$post_lang_table         = ( new PostTable() )->get_table_name();
-		$translatable_post_types = implode( "','", LangInterface::get_translatable_post_types() );
+		$translatable_post_types = LangInterface::get_translatable_post_types();
 
 		/**
-		 *  FIXME: possible problem when making a post type untranslatable, the locale info will
-		 *  still be in the table but it should be ignored.
-		 *
-		 * Should we only show untranslatable posts that have the default language or NULL.
+		 * If all post_types passed are translatable, we don't need to do a UNION with all the
+		 * untranslatable posts.
 		 */
-		return "SELECT post_id
-			FROM {$post_lang_table} AS PT
-			WHERE locale = '{$current_lang}'
-			UNION
-			SELECT ID
-			FROM {$wpdb->posts}
-			WHERE post_type NOT IN ('{$translatable_post_types}')";
+		$query_fully_translatable = ! empty( $post_types );
+		foreach ( $post_types as $post_type ) {
+			if ( ! in_array( $post_type, $translatable_post_types, true ) ) {
+				$query_fully_translatable = false;
+				break;
+			}
+		}
+
+		// If not all post types requested are translatable, we don't need the untranslatable.
+		$untranslatable_condition = '';
+		if ( ! $query_fully_translatable ) {
+
+			// If no post types are passed, we want to filter all post types.
+			if ( empty( $post_types ) ) {
+				$untranslatable_post_types = array_diff( get_post_types(), $translatable_post_types );
+
+			} else {
+				// Otherwise, we want to filter only the post types passed.
+				$untranslatable_post_types = array_diff( $post_types, $translatable_post_types );
+			}
+
+			if ( ! empty( $untranslatable_post_types ) ) {
+				$post_types_str           = implode( "','", $untranslatable_post_types );
+				$untranslatable_condition = "OR {$wpdb->posts}.post_type IN ('{$post_types_str}')";
+			}
+		}
+
+		return sprintf(
+			" AND (
+				{$wpdb->posts}.ID IN (
+					SELECT post_id
+					FROM {$post_lang_table} AS PT
+					WHERE locale = '{$current_lang}'
+				)
+				%s
+			)",
+			$untranslatable_condition,
+		);
+	}
+
+	/**
+	 * Get the query for filtering posts by language using a UNION query.
+	 *
+	 * This query is used to filter posts by language when the upper query does not have a
+	 * post type column, like we do in WP_Query.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param array $post_types
+	 * @return string
+	 */
+	public function get_lang_filter_union_query( array $post_types = [] ) : string {
+		global $wpdb;
+
+		$current_lang            = \esc_sql( LangInterface::get_current_language() );
+		$post_lang_table         = ( new PostTable() )->get_table_name();
+		$translatable_post_types = LangInterface::get_translatable_post_types();
+
+		$untranslatable_post_types = [];
+
+		// If no post types are passed, we want to filter all post types.
+		if ( empty( $post_types ) ) {
+			$untranslatable_post_types = array_diff( get_post_types(), $translatable_post_types );
+
+		// Otherwise, we want to filter only the post types passed.
+		} else {
+			$untranslatable_post_types = array_diff( $post_types, $translatable_post_types );
+		}
+
+		if ( ! empty( $untranslatable_post_types ) ) {
+			$post_types_str = implode( "','", $untranslatable_post_types );
+		}
+
+		return sprintf(
+			"SELECT post_id
+				FROM {$post_lang_table} AS PT
+				WHERE locale = '{$current_lang}'
+				%s",
+			empty( $untranslatable_post_types ) ?
+				''
+				: "UNION
+				SELECT ID
+				FROM {$wpdb->posts}
+				WHERE post_type IN ('{$post_types_str}')"
+		);
 	}
 
 	/**
@@ -144,7 +226,7 @@ class LangFilter {
 	/**
 	 * Returns whether the filtering of posts should happen.
 	 *
-	 * @since 0.4.3 - Add check for `ubb_lang_filter` query_var with a false value to stop the lang filter.
+	 * @since 0.4.3 Add check for `ubb_lang_filter` query_var with a false value to stop the lang filter.
 	 * @since 0.0.1
 	 *
 	 * @param WP_Query $query
