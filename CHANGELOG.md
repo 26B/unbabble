@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Register the Options update hook only in the admin/backoffice.
 - Changed from transients to WP Object Cache in `LangInterface`'s `get_post_language` and `get_term_language`. The amount of insert/delete transient queries caused significant slowdown in pages with a lot of elements.
 
 ## [0.5.8] - 2025-01-13
