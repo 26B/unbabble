@@ -17,6 +17,7 @@ class Options {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Register the update action only if the user is in the admin.
 	 * @since 0.5.0 Added conditions for registering the update action.
 	 * @since 0.0.11
 	 *
