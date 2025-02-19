@@ -221,7 +221,8 @@ class LangInterface {
 		);
 
 		if ( is_int( $inserted ) ) {
-			\delete_transient( sprintf( 'ubb_%s_post_language', $post_id ) );
+			$cache_key = sprintf( 'ubb_%s_%s_post_language', \get_current_blog_id(), $post_id );
+			\wp_cache_delete( $cache_key, 'ubb' );
 
 			/**
 			 * Fires after a post's language is set.
@@ -470,7 +471,8 @@ class LangInterface {
 			return false;
 		}
 
-		\delete_transient( sprintf( 'ubb_%s_post_language', $post_id ) );
+		$cache_key = sprintf( 'ubb_%s_%s_post_language', \get_current_blog_id(), $post_id );
+		\wp_cache_delete( $cache_key, 'ubb' );
 
 		/**
 		 * Fires after a post's language is changed.
@@ -702,7 +704,8 @@ class LangInterface {
 		);
 
 		if ( is_int( $inserted ) ) {
-			\delete_transient( sprintf( 'ubb_%s_term_language', $term_id ) );
+			$cache_key = sprintf( 'ubb_%s_%s_term_language', \get_current_blog_id(), $term_id );
+			\wp_cache_delete( $cache_key, 'ubb' );
 
 			/**
 			 * Fires after a term's language is set.
@@ -935,7 +938,8 @@ class LangInterface {
 			return false;
 		}
 
-		\delete_transient( sprintf( 'ubb_%s_term_language', $term_id ) );
+		$cache_key = sprintf( 'ubb_%s_%s_term_language', \get_current_blog_id(), $term_id );
+		\wp_cache_delete( $cache_key, 'ubb' );
 
 		/**
 		 * Fires after a term's language is changed.
