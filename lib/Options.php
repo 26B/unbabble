@@ -23,7 +23,9 @@ class Options {
 	 * @return null
 	 */
 	public function register() : void {
-		\add_action( 'wp_loaded', [ self::class, 'update' ] );
+		if ( \is_admin() ) {
+			\add_action( 'wp_loaded', [ self::class, 'update' ] );
+		}
 	}
 
 	/**
