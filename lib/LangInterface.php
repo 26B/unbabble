@@ -244,6 +244,7 @@ class LangInterface {
 	/**
 	 * Returns a post's language.
 	 *
+	 * @since Unreleased Change transients to WP Object Cache.
 	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1
 	 *
@@ -252,17 +253,18 @@ class LangInterface {
 	 */
 	public static function get_post_language( int $post_id ) : ?string {
 		global $wpdb;
-		$post_type = get_post_type( $post_id );
+		$post_type = \get_post_type( $post_id );
 		if ( ! self::is_post_type_translatable( $post_type ) ) {
 			// TODO: Maybe it should be the default.
 			return self::get_current_language();
 		}
 
-		$transient_key = sprintf( 'ubb_%s_post_language', $post_id );
-		$post_lang     = \get_transient( $transient_key );
+		$cache_key = sprintf( 'ubb_%s_%s_post_language', \get_current_blog_id(), $post_id );
+		$found     = false;
+		$post_lang = \wp_cache_get( $cache_key, 'ubb', false, $found );
 
 		// If there is a transient value, return it.
-		if ( $post_lang !== false ) {
+		if ( $found && $post_lang !== false ) {
 			return empty( $post_lang ) ? null : $post_lang;
 		}
 
@@ -279,7 +281,7 @@ class LangInterface {
 			$post_lang = '';
 		}
 
-		\set_transient( $transient_key, $post_lang, 30 );
+		\wp_cache_set( $cache_key, $post_lang, 'ubb', 30 );
 
 		return empty( $post_lang ) ? null : $post_lang;
 	}
@@ -723,6 +725,7 @@ class LangInterface {
 	/**
 	 * Returns a term's language.
 	 *
+	 * @since Unreleased Change transients to WP Object Cache.
 	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1
 	 *
@@ -731,11 +734,18 @@ class LangInterface {
 	 */
 	public static function get_term_language( int $term_id ) : ?string {
 		global $wpdb;
-		$transient_key = sprintf( 'ubb_%s_term_language', $term_id );
-		$term_lang     = \get_transient( $transient_key );
+		$taxonomy = \get_taxonomy( $term_id );
+		if ( ! self::is_taxonomy_translatable( $taxonomy ) ) {
+			// TODO: Maybe it should be the default.
+			return self::get_current_language();
+		}
+
+		$cache_key = sprintf( 'ubb_%s_%s_term_language', \get_current_blog_id(), $term_id );
+		$found     = false;
+		$term_lang = \wp_cache_get( $cache_key, 'ubb', false, $found );
 
 		// If there is a transient value, return it.
-		if ( $term_lang !== false ) {
+		if ( $found && $term_lang !== false ) {
 			return empty( $term_lang ) ? null : $term_lang;
 		}
 
@@ -753,7 +763,7 @@ class LangInterface {
 			$term_lang = '';
 		}
 
-		\set_transient( $transient_key, $term_lang, 30 );
+		\wp_cache_set( $cache_key, $term_lang, 'ubb', 30 );
 
 		return empty( $term_lang ) ? null : $term_lang;
 	}
