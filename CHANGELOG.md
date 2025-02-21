@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Bad function call in `LangInterface::get_term_language` to get term taxonomy.
+
 ## [0.5.9] - 2025-01-13
 
 ### Changed

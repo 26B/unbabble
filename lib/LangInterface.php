@@ -728,6 +728,7 @@ class LangInterface {
 	/**
 	 * Returns a term's language.
 	 *
+	 * @since Unreleased Fix bad function call to get term's taxonomy.
 	 * @since 0.5.9 Change transients to WP Object Cache.
 	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1
@@ -737,8 +738,8 @@ class LangInterface {
 	 */
 	public static function get_term_language( int $term_id ) : ?string {
 		global $wpdb;
-		$taxonomy = \get_taxonomy( $term_id );
-		if ( ! self::is_taxonomy_translatable( $taxonomy ) ) {
+		$taxonomy = \get_term( $term_id )->taxonomy ?? '';
+		if ( empty( $taxonomy ) || ! self::is_taxonomy_translatable( $taxonomy ) ) {
 			// TODO: Maybe it should be the default.
 			return self::get_current_language();
 		}
