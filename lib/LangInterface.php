@@ -728,7 +728,7 @@ class LangInterface {
 	/**
 	 * Returns a term's language.
 	 *
-	 * @since Unreleased Fix bad function call to get term's taxonomy.
+	 * @since 0.5.10 Fix bad function call to get term's taxonomy.
 	 * @since 0.5.9 Change transients to WP Object Cache.
 	 * @since 0.5.0 Improve handling of empty values.
 	 * @since 0.0.1

@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.10] - 2025-01-21
+
 ### Fixed
 
 - Bad function call in `LangInterface::get_term_language` to get term taxonomy.
 
-## [0.5.9] - 2025-01-13
+## [0.5.9] - 2025-01-19
 
 ### Changed
 
@@ -555,7 +557,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.9...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.10...HEAD
+[0.5.10]: https://github.com/26b/unbabble/compare/0.5.9...0.5.10
 [0.5.9]: https://github.com/26b/unbabble/compare/0.5.8...0.5.9
 [0.5.8]: https://github.com/26b/unbabble/compare/0.5.7...0.5.8
 [0.5.7]: https://github.com/26b/unbabble/compare/0.5.6...0.5.7
