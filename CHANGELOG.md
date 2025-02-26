@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Changed query for possible term links to improve performance.
+- Changed query for possible term links to improve performance and added a small object cache.
 
 ## [0.5.10] - 2025-01-21
 
