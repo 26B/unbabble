@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.11] - 2025-01-26
+
 ### Changed
 
 - Changed query for possible term links to improve performance and added a small object cache.
@@ -561,7 +563,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.10...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.11...HEAD
+[0.5.11]: https://github.com/26b/unbabble/compare/0.5.10...0.5.11
 [0.5.10]: https://github.com/26b/unbabble/compare/0.5.9...0.5.10
 [0.5.9]: https://github.com/26b/unbabble/compare/0.5.8...0.5.9
 [0.5.8]: https://github.com/26b/unbabble/compare/0.5.7...0.5.8
