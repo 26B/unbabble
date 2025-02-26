@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Setting Advanced Custom Fields fields as translatable automatically when they are registered.
+- Blog switching/restoring clears Options static cache.
+- Filter to stop Options static cache clearing upon blog switching/restoring.
 
 ### Changed
 

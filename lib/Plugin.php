@@ -151,6 +151,8 @@ class Plugin {
 			'customize'         => Admin\Customize::class,
 			'options_proxy'     => Admin\OptionsProxy::class,
 
+			'multisite_blog_switch' => Multisite\BlogSwitch::class,
+
 			'api_header'     => API\Header::class,
 			'api_query_vars' => API\QueryVar::class,
 
