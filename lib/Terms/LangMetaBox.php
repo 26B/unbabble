@@ -389,10 +389,16 @@ class LangMetaBox {
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
 				/**
+				 * The query is split into two parts via a UNION.
+				 *
 				 * The first part of the query groups the terms that have a translation link group.
 				 * They are grouped by their ubb_source meta and a column is set for each language
 				 * with 1 or 0 depending if the group has a translation in that language. Any group
 				 * with 1 in the argument term's language is ignored as it cannot be linked to.
+				 *
+				 * The second part of the query gets all the terms that do not have a translation
+				 * link group. We fetch the terms for every language except the term's language
+				 * since we don't need to account for translation groups.
 				 */
 				"SELECT term_id, group_label
 				FROM (
@@ -411,11 +417,6 @@ class LangMetaBox {
 				) AS G
 				WHERE G.{$term_lang} <> 1
 				UNION
-				/**
-				 * The second part of the query gets all the terms that do not have a translation
-				 * link group. We fetch the terms for every language except the term's language
-				 * since we don't need to account for translation groups.
-				 */
 				SELECT T.term_id, CONCAT(T.name, '(', UBB.locale, ')') as group_label
 				FROM {$translations_table} AS UBB
 				INNER JOIN {$wpdb->term_taxonomy} AS TT ON (
