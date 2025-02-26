@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Changed query for possible term links to improve performance.
+
 ## [0.5.10] - 2025-01-21
 
 ### Fixed

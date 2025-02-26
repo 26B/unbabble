@@ -363,6 +363,7 @@ class LangMetaBox {
 	/**
 	 * Get possible terms for the $term to link to.
 	 *
+	 * @since Unreleased Improve query speed
 	 * @since 0.0.1
 	 *
 	 * @param WP_Term $term
@@ -372,30 +373,61 @@ class LangMetaBox {
 	private function get_possible_links( WP_Term $term, string $term_lang ) : array {
 		global $wpdb;
 		$translations_table    = ( new TermTable() )->get_table_name();
-		$allowed_languages_str = implode( "','", LangInterface::get_languages() );
+
+		$languages = LangInterface::get_languages();
+		if ( empty( $languages ) ) {
+			return [];
+		}
+
+		$allowed_languages_str = implode( "','", $languages );
+		$other_languages_str   = implode( "','", array_diff( $languages, [ $term_lang ] ) );
+		$columns               = '';
+		foreach ( $languages as $lang ) {
+			$columns .= ", SUM(locale = '{$lang}') as {$lang}";
+		}
 
 		$possible_sources = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT MIN(A.term_id) as term_id, GROUP_CONCAT( CONCAT(A.name, '(', locale, ')' ) ) as group_label
+				/**
+				 * The first part of the query groups the terms that have a translation link group.
+				 * They are grouped by their ubb_source meta and a column is set for each language
+				 * with 1 or 0 depending if the group has a translation in that language. Any group
+				 * with 1 in the argument term's language is ignored as it cannot be linked to.
+				 */
+				"SELECT term_id, group_label
 				FROM (
-					SELECT TT.term_id, T.name, locale, IFNULL(meta_value, TT.term_id) AS source
-					FROM {$translations_table} AS TT
-					LEFT JOIN {$wpdb->termmeta} AS TM ON (TT.term_id = TM.term_id AND meta_key = 'ubb_source')
-					INNER JOIN {$wpdb->terms} as T ON (TT.term_id = T.term_id)
-					INNER JOIN {$wpdb->term_taxonomy} as TAX ON(TAX.term_id = T.term_id)
-					WHERE taxonomy = %s
-					AND TT.locale IN ('{$allowed_languages_str}')
-				) AS A
-				WHERE locale != %s
-				AND source NOT IN (
-					SELECT IFNULL(meta_value, TT.term_id) AS source
-					FROM {$translations_table} AS TT
-					LEFT JOIN {$wpdb->termmeta} AS TM ON (TM.term_id = TT.term_id AND meta_key = 'ubb_source')
-					WHERE locale = %s
-				) GROUP BY source",
+					SELECT MIN(TT.term_id) as term_id,
+						GROUP_CONCAT( CONCAT(T.name, '(', locale, ')' ) ) as group_label
+						{$columns}
+					FROM {$translations_table} AS UBB
+					INNER JOIN {$wpdb->term_taxonomy} AS TT ON (
+						UBB.term_id = TT.term_id
+						AND TT.taxonomy = %s
+						AND UBB.locale IN ('{$allowed_languages_str}')
+					)
+					INNER JOIN {$wpdb->terms} AS T ON (TT.term_id = T.term_id)
+					INNER JOIN {$wpdb->termmeta} AS TM ON (TT.term_id = TM.term_id AND meta_key = 'ubb_source')
+					GROUP BY meta_value
+				) AS G
+				WHERE G.{$term_lang} <> 1
+				UNION
+				/**
+				 * The second part of the query gets all the terms that do not have a translation
+				 * link group. We fetch the terms for every language except the term's language
+				 * since we don't need to account for translation groups.
+				 */
+				SELECT T.term_id, CONCAT(T.name, '(', UBB.locale, ')') as group_label
+				FROM {$translations_table} AS UBB
+				INNER JOIN {$wpdb->term_taxonomy} AS TT ON (
+					UBB.term_id = TT.term_id
+					AND TT.taxonomy = %s
+					AND UBB.locale IN ('{$other_languages_str}')
+				)
+				INNER JOIN {$wpdb->terms} AS T ON (TT.term_id = T.term_id)
+				LEFT JOIN {$wpdb->termmeta} AS TM ON (TT.term_id = TM.term_id AND meta_key = 'ubb_source')
+				WHERE meta_value IS NULL",
 				$term->taxonomy,
-				$term_lang,
-				$term_lang
+				$term->taxonomy
 			)
 		);
 
