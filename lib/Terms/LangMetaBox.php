@@ -379,6 +379,22 @@ class LangMetaBox {
 			return [];
 		}
 
+		/**
+		 * Check if the possible links are cached.
+		 */
+		$cache_key    = sprintf( 'ubb_term_possible_links_%s_%s', $term->term_id, $term_lang );
+		$found        = false;
+		$cached_value = \wp_cache_get( $cache_key, 'ubb', false, $found );
+
+		// If there is a transient value, return it.
+		if ( $found && $cached_value !== false ) {
+			return empty( $cached_value ) ? null : $cached_value;
+		}
+
+		/**
+		 * Get the possible sources for the term.
+		 */
+
 		$allowed_languages_str = implode( "','", $languages );
 		$other_languages_str   = implode( "','", array_diff( $languages, [ $term_lang ] ) );
 		$columns               = '';
@@ -436,6 +452,10 @@ class LangMetaBox {
 		foreach ( $possible_sources as $source ) {
 			$options[] = [ $source->term_id, $source->group_label ];
 		}
+
+		// Cache the possible link options.
+		\wp_cache_set( $cache_key, $options, 'ubb', 30 );
+
 		return $options;
 	}
 }
