@@ -142,6 +142,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a relationship field is translatable.
 	 *
+	 * @since Unreleased Handle $field['post_type'] not being set.
 	 * @since 0.5.8
 	 *
 	 * @param array $field
@@ -150,7 +151,7 @@ class AdvancedCustomFieldsPro {
 	 */
 	private function check_relationship( array $field ) : ?string {
 		// TODO: How does ACF handle when only some of these are translatable?
-		foreach ( $field['post_type'] as $post_types ) {
+		foreach ( $field['post_type'] ?? [] as $post_types ) {
 			if ( LangInterface::is_post_type_translatable( $post_types ) ) {
 				return 'post';
 			}
@@ -161,6 +162,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a post object field is translatable.
 	 *
+	 * @since Unreleased Handle $field['post_type'] not being set.
 	 * @since 0.5.8
 	 *
 	 * @param array $field
@@ -169,7 +171,7 @@ class AdvancedCustomFieldsPro {
 	 */
 	private function check_post_object( array $field ) : ?string {
 		// TODO: How does ACF handle when only some of these are translatable?
-		foreach ( $field['post_type'] as $post_type ) {
+		foreach ( $field['post_type'] ?? [] as $post_type ) {
 			if ( LangInterface::is_post_type_translatable( $post_type ) ) {
 				return 'post';
 			}

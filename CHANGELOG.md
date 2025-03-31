@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- ACF Integraton: handle 'post_type' field in some ACF field arrays not being set.
+
 ## [0.5.11] - 2025-01-26
 
 ### Changed
