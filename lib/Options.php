@@ -348,6 +348,8 @@ class Options {
 		 *
 		 * The options returned from this filter will be saved to the option `ubb_options`.
 		 *
+		 * TODO: Warning about multisite options and blog switching.
+		 *
 		 * @since 0.0.1
 		 *
 		 * @param ?array $options {
@@ -512,6 +514,7 @@ class Options {
 	/**
 	 * Fetches the options value from the database.
 	 *
+	 * @since Unreleased Check plugin is active when the blog is currently switched.
 	 * @since 0.4.1
 	 *
 	 * @param  ?int $blog_id
@@ -519,7 +522,14 @@ class Options {
 	 */
 	private static function fetch_options_value( ?int $blog_id = null ) : mixed {
 		global $wpdb;
+
 		if ( $blog_id === null || ! \is_multisite() ) {
+
+			// If the blog is switched currently, check if the plugin is active.
+			if ( \is_multisite() && \ms_is_switched() && ! \is_plugin_active( 'unbabble/unbabble.php' ) ) {
+				return null;
+			}
+
 			return \get_option( 'ubb_options' );
 		}
 
