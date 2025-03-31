@@ -142,7 +142,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a relationship field is translatable.
 	 *
-	 * @since Unreleased Handle $field['post_type'] not being set.
+	 * @since 0.5.12 Handle $field['post_type'] not being set.
 	 * @since 0.5.8
 	 *
 	 * @param array $field
@@ -162,7 +162,7 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Check if a post object field is translatable.
 	 *
-	 * @since Unreleased Handle $field['post_type'] not being set.
+	 * @since 0.5.12 Handle $field['post_type'] not being set.
 	 * @since 0.5.8
 	 *
 	 * @param array $field

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.12] - 2025-03-31
+
 ### Fixed
 
 - ACF Integraton: handle 'post_type' field in some ACF field arrays not being set.
@@ -567,7 +569,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.11...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.12...HEAD
+[0.5.12]: https://github.com/26b/unbabble/compare/0.5.11...0.5.12
 [0.5.11]: https://github.com/26b/unbabble/compare/0.5.10...0.5.11
 [0.5.10]: https://github.com/26b/unbabble/compare/0.5.9...0.5.10
 [0.5.9]: https://github.com/26b/unbabble/compare/0.5.8...0.5.9
