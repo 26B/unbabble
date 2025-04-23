@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Adds missing class property declarations (PHP 8.2 support).
+
 ## [0.5.12] - 2025-03-31
 
 ### Fixed
