@@ -15,7 +15,7 @@ class Post {
 	/**
 	 * The namespace.
 	 *
-	 * @since 0.0.0
+	 * @since Unreleased
 	 * @var   string
 	 */
 	protected $namespace;
