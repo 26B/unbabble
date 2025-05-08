@@ -13,6 +13,14 @@ use TwentySixB\WP\Plugin\Unbabble\Plugin;
 class Options {
 
 	/**
+	 * The namespace.
+	 *
+	 * @since Unreleased
+	 * @var string
+	 */
+	protected $namespace;
+
+	/**
 	 * @since 0.2.0
 	 */
 	public function __construct( Plugin $plugin, string $namespace ) {

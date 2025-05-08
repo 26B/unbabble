@@ -11,6 +11,15 @@ use WP_REST_Request;
 use WP_REST_Response;
 
 class HiddenContent {
+
+	/**
+	 * The namespace.
+	 *
+	 * @since Unreleased
+	 * @var   string
+	 */
+	protected $namespace;
+
 	public function __construct( Plugin $plugin, string $namespace ) {
 		$this->namespace = $namespace;
 	}
