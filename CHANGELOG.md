@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Adds missing class property declarations (PHP 8.2 support).
+- Support for multilingual YoastSEO post type archive indexables. Allows for different SEO information for each archive of a translatable post type.
+
+### Fixed
+
+- Missing WordPress updated option actions when an option's proxy is saved on non default language.
 
 ## [0.5.12] - 2025-03-31
 
