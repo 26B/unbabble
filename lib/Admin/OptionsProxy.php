@@ -60,6 +60,7 @@ class OptionsProxy {
 	 * Also updates the base WordPress option when the language is the default. This is to keep the
 	 * default information in the core WordPress incase Unbabble is deactivated/uninstalled.
 	 *
+	 * @since Unreleased Add missing WordPress updated option actions.
 	 * @since 0.2.0
 	 *
 	 * @param mixed $value
@@ -82,6 +83,18 @@ class OptionsProxy {
 		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $value;
 		}
+
+		// Do updated option actions.
+
+		/**
+		 * Documentation at wp-includes/option.php.
+		 */
+		do_action( "update_option_{$option}", $old_value, $value, $option );
+
+		/**
+		 * Documentation at wp-includes/option.php.
+		 */
+		do_action( 'updated_option', $option, $old_value, $value );
 
 		// Return old value so the value does not get updated.
 		return $old_value;
