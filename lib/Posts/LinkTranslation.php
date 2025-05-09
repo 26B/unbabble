@@ -157,7 +157,7 @@ class LinkTranslation {
 
 		$search_filter = '';
 		if ( ! empty( $search ) ) {
-			$search_filter = $wpdb->prepare( "AND P.post_title LIKE %s", '%' . $wpdb->esc_like( $search ) . '%' );
+			$search_filter = $wpdb->prepare( "WHERE group_info LIKE %s", '%' . $wpdb->esc_like( $search ) . '%' );
 		}
 
 		$instr = [];
@@ -203,11 +203,11 @@ class LinkTranslation {
 							INNER JOIN {$wpdb->posts} as P ON (PT.post_id = P.ID)
 							WHERE post_type = %s AND post_status NOT IN ('revision','auto-draft')
 							AND PT.locale IN ('{$allowed_languages_str}')
-							{$search_filter}
 							{$link_filter}
 						) as A
 						GROUP BY source
 					) AS B
+					{$search_filter}
 				) AS C
 				WHERE {$post_lang} = 0
 				ORDER BY group_info ASC
