@@ -72,18 +72,9 @@ class YoastSEO {
 			)
 		);
 
-		// Indexable already exists.
-		if ( $id ) {
-			// Indexable is correct, do nothing.
-			if ( $indexable->id === (int) $id ) {
-				return $intend_to_save;
-			}
-
-			// Indexable is different, set the new id.
-			$indexable->id = $id;
-		} else {
-			// Indexable does not exist, force Yoast SEO to create a new indexable.
-
+		// Indexable does not exist, force Yoast SEO to create a new indexable.
+		if ( empty( $id ) ) {
+		
 			/**
 			 * In order for the ORM to insert a new indexable, we need to set its `is_new`
 			 * property to true.
@@ -99,6 +90,11 @@ class YoastSEO {
 
 			// Set the indexable id to null.
 			$indexable->id = null;
+		}
+
+		// Indexable is different, set the new id.
+		if ( $indexable->id !== (int) $id ) {
+			$indexable->id = $id;
 		}
 
 		// Proceed as normal.
