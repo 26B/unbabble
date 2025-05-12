@@ -60,7 +60,7 @@ class OptionsProxy {
 	 * Also updates the base WordPress option when the language is the default. This is to keep the
 	 * default information in the core WordPress incase Unbabble is deactivated/uninstalled.
 	 *
-	 * @since Unreleased Add missing WordPress updated option actions.
+	 * @since 0.5.13 Add missing WordPress updated option actions.
 	 * @since 0.2.0
 	 *
 	 * @param mixed $value

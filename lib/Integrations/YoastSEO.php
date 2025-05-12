@@ -11,7 +11,7 @@ class YoastSEO {
 	/**
 	 * Archive post type.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.13
 	 * @var ?string
 	 */
 	private $post_type_archive = null;
@@ -19,7 +19,7 @@ class YoastSEO {
 	/**
 	 * Query to match Yoast SEO's query in find_for_post_type_archive.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.13
 	 *
 	 * @var ?string
 	 */
@@ -57,7 +57,7 @@ class YoastSEO {
 	 * indexable, it only checks for the object type and the object sub type, not the permalink.
 	 * This leads to a single indexable being created for all archive languages.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.13
 	 * @param bool $intend_to_save
 	 * @param Indexable $indexable
 	 * @return bool
@@ -138,7 +138,7 @@ class YoastSEO {
 	 *
 	 * Pre-loaded query is kept in a class property and then used in the filter.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.13
 	 *
 	 * @return void
 	 */
@@ -178,7 +178,7 @@ class YoastSEO {
 	 * there being no other apparent way via hooks to alter the query or the indexable object
 	 * after it has been loaded.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.13
 	 *
 	 * @param string $query The query to load the indexable.
 	 * @return string The altered query.
@@ -210,7 +210,7 @@ class YoastSEO {
 	/**
 	 * Get the post type archive from the query.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.13
 	 *
 	 * @return ?string The post type archive.
 	 */
