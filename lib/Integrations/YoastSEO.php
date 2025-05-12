@@ -92,7 +92,6 @@ class YoastSEO {
 			return $intend_to_save;
 		}
 
-
 		// Get the id of the indexable from the yoast indexable table.
 		$id = $wpdb->get_var(
 			$wpdb->prepare(
@@ -103,17 +102,8 @@ class YoastSEO {
 			)
 		);
 
-		// Indexable already exists.
-		if ( $id ) {
-			// Indexable is correct, do nothing.
-			if ( $indexable->id === (int) $id ) {
-				return $intend_to_save;
-			}
-
-			// Indexable is different, set the new id.
-			$indexable->id = $id;
-		} else {
-			// Indexable does not exist, force Yoast SEO to create a new indexable.
+		// Indexable does not exist, force Yoast SEO to create a new indexable.
+		if ( empty( $id ) ) {
 
 			/**
 			 * In order for the ORM to insert a new indexable, we need to set its `is_new`
@@ -130,6 +120,10 @@ class YoastSEO {
 
 			// Set the indexable id to null.
 			$indexable->id = null;
+
+		// Indexable is different, set the new id.
+		} else if ( $indexable->id !== (int) $id ) {
+			$indexable->id = $id;
 		}
 
 		// Proceed as normal.
