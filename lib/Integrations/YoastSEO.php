@@ -3,21 +3,52 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Integrations;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use Yoast\WP\Lib\ORM;
 use Yoast\WP\SEO\Models\Indexable;
 
 class YoastSEO {
+
+	/**
+	 * Archive post type.
+	 *
+	 * @since Unreleased
+	 * @var ?string
+	 */
+	private $post_type_archive = null;
+
+	/**
+	 * Query to match Yoast SEO's query in find_for_post_type_archive.
+	 *
+	 * @since Unreleased
+	 *
+	 * @var ?string
+	 */
+	private $post_type_archive_indexable_query = null;
+
 	public function register() {
 		add_filter( 'ubb_proxy_options', fn ( $options ) => array_merge(
 			$options,
 			[ 'wpseo_titles' ]
 		) );
 
-		// Handle multilingual post type archive indexables.
-		add_filter( 'wpseo_should_save_indexable', [ $this, 'post_type_archive_indexable' ], 10, 2 );
+		// Handle saving multilingual post type archive indexables.
+		add_filter( 'wpseo_should_save_indexable', [ $this, 'save_post_type_archive_indexable' ], 10, 2 );
+
+		/**
+		 * Handle loading multilingual post type archive indexables.
+		 *
+		 * On `template_redirect` we check if the current page is a post type archive and if so,
+		 * we try to register the filter to load the indexable.
+		 */
+		add_action( 'template_redirect', function () {
+			if ( is_post_type_archive( LangInterface::get_translatable_post_types() ) ) {
+				$this->register_load_indexable_filter();
+			}
+		});
 	}
 
 	/**
-	 * Handle post type archive indexables for each language.
+	 * Handle saving post type archive indexables for each language.
 	 *
 	 * This is a workaround for Yoast SEO not handling post type archives correctly when using
 	 * Unbabble.
@@ -31,7 +62,7 @@ class YoastSEO {
 	 * @param Indexable $indexable
 	 * @return bool
 	 */
-	public function post_type_archive_indexable( $intend_to_save, $indexable ) {
+	public function save_post_type_archive_indexable( $intend_to_save, $indexable ) {
 		global $wpdb;
 
 		/**
@@ -103,5 +134,110 @@ class YoastSEO {
 
 		// Proceed as normal.
 		return $intend_to_save;
+	}
+
+	/**
+	 * Register the filter to load the post type archive indexable.
+	 *
+	 * Pre-load the query to match Yoast SEO's query in `find_for_post_type_archive`, so it's not
+	 * built every time the 'query' hook is called since it's a very used hook in WordPress.
+	 *
+	 * Pre-loaded query is kept in a class property and then used in the filter.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
+	private function register_load_indexable_filter() : void {
+		global $wpdb;
+
+		// Get the archive post type.
+		$post_type = $this->get_archive_post_type();
+		if ( ! $post_type ) {
+			return;
+		}
+
+		// Set the class variable to the custom value based on the WPDB prefix.
+		$table_name = Indexable::get_table_name( 'Indexable', true );
+		$orm        = ORM::for_table( $table_name );
+		$orm->where( 'object_type', 'post-type-archive' )
+			->where( 'object_sub_type', $post_type )
+			->limit( 1 );
+
+		// Build query in wp-content/plugins/wordpress-seo/src/repositories/indexable-repository.php on find_for_post_type_archive method.
+		$this->post_type_archive                 = $post_type;
+		$this->post_type_archive_indexable_query = $wpdb->prepare(
+			$orm->get_sql(),
+			'post-type-archive',
+			$post_type
+		);
+
+		// Add the filter to load the indexable.
+		add_filter( 'query', [ $this, 'load_post_type_archive_indexable' ], 10, 2 );
+	}
+
+	/**
+	 * Alter YoastSEO's find_one post type archive indexable query to include the permalink so
+	 * the correct language indexable is returned.
+	 *
+	 * This is a workaround for YoastSEO not loading indexables using the archive permalink and
+	 * there being no other apparent way via hooks to alter the query or the indexable object
+	 * after it has been loaded.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param string $query The query to load the indexable.
+	 * @return string The altered query.
+	 */
+	public function load_post_type_archive_indexable( $query ) {
+		global $wpdb;
+
+		// Check if the query is for the Yoast indexable table.
+		if ( $this->post_type_archive_indexable_query !== $query ) {
+			return $query;
+		}
+
+		// Add the permalink condition to the query.
+		$query = str_replace(
+			'WHERE ',
+			$wpdb->prepare(
+				'WHERE `permalink` = %s AND ',
+				get_post_type_archive_link( $this->post_type_archive)
+			),
+			$query
+		);
+
+		// Remove the filter to prevent it from being called again.
+		remove_filter( 'query', [ $this, 'load_post_type_archive_indexable' ] );
+
+		return $query;
+	}
+
+	/**
+	 * Get the post type archive from the query.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return ?string The post type archive.
+	 */
+	private function get_archive_post_type() : ?string {
+		$post_types = get_query_var( 'post_type' );
+		if ( ! $post_types ) {
+			return null;
+		}
+
+		if ( is_array( $post_types ) ) {
+			if ( count( $post_types ) > 1 ) {
+				return null;
+			} else {
+				return $post_types[0];
+			}
+		}
+
+		if ( is_string( $post_types ) ) {
+			return $post_types;
+		}
+
+		return null;
 	}
 }
