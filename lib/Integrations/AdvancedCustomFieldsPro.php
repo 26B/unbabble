@@ -3,6 +3,8 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Integrations;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\RegexTranslationKey;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\TranslationKey;
 
 class AdvancedCustomFieldsPro {
 	public function register() {
@@ -40,7 +42,7 @@ class AdvancedCustomFieldsPro {
 	 *
 	 * @return array
 	 */
-	public function set_fields_as_translatable( array $fields, string $prefix = '' ) : array {
+	public function set_fields_as_translatable( array $fields, string $prefix = '', string $regex_prefix = '' ) : array {
 		$field_keys = [];
 
 		/**
@@ -52,7 +54,8 @@ class AdvancedCustomFieldsPro {
 
 		// Loop all the fields being imported.
 		foreach ( $fields as $field ) {
-			$prefix_value = $prefix;
+			$prefix_value       = $prefix;
+			$regex_prefix_value = $regex_prefix;
 
 			/**
 			 * Ignore sub fields since we deal with top fields only (aggregators included),
@@ -74,25 +77,44 @@ class AdvancedCustomFieldsPro {
 
 			// If the field is a layout, fetch the prefix value.
 			if ( isset( $field['parent_layout'] ) ) {
-				$prefix_value = $layouts_to_look_for[ $field['parent_layout'] ];
+				$prefix_value       = $layouts_to_look_for[ $field['parent_layout'] ]['simple'];
+				$regex_prefix_value = $layouts_to_look_for[ $field['parent_layout'] ]['regex'];
 			}
 
 			// If the field is a repeater, check it subfields and add the prefix value.
 			if ( $field['type'] === 'repeater' ) {
-				$this->set_fields_as_translatable( $field['sub_fields'] ?? [], $prefix_value . $field['name'] . '_%_' );
+				// Since we're adding regex for repeater, we need the prefix value (previous regex if defined, otherwise normal prefix).
+				$new_regex_prefix_value = empty( $regex_prefix_value ) ? $prefix_value : $regex_prefix_value;
+
+				$this->set_fields_as_translatable(
+					$field['sub_fields'] ?? [],
+					$prefix_value . $field['name'] . '_%_',
+					$new_regex_prefix_value . $field['name'] . '_([0-9]+)_'
+				);
 				continue;
 			}
 
 			// If the field is a block or a group, check it subfields and add the prefix value.
 			if ( $field['type'] === 'block' || $field['type'] === 'group' ) {
-				$this->set_fields_as_translatable( $field['sub_fields'] ?? [], $prefix_value . $field['name'] . '_' );
+				// Since we're adding no regex for group or block, we only add regex if there was any defined before.
+				$new_regex_prefix_value = empty( $regex_prefix_value ) ? '' : ( $regex_prefix_value . $field['name'] . '_');
+
+				$this->set_fields_as_translatable(
+					$field['sub_fields'] ?? [],
+					$prefix_value . $field['name'] . '_',
+					$new_regex_prefix_value
+				);
 				continue;
 			}
 
 			// If the field is a flexible content, add its layouts to the variable with the correct prefix value to be checked later.
 			if ( $field['type'] === 'flexible_content' ) {
 				foreach ( $field['layouts'] ?? [] as $layout ) {
-					$layouts_to_look_for[ $layout['key'] ] = $prefix_value . $field['name'] . '_%_';
+					$layouts_to_look_for[ $layout['key'] ]['simple'] = $prefix_value . $field['name'] . '_%_';
+
+					// Since we're adding regex for flexible content, we need the prefix value (previous regex if defined, otherwise normal prefix).
+					$new_regex_prefix_value = empty( $regex_prefix_value ) ? $prefix_value : $regex_prefix_value;
+					$layouts_to_look_for[ $layout['key'] ]['regex']  = $new_regex_prefix_value . $field['name'] . '_([0-9]+)_';
 				}
 				continue;
 			}
@@ -127,7 +149,18 @@ class AdvancedCustomFieldsPro {
 			}
 
 			// Add to the field keys array.
-			$field_keys[ $prefix_value . $field['name'] ] = $object_type;
+			if ( ! empty( $regex_prefix_value ) ) {
+				$field_keys[ $prefix_value . $field['name'] ] = new RegexTranslationKey(
+					'/^' . $regex_prefix_value . $field['name'] . '$/',
+					$object_type,
+					$prefix_value . $field['name']
+				);
+			} else {
+				$field_keys[ $prefix_value . $field['name'] ] = new TranslationKey(
+					$prefix_value . $field['name'],
+					$object_type,
+				);
+			}
 		}
 
 		// Register the field keys to be translated.

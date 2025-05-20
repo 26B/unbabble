@@ -5,6 +5,9 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 use Ramsey\Uuid\Uuid;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\Helper;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\RegexTranslationKey;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\TranslationKey;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 use WP_Query;
@@ -1256,16 +1259,74 @@ class LangInterface {
 	 */
 	private static function translate_post_meta( int $post_id, string $new_lang, array $meta_keys_to_translate ) : bool {
 		global $wpdb;
-		$meta_keys_str = implode(
-			"','",
+		$simple_meta_keys = [];
+		$regex_meta_keys  = [];
+		$like_meta_keys   = [];
+
+		foreach ( $meta_keys_to_translate as $meta_key => $meta_data ) {
+			if ( ! $meta_data instanceof TranslationKey ) {
+				$simple_meta_keys[] = esc_sql( $meta_key );
+				continue;
+			}
+
+			if ( $meta_data instanceof RegexTranslationKey ) {
+				if ( $meta_data->has_sql_like() ) {
+					$like_meta_keys[] = esc_sql( $meta_data->get_sql_like() );
+					continue;
+				}
+
+				$regex_key = $meta_data->get_key();
+				if ( str_starts_with( $regex_key, '/' ) ) {
+					$regex_key = substr( $regex_key, 1 );
+				}
+				if ( str_ends_with( $regex_key, '/' ) ) {
+					$regex_key = substr( $regex_key, 0, -1 );
+				}
+
+				$regex_meta_keys[] = esc_sql( $regex_key );
+				continue;
+			}
+
+			$simple_meta_keys[] = esc_sql( $meta_data->get_key() );
+		}
+
+		// Straight forward keys, a simple IN to check them
+		$meta_keys_str = implode( "','", $simple_meta_keys );
+		$meta_keys_str = empty( $meta_keys_str ) ? '' : ( "meta_key IN ('{$meta_keys_str}')" );
+
+		// Keys with SQL like equivalent, a concatenation of multiple LIKEs.
+		$like_meta_keys_str = implode(
+			" OR ",
 			array_map(
-				fn ( $meta_key ) => esc_sql( $meta_key ),
-				array_keys( $meta_keys_to_translate )
+				fn ( $meta_key ) => sprintf( "meta_key LIKE '%s'", $meta_key ),
+				$like_meta_keys
 			)
 		);
+		$like_meta_keys_str = empty( $like_meta_keys_str ) ? '' : $like_meta_keys_str;
+
+		// Keys with Regex but no SQL LIKE.
+		$regex_meta_keys_str = implode(
+			" OR ",
+			array_map(
+				fn ( $meta_key ) => sprintf( "meta_key REGEXP '%s'", preg_quote( $meta_key ) ),
+				$regex_meta_keys
+			)
+		);
+		$regex_meta_keys_str = empty( $regex_meta_keys_str ) ? '' : $regex_meta_keys_str;
+
+		$where_parts = implode( ' OR ', array_filter( [ $meta_keys_str, $like_meta_keys_str, $regex_meta_keys_str ] ) );
+
+		if ( empty( $where_parts ) ) {
+			return true;
+		}
+
 		$meta = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->postmeta} WHERE meta_key IN ('{$meta_keys_str}') AND post_id = %s",
+				"SELECT *
+					FROM {$wpdb->postmeta}
+					WHERE post_id = %s
+					AND ({$where_parts})
+				",
 				$post_id
 			),
 			ARRAY_A
@@ -1299,7 +1360,12 @@ class LangInterface {
 				}
 			}
 
-			self::translate_post_meta_type_ids( $meta_keys_to_translate[ $meta_key ], $meta_data['meta_id'], $meta_key, $meta_value, $new_lang );
+			$type = Helper::match_translation_key( $meta_key, $meta_keys_to_translate );
+			if ( ! $type || ! in_array( $type, [ 'post', 'term' ], true ) ) {
+				continue;
+			}
+
+			self::translate_post_meta_type_ids( $type, $meta_data['meta_id'], $meta_key, $meta_value, $new_lang );
 		}
 
 		return true;
@@ -1344,6 +1410,12 @@ class LangInterface {
 						continue;
 					}
 
+					// Check first if the post is already in the new language due to previous errors.
+					if ( $new_lang === self::get_post_language( $object_id ) ) {
+						$new_meta_value[] = $object_id;
+						continue;
+					}
+
 					$meta_post_translation = self::get_post_translation( $object_id, $new_lang );
 					if ( $meta_post_translation === null ) {
 						continue;
@@ -1357,6 +1429,12 @@ class LangInterface {
 
 					// Keep same ID for non translatable taxonomies.
 					if ( ! self::is_taxonomy_translatable( $term->taxonomy ) ) {
+						$new_meta_value[] = $object_id;
+						continue;
+					}
+
+					// Check first if the term is already in the new language due to previous errors.
+					if ( $new_lang === self::get_term_language( $object_id ) ) {
 						$new_meta_value[] = $object_id;
 						continue;
 					}
