@@ -388,7 +388,7 @@ class LangMetaBox {
 
 		// If there is a transient value, return it.
 		if ( $found && $cached_value !== false ) {
-			return empty( $cached_value ) ? null : $cached_value;
+			return empty( $cached_value ) ? [] : $cached_value;
 		}
 
 		/**
