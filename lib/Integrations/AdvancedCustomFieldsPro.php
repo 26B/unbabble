@@ -81,7 +81,7 @@ class AdvancedCustomFieldsPro {
 				$regex_prefix_value = $layouts_to_look_for[ $field['parent_layout'] ]['regex'];
 			}
 
-			// If the field is a repeater, check it subfields and add the prefix value.
+			// If the field is a repeater, check its subfields and add the prefix value.
 			if ( $field['type'] === 'repeater' ) {
 				// Since we're adding regex for repeater, we need the prefix value (previous regex if defined, otherwise normal prefix).
 				$new_regex_prefix_value = empty( $regex_prefix_value ) ? $prefix_value : $regex_prefix_value;
