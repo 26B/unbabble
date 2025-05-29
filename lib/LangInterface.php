@@ -1261,7 +1261,6 @@ class LangInterface {
 		global $wpdb;
 		$simple_meta_keys = [];
 		$regex_meta_keys  = [];
-		$like_meta_keys   = [];
 
 		foreach ( $meta_keys_to_translate as $meta_key => $meta_data ) {
 			if ( ! $meta_data instanceof TranslationKey ) {
@@ -1270,19 +1269,7 @@ class LangInterface {
 			}
 
 			if ( $meta_data instanceof RegexTranslationKey ) {
-				if ( $meta_data->has_sql_like() ) {
-					$like_meta_keys[] = esc_sql( $meta_data->get_sql_like() );
-					continue;
-				}
-
-				$regex_key = $meta_data->get_key();
-				if ( str_starts_with( $regex_key, '/' ) ) {
-					$regex_key = substr( $regex_key, 1 );
-				}
-				if ( str_ends_with( $regex_key, '/' ) ) {
-					$regex_key = substr( $regex_key, 0, -1 );
-				}
-
+				$regex_key = $meta_data->get_sql_key();
 				$regex_meta_keys[] = esc_sql( $regex_key );
 				continue;
 			}
@@ -1294,16 +1281,6 @@ class LangInterface {
 		$meta_keys_str = implode( "','", $simple_meta_keys );
 		$meta_keys_str = empty( $meta_keys_str ) ? '' : ( "meta_key IN ('{$meta_keys_str}')" );
 
-		// Keys with SQL like equivalent, a concatenation of multiple LIKEs.
-		$like_meta_keys_str = implode(
-			" OR ",
-			array_map(
-				fn ( $meta_key ) => sprintf( "meta_key LIKE '%s'", $meta_key ),
-				$like_meta_keys
-			)
-		);
-		$like_meta_keys_str = empty( $like_meta_keys_str ) ? '' : $like_meta_keys_str;
-
 		// Keys with Regex but no SQL LIKE.
 		$regex_meta_keys_str = implode(
 			" OR ",
@@ -1314,7 +1291,7 @@ class LangInterface {
 		);
 		$regex_meta_keys_str = empty( $regex_meta_keys_str ) ? '' : $regex_meta_keys_str;
 
-		$where_parts = implode( ' OR ', array_filter( [ $meta_keys_str, $like_meta_keys_str, $regex_meta_keys_str ] ) );
+		$where_parts = implode( ' OR ', array_filter( [ $meta_keys_str, $regex_meta_keys_str ] ) );
 
 		if ( empty( $where_parts ) ) {
 			return true;

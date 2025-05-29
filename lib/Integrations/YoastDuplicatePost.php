@@ -4,8 +4,6 @@ namespace TwentySixB\WP\Plugin\Unbabble\Integrations;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\Helper;
-use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\RegexTranslationKey;
-use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\TranslationKey;
 use WP_Error;
 use WP_Post;
 use WP_Term;

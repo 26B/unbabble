@@ -152,8 +152,7 @@ class AdvancedCustomFieldsPro {
 			if ( ! empty( $regex_prefix_value ) ) {
 				$field_keys[ $prefix_value . $field['name'] ] = new RegexTranslationKey(
 					'/^' . $regex_prefix_value . $field['name'] . '$/',
-					$object_type,
-					$prefix_value . $field['name']
+					$object_type
 				);
 			} else {
 				$field_keys[ $prefix_value . $field['name'] ] = new TranslationKey(
