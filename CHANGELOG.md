@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `Terms\LangMetaBox::get_possible_links`'s bad return on empty cache value.
+
 ## [0.5.13] - 2025-05-12
 
 ### Added
