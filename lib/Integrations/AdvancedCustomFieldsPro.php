@@ -94,7 +94,7 @@ class AdvancedCustomFieldsPro {
 				continue;
 			}
 
-			// If the field is a block or a group, check it subfields and add the prefix value.
+			// If the field is a block or a group, check its subfields and add the prefix value.
 			if ( $field['type'] === 'block' || $field['type'] === 'group' ) {
 				// Since we're adding no regex for group or block, we only add regex if there was any defined before.
 				$new_regex_prefix_value = empty( $regex_prefix_value ) ? '' : ( $regex_prefix_value . $field['name'] . '_');
