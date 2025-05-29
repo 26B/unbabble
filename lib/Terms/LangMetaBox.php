@@ -363,6 +363,7 @@ class LangMetaBox {
 	/**
 	 * Get possible terms for the $term to link to.
 	 *
+	 * @since Unreleased Fix bad return on empty cache value.
 	 * @since 0.5.11 Improve query speed and cache results via WP object cache.
 	 * @since 0.0.1
 	 *
