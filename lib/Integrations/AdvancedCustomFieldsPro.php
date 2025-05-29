@@ -89,7 +89,7 @@ class AdvancedCustomFieldsPro {
 				$this->set_fields_as_translatable(
 					$field['sub_fields'] ?? [],
 					$prefix_value . $field['name'] . '_%_',
-					$new_regex_prefix_value . $field['name'] . '_([0-9]+)_'
+					$new_regex_prefix_value . $field['name'] . '_(0|[1-9]\d*)_'
 				);
 				continue;
 			}
@@ -114,7 +114,7 @@ class AdvancedCustomFieldsPro {
 
 					// Since we're adding regex for flexible content, we need the prefix value (previous regex if defined, otherwise normal prefix).
 					$new_regex_prefix_value = empty( $regex_prefix_value ) ? $prefix_value : $regex_prefix_value;
-					$layouts_to_look_for[ $layout['key'] ]['regex']  = $new_regex_prefix_value . $field['name'] . '_([0-9]+)_';
+					$layouts_to_look_for[ $layout['key'] ]['regex']  = $new_regex_prefix_value . $field['name'] . '_(0|[1-9]\d*)_';
 				}
 				continue;
 			}
