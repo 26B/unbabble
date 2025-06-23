@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Javascript error for undefined `directories` in the options page.
+
 ## [0.5.13] - 2025-05-12
 
 ### Added
