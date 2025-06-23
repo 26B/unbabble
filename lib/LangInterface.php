@@ -5,6 +5,9 @@ namespace TwentySixB\WP\Plugin\Unbabble;
 use Ramsey\Uuid\Uuid;
 use TwentySixB\WP\Plugin\Unbabble\DB\PostTable;
 use TwentySixB\WP\Plugin\Unbabble\DB\TermTable;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\Helper;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\RegexTranslationKey;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\TranslationKey;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use WP_Post;
 use WP_Query;
@@ -1247,6 +1250,7 @@ class LangInterface {
 	/**
 	 * Translate a posts meta entries.
 	 *
+	 * @since Unreleased Refactor class to use the TranslationKey classes and support for regexes.
 	 * @since 0.0.1
 	 *
 	 * @param int    $post_id                ID of the post to translate meta for.
@@ -1256,16 +1260,54 @@ class LangInterface {
 	 */
 	private static function translate_post_meta( int $post_id, string $new_lang, array $meta_keys_to_translate ) : bool {
 		global $wpdb;
-		$meta_keys_str = implode(
-			"','",
+		$simple_meta_keys = [];
+		$regex_meta_keys  = [];
+
+		// Process keys into simple and regex keys.
+		foreach ( $meta_keys_to_translate as $meta_key => $meta_data ) {
+			if ( ! $meta_data instanceof TranslationKey ) {
+				$simple_meta_keys[] = esc_sql( $meta_key );
+				continue;
+			}
+
+			if ( $meta_data instanceof RegexTranslationKey ) {
+				$regex_key = $meta_data->get_sql_key();
+				$regex_meta_keys[] = esc_sql( $regex_key );
+				continue;
+			}
+
+			$simple_meta_keys[] = esc_sql( $meta_data->get_key() );
+		}
+
+		// Straight forward keys, a simple IN to check them
+		$meta_keys_str = implode( "','", $simple_meta_keys );
+		$meta_keys_str = empty( $meta_keys_str ) ? '' : ( "meta_key IN ('{$meta_keys_str}')" );
+
+		// Keys with Regex but no SQL LIKE.
+		$regex_meta_keys_str = implode(
+			" OR ",
 			array_map(
-				fn ( $meta_key ) => esc_sql( $meta_key ),
-				array_keys( $meta_keys_to_translate )
+				fn ( $meta_key ) => sprintf( "meta_key REGEXP '%s'", preg_quote( $meta_key ) ),
+				$regex_meta_keys
 			)
 		);
+		$regex_meta_keys_str = empty( $regex_meta_keys_str ) ? '' : $regex_meta_keys_str;
+
+		// Create where parts for the query.
+		$where_parts = implode( ' OR ', array_filter( [ $meta_keys_str, $regex_meta_keys_str ] ) );
+
+		if ( empty( $where_parts ) ) {
+			return true;
+		}
+
+		// Get all meta for the post that match the keys.
 		$meta = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT * FROM {$wpdb->postmeta} WHERE meta_key IN ('{$meta_keys_str}') AND post_id = %s",
+				"SELECT *
+					FROM {$wpdb->postmeta}
+					WHERE post_id = %s
+					AND ({$where_parts})
+				",
 				$post_id
 			),
 			ARRAY_A
@@ -1299,7 +1341,14 @@ class LangInterface {
 				}
 			}
 
-			self::translate_post_meta_type_ids( $meta_keys_to_translate[ $meta_key ], $meta_data['meta_id'], $meta_key, $meta_value, $new_lang );
+			// Match the meta key to the meta keys to translate.
+			$type = Helper::match_translation_key( $meta_key, $meta_keys_to_translate );
+			if ( ! $type || ! in_array( $type, [ 'post', 'term' ], true ) ) {
+				continue;
+			}
+
+			// Translate the meta value.
+			self::translate_post_meta_type_ids( $type, $meta_data['meta_id'], $meta_key, $meta_value, $new_lang );
 		}
 
 		return true;
@@ -1308,6 +1357,7 @@ class LangInterface {
 	/**
 	 * Updates a meta_id with the updated translated value.
 	 *
+	 * @since Unreleased Add check for same post/term language as the target language.
 	 * @since 0.0.1
 	 *
 	 * @param string $meta_type   Meta type, 'post' or 'term'.
@@ -1344,6 +1394,12 @@ class LangInterface {
 						continue;
 					}
 
+					// Check first if the post is already in the new language due to previous errors.
+					if ( $new_lang === self::get_post_language( $object_id ) ) {
+						$new_meta_value[] = $object_id;
+						continue;
+					}
+
 					$meta_post_translation = self::get_post_translation( $object_id, $new_lang );
 					if ( $meta_post_translation === null ) {
 						continue;
@@ -1357,6 +1413,12 @@ class LangInterface {
 
 					// Keep same ID for non translatable taxonomies.
 					if ( ! self::is_taxonomy_translatable( $term->taxonomy ) ) {
+						$new_meta_value[] = $object_id;
+						continue;
+					}
+
+					// Check first if the term is already in the new language due to previous errors.
+					if ( $new_lang === self::get_term_language( $object_id ) ) {
 						$new_meta_value[] = $object_id;
 						continue;
 					}

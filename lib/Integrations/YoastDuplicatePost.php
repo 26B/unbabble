@@ -3,6 +3,7 @@
 namespace TwentySixB\WP\Plugin\Unbabble\Integrations;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
+use TwentySixB\WP\Plugin\Unbabble\Meta\Translations\Helper;
 use WP_Error;
 use WP_Post;
 use WP_Term;
@@ -200,14 +201,15 @@ class YoastDuplicatePost {
 			$default_meta['_thumbnail_id'] = 'post';
 		}
 
-		// TODO: Handle wildcards/regex.
 		// Similar to `ubb_change_language_post_meta_translate_keys` in lib\LangInterface.php.
 		$meta_to_translate = \apply_filters( 'ubb_yoast_duplicate_post_meta_translate_keys', $default_meta, $post_id, $new_lang );
 
 		$self = $this;
 		\add_filter( 'add_post_metadata',
-			function( $check, $new_post_id, $meta_key, $meta_value, $unique ) use ( $self, $meta_to_translate, $post_id, $new_lang ) {
-				if ( ! isset( $meta_to_translate[ $meta_key ] ) ) {
+			function( $check, $new_post_id, $meta_key, $meta_value ) use ( $self, $meta_to_translate, $post_id, $new_lang ) {
+				// Match the meta key to the translation keys.
+				$type = Helper::match_translation_key( $meta_key, $meta_to_translate );
+				if ( ! $type && in_array( $type, [ 'post', 'term' ], true ) ) {
 					return $check;
 				}
 
@@ -216,14 +218,29 @@ class YoastDuplicatePost {
 					return $check;
 				}
 
-				return $self->translate_meta_value( $check, $new_post_id, $meta_key, $meta_value, $unique, $meta_to_translate, $post_id, $new_lang );
+				return $self->translate_meta_value( $check, $new_post_id, $meta_key, $meta_value, $type, $post_id, $new_lang );
 			},
 			10,
-			5
+			4
 		);
 	}
 
-	public function translate_meta_value( $check, $new_post_id, $meta_key, $meta_value, $unique, $meta_to_translate, $post_id, $new_lang ) {
+	/**
+	 * Translate meta value for the new post.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param bool   $check
+	 * @param int    $new_post_id
+	 * @param string $meta_key
+	 * @param mixed  $meta_value
+	 * @param string $type
+	 * @param int    $post_id
+	 * @param string $new_lang
+	 *
+	 * @return mixed
+	 */
+	private function translate_meta_value( $check, $new_post_id, $meta_key, $meta_value, $type, $post_id, $new_lang ) {
 
 		// TODO: Filter docs. Might need more arguments.
 		// Similar to `ubb_change_language_post_meta_translate_value` in lib\LangInterface.php.
@@ -237,11 +254,11 @@ class YoastDuplicatePost {
 			return $return;
 		}
 
-		if ( $meta_to_translate[ $meta_key ] === 'post' ) {
+		if ( $type === 'post' ) {
 			return $this->translate_post_meta( $check, $new_post_id, $meta_key, $meta_value, $new_lang );
 		}
 
-		if ( $meta_to_translate[ $meta_key ] === 'term' ) {
+		if ( $type === 'term' ) {
 			return $this->translate_term_meta( $check, $new_post_id, $meta_key, $meta_value, $new_lang );
 		}
 
