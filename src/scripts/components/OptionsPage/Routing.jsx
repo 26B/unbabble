@@ -18,7 +18,7 @@ const Routing = ( {
 			router_options: {
 				...routing.router_options,
 				directories: {
-					...routing.router_options.directories,
+					...routing.router_options?.directories,
 					[ language ]: directory,
 				},
 			},
@@ -85,7 +85,7 @@ const Routing = ( {
 												isDefault
 													? '/'
 													: routing.router_options
-															.directories[
+															?.directories?.[
 															language
 													  ] ?? ''
 											}
