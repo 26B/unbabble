@@ -207,6 +207,7 @@ class YoastDuplicatePost {
 		$self = $this;
 		\add_filter( 'add_post_metadata',
 			function( $check, $new_post_id, $meta_key, $meta_value ) use ( $self, $meta_to_translate, $post_id, $new_lang ) {
+				// Match the meta key to the translation keys.
 				$type = Helper::match_translation_key( $meta_key, $meta_to_translate );
 				if ( ! $type && in_array( $type, [ 'post', 'term' ], true ) ) {
 					return $check;
@@ -224,7 +225,22 @@ class YoastDuplicatePost {
 		);
 	}
 
-	public function translate_meta_value( $check, $new_post_id, $meta_key, $meta_value, $type, $post_id, $new_lang ) {
+	/**
+	 * Translate meta value for the new post.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param bool   $check
+	 * @param int    $new_post_id
+	 * @param string $meta_key
+	 * @param mixed  $meta_value
+	 * @param string $type
+	 * @param int    $post_id
+	 * @param string $new_lang
+	 *
+	 * @return mixed
+	 */
+	private function translate_meta_value( $check, $new_post_id, $meta_key, $meta_value, $type, $post_id, $new_lang ) {
 
 		// TODO: Filter docs. Might need more arguments.
 		// Similar to `ubb_change_language_post_meta_translate_value` in lib\LangInterface.php.

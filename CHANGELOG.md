@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New classes to handle translations of meta fields with simple and regex keys.
+
+### Changed
+
+- Improved handling of meta fields creating a post translation with the copy enabled.
+
+### Fixed
+
+- Meta with dynamic keys were not being handled correctly for Advanced Custom Fields (ACF) fields.
+- Translation of IDs in dynamic meta keys.
+
 ## [0.5.13] - 2025-05-12
 
 ### Added

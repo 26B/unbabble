@@ -35,10 +35,12 @@ class AdvancedCustomFieldsPro {
 	/**
 	 * Sets ACF fields as translatable according to their type.
 	 *
+	 * @since Unreleased Added `$regex_prefix` argument.
 	 * @since 0.5.8
 	 *
 	 * @param array  $fields
 	 * @param string $prefix
+	 * @param string $regex_prefix
 	 *
 	 * @return array
 	 */

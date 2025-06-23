@@ -1250,6 +1250,7 @@ class LangInterface {
 	/**
 	 * Translate a posts meta entries.
 	 *
+	 * @since Unreleased Refactor class to use the TranslationKey classes and support for regexes.
 	 * @since 0.0.1
 	 *
 	 * @param int    $post_id                ID of the post to translate meta for.
@@ -1262,6 +1263,7 @@ class LangInterface {
 		$simple_meta_keys = [];
 		$regex_meta_keys  = [];
 
+		// Process keys into simple and regex keys.
 		foreach ( $meta_keys_to_translate as $meta_key => $meta_data ) {
 			if ( ! $meta_data instanceof TranslationKey ) {
 				$simple_meta_keys[] = esc_sql( $meta_key );
@@ -1291,12 +1293,14 @@ class LangInterface {
 		);
 		$regex_meta_keys_str = empty( $regex_meta_keys_str ) ? '' : $regex_meta_keys_str;
 
+		// Create where parts for the query.
 		$where_parts = implode( ' OR ', array_filter( [ $meta_keys_str, $regex_meta_keys_str ] ) );
 
 		if ( empty( $where_parts ) ) {
 			return true;
 		}
 
+		// Get all meta for the post that match the keys.
 		$meta = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT *
@@ -1337,11 +1341,13 @@ class LangInterface {
 				}
 			}
 
+			// Match the meta key to the meta keys to translate.
 			$type = Helper::match_translation_key( $meta_key, $meta_keys_to_translate );
 			if ( ! $type || ! in_array( $type, [ 'post', 'term' ], true ) ) {
 				continue;
 			}
 
+			// Translate the meta value.
 			self::translate_post_meta_type_ids( $type, $meta_data['meta_id'], $meta_key, $meta_value, $new_lang );
 		}
 
@@ -1351,6 +1357,7 @@ class LangInterface {
 	/**
 	 * Updates a meta_id with the updated translated value.
 	 *
+	 * @since Unreleased Add check for same post/term language as the target language.
 	 * @since 0.0.1
 	 *
 	 * @param string $meta_type   Meta type, 'post' or 'term'.
