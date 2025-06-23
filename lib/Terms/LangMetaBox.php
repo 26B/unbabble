@@ -363,6 +363,7 @@ class LangMetaBox {
 	/**
 	 * Get possible terms for the $term to link to.
 	 *
+	 * @since Unreleased Fix bad return on empty cache value.
 	 * @since 0.5.11 Improve query speed and cache results via WP object cache.
 	 * @since 0.0.1
 	 *
@@ -388,7 +389,7 @@ class LangMetaBox {
 
 		// If there is a transient value, return it.
 		if ( $found && $cached_value !== false ) {
-			return empty( $cached_value ) ? null : $cached_value;
+			return empty( $cached_value ) ? [] : $cached_value;
 		}
 
 		/**
