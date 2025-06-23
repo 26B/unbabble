@@ -8,14 +8,14 @@ namespace TwentySixB\WP\Plugin\Unbabble\Meta\Translations;
  * This class is used to store the regex key, type of a translation.
  *
  * @package TwentySixB\WP\Plugin\Unbabble\Meta\Translations
- * @since Unreleased
+ * @since 0.5.14
  */
 class RegexTranslationKey extends TranslationKey {
 
 	/**
 	 * @param string $key
 	 * @param string $type
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	public function __construct( string $key, string $type ) {
 

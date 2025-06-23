@@ -8,26 +8,26 @@ namespace TwentySixB\WP\Plugin\Unbabble\Meta\Translations;
  * This class is used to store the key and type of a translation.
  *
  * @package TwentySixB\WP\Plugin\Unbabble\Meta\Translations
- * @since Unreleased
+ * @since 0.5.14
  */
 class TranslationKey {
 
 	/**
 	 * @var string
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	protected $key;
 
 	/**
 	 * @var string
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	protected $type;
 
 	/**
 	 * @param string $key
 	 * @param string $type
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	public function __construct( string $key, string $type ) {
 		$this->key  = $key;
@@ -38,7 +38,7 @@ class TranslationKey {
 	 * Get the meta key.
 	 *
 	 * @return string
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	public function get_key() : string {
 		return $this->key;
@@ -48,7 +48,7 @@ class TranslationKey {
 	 * Get the type of the meta key.
 	 *
 	 * @return string
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	public function get_type() : string {
 		return $this->type;
@@ -59,7 +59,7 @@ class TranslationKey {
 	 *
 	 * @param string $key_to_match
 	 * @return bool
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	public function matches( string $key_to_match ) : bool {
 		return $this->key === $key_to_match;

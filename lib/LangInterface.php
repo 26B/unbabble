@@ -1250,7 +1250,7 @@ class LangInterface {
 	/**
 	 * Translate a posts meta entries.
 	 *
-	 * @since Unreleased Refactor class to use the TranslationKey classes and support for regexes.
+	 * @since 0.5.14 Refactor class to use the TranslationKey classes and support for regexes.
 	 * @since 0.0.1
 	 *
 	 * @param int    $post_id                ID of the post to translate meta for.
@@ -1357,7 +1357,7 @@ class LangInterface {
 	/**
 	 * Updates a meta_id with the updated translated value.
 	 *
-	 * @since Unreleased Add check for same post/term language as the target language.
+	 * @since 0.5.14 Add check for same post/term language as the target language.
 	 * @since 0.0.1
 	 *
 	 * @param string $meta_type   Meta type, 'post' or 'term'.

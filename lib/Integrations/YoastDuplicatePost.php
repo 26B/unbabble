@@ -228,7 +228,7 @@ class YoastDuplicatePost {
 	/**
 	 * Translate meta value for the new post.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.14
 	 *
 	 * @param bool   $check
 	 * @param int    $new_post_id

@@ -6,7 +6,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Meta\Translations;
  * Class to help with translating metas.
  *
  * @package TwentySixB\WP\Plugin\Unbabble\Meta\Translations
- * @since Unreleased
+ * @since 0.5.14
  */
 class Helper {
 
@@ -17,7 +17,7 @@ class Helper {
 	 * @param array  $translation_keys
 	 * @return string|null
 	 *
-	 * @since Unreleased
+	 * @since 0.5.14
 	 */
 	public static function match_translation_key( string $meta_key, array $translation_keys ) : ?string {
 

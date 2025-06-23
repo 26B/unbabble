@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.14] - 2025-06-23
+
 ### Added
 
 - New classes to handle translations of meta fields with simple and regex keys.
@@ -595,7 +597,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.13...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.14...HEAD
+[0.5.14]: https://github.com/26b/unbabble/compare/0.5.13...0.5.14
 [0.5.13]: https://github.com/26b/unbabble/compare/0.5.12...0.5.13
 [0.5.12]: https://github.com/26b/unbabble/compare/0.5.11...0.5.12
 [0.5.11]: https://github.com/26b/unbabble/compare/0.5.10...0.5.11
