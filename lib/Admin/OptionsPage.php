@@ -82,6 +82,17 @@ class OptionsPage {
 		<?php
 	}
 
+	/**
+	 * Output the actions page.
+	 *
+	 * @since Unreleased
+	 */
+	public function actions_page_output() {
+		?>
+		<div id="ubb-options-page"></div>
+		<?php
+	}
+
 	public function field_allowed_languages() {
 		$langs = array_map(
 			fn ( $lang ) => sprintf(

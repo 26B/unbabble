@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Missing callback for Admin Actions page output.
+
 ## [0.5.14] - 2025-06-23
 
 ### Added
