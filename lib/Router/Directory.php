@@ -428,6 +428,7 @@ class Directory {
 	/**
 	 * Applies the language to the network home url.
 	 *
+	 * @since Unreleased Clear Options static cache after every blog switch/restore for correct options access.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
@@ -443,6 +444,7 @@ class Directory {
 		$main_blog_id     = $network->blog_id;
 		$curr_origin_lang = LangInterface::get_current_language();
 		switch_to_blog( $main_blog_id );
+		Options::clear_static_cache();
 		if ( Options::should_run_unbabble() ) {
 			if (
 				$curr_origin_lang !== LangInterface::get_default_language()
@@ -462,6 +464,8 @@ class Directory {
 			}
 		}
 		restore_current_blog();
+		Options::clear_static_cache();
+
 		return $new_url;
 	}
 

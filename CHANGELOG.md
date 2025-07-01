@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Missing callback for Admin Actions page output.
+- Directory routing problems with `network_home_url` missing Options static cache clear after every blog switch/restore.
 
 ## [0.5.14] - 2025-06-23
 
