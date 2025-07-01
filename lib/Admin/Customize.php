@@ -22,6 +22,9 @@ class Customize {
 	 */
 	public function register() {
 
+		// Fix bad customize action URL that contains bad query args (e.g. `?lang=en_US?theme=...`).
+		add_filter( 'wp_prepare_themes_for_js', [ $this, 'fix_customize_action_url' ] );
+
 		// Only register customize hooks if nav_menu is translatable.
 		if ( ! LangInterface::is_taxonomy_translatable( 'nav_menu' ) ) {
 			return;
@@ -49,6 +52,63 @@ class Customize {
 				add_action( 'admin_footer', array( $this, 'nav_menu_lang_metaboxes' ), 10 );
 			}
 		} );
+	}
+
+	/**
+	 * Fix the customize action URL that contains bad query args (e.g. `?lang=en_US?theme=...`).
+	 *
+	 * TODO: Remove after WordPress 6.9. This should be fixed in that version.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param array $prepared_themes
+	 * @return array
+	 */
+	public function fix_customize_action_url( array $prepared_themes ) : array {
+		foreach ( $prepared_themes as $slug => $theme_data ) {
+			// If the theme does not have a customize action, skip it.
+			if ( empty( $theme_data['actions']['customize'] ) ) {
+				continue;
+			}
+
+			// Decode action url to match correctly.
+			$action_url = urldecode( $theme_data['actions']['customize'] );
+
+			// Get the base URL for the customize action.
+			$base_url = admin_url( 'customize.php' );
+
+			// If the action URL does not start with the base URL, skip it.
+			if ( ! str_starts_with( $action_url, $base_url ) ) {
+				continue;
+			}
+
+			// If the base URL does not contain the problematic `?lang=` query arg, skip it.
+			if ( ! str_contains( $base_url, '?lang=' ) ) {
+				continue;
+			}
+
+			// Split the action URL into parts to extract the query args.
+			$parts = explode( $base_url, $action_url, 2 );
+			if ( count( $parts ) < 2 ) {
+				continue;
+			}
+
+			// Get the query args from the second part.
+			$args = $parts[1];
+
+			// If the query args do not start with a `?`, skip it.
+			if ( ! str_starts_with( $args, '?' ) ) {
+				continue;
+			}
+
+			// Remove the '?' from the '?theme=...' part.
+			$args = substr( $args, 1 );
+
+			// Rebuild url correctly and set to the action.
+			$prepared_themes[ $slug ]['actions']['customize'] = $base_url . '&' . urlencode( $args );
+		}
+
+		return $prepared_themes;
 	}
 
 	/**
