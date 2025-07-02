@@ -59,7 +59,7 @@ class Customize {
 	 *
 	 * TODO: Remove after WordPress 6.9. This should be fixed in that version.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.15
 	 *
 	 * @param array $prepared_themes
 	 * @return array

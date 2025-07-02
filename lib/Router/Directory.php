@@ -428,7 +428,7 @@ class Directory {
 	/**
 	 * Applies the language to the network home url.
 	 *
-	 * @since Unreleased Clear Options static cache after every blog switch/restore for correct options access.
+	 * @since 0.5.15 Clear Options static cache after every blog switch/restore for correct options access.
 	 * @since 0.0.3
 	 *
 	 * @param string $url

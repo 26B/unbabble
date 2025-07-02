@@ -85,7 +85,7 @@ class OptionsPage {
 	/**
 	 * Output the actions page.
 	 *
-	 * @since Unreleased
+	 * @since 0.5.15
 	 */
 	public function actions_page_output() {
 		?>
