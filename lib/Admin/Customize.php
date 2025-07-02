@@ -25,6 +25,9 @@ class Customize {
 		// Fix bad customize action URL that contains bad query args (e.g. `?lang=en_US?theme=...`).
 		add_filter( 'wp_prepare_themes_for_js', [ $this, 'fix_customize_action_url' ] );
 
+		// Make widget blocks translatable.
+		add_filter( 'ubb_proxy_options', fn ( $options ) => array_merge( $options, [ 'widget_block' ] ) );
+
 		// Only register customize hooks if nav_menu is translatable.
 		if ( ! LangInterface::is_taxonomy_translatable( 'nav_menu' ) ) {
 			return;
