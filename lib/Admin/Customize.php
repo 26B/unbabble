@@ -17,7 +17,7 @@ class Customize {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Make 'widget_block' option translatable.
+	 * @since 0.5.16 Make 'widget_block' option translatable.
 	 * @since 0.4.5 Add check for translatable nav_menu.
 	 * @since 0.0.3
 	 */

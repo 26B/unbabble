@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.16] - 2025-07-02
+
 ### Added
 
 - Make `widget_block` option translatable to allow for widget blocks in different languages.
@@ -609,7 +611,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.15...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.5.16...HEAD
+[0.5.16]: https://github.com/26b/unbabble/compare/0.5.15...0.5.16
 [0.5.15]: https://github.com/26b/unbabble/compare/0.5.14...0.5.15
 [0.5.14]: https://github.com/26b/unbabble/compare/0.5.13...0.5.14
 [0.5.13]: https://github.com/26b/unbabble/compare/0.5.12...0.5.13
