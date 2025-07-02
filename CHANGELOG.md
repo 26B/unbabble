@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Make `widget_block` option translatable to allow for widget blocks in different languages.
+
 ## [0.5.15] - 2025-07-02
 
 ### Fixed
