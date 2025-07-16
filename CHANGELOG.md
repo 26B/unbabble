@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Changed most methods in `Router\RoutingResolver`, `Router\Directory` and `Router\QueryVar` to static methods, to allow for easy removal of the filters in exceptional cases.
+
 ## [0.5.16] - 2025-07-02
 
 ### Added

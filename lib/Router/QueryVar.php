@@ -10,6 +10,7 @@ use WP_Term;
 /**
  * Hooks related to wordpress routing via the query_var lang.
  *
+ * @since Unreleased Change most methods to static methods to allow for easy removal of filters.
  * @since 0.0.1
  */
 class QueryVar {
@@ -17,13 +18,14 @@ class QueryVar {
 	/**
 	 * Applies language to the post's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_link
 	 * @param WP_Post|int|mixed $post
 	 * @return string
 	 */
-	public function apply_lang_to_post_url( string $post_link, $post ) : string {
+	public static function apply_lang_to_post_url( string $post_link, $post ) : string {
 
 		// Don't do anything if switched to a site without unbabble.
 		if ( ! LangInterface::is_unbabble_active() ) {
@@ -47,50 +49,54 @@ class QueryVar {
 	/**
 	 * Applies language to the page's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.1.1
 	 *
 	 * @param string $page_link
 	 * @param WP_Post|int|mixed $page
 	 * @return string
 	 */
-	public function apply_lang_to_page_url( string $page_link, $page ) : string {
-		return $this->apply_lang_to_post_url( $page_link, $page );
+	public static function apply_lang_to_page_url( string $page_link, $page ) : string {
+		return self::apply_lang_to_post_url( $page_link, $page );
 	}
 
 	/**
 	 * Applies language to the custom post's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_link
 	 * @param WP_Post $post
 	 * @return string
 	 */
-	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
+	public static function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
 		$post_type = $post->post_type;
 		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return $post_link;
 		}
-		return $this->apply_lang_to_post_url( $post_link, $post );
+		return self::apply_lang_to_post_url( $post_link, $post );
 	}
 
 	/**
 	 * Applies language to the attachment's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $link
 	 * @param int $post_id
 	 * @return string
 	 */
-	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
+	public static function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
 		$post = WP_Post::get_instance( $post_id );
-		return $this->apply_lang_to_post_url( $link, $post );
+		return self::apply_lang_to_post_url( $link, $post );
 	}
 
 	/**
 	 * Applies language to the term's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $termlink
@@ -98,7 +104,7 @@ class QueryVar {
 	 * @param string $taxonomy
 	 * @return string
 	 */
-	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
+	public static function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
 
 		// Don't do anything if switched to a site without unbabble.
 		if ( ! LangInterface::is_unbabble_active() ) {
@@ -119,12 +125,13 @@ class QueryVar {
 	/**
 	 * Sets the language for the default homepage.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param WP_Query $query
 	 * @return void
 	 */
-	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
+	public static function homepage_default_lang_redirect( \WP_Query $query ) : void {
 
 		// Don't do anything if switched to a site without unbabble.
 		if ( ! LangInterface::is_unbabble_active() ) {
@@ -148,13 +155,14 @@ class QueryVar {
 	/**
 	 * Applies the language to a post type's archvie link.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $link
 	 * @param string $post_type
 	 * @return string
 	 */
-	public function post_type_archive_link( string $link, string $post_type ) : string {
+	public static function post_type_archive_link( string $link, string $post_type ) : string {
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $link;
@@ -178,12 +186,13 @@ class QueryVar {
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param mixed $pre
 	 * @return null|string|false
 	 */
-	public function pre_redirect_guess_404_permalink( $pre ) {
+	public static function pre_redirect_guess_404_permalink( $pre ) {
 		// TODO: What to do with the $pre.
 		global $wpdb;
 		if ( get_query_var( 'name' ) ) {
@@ -254,6 +263,7 @@ class QueryVar {
 	/**
 	 * Adds directory to home_url.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
@@ -262,7 +272,7 @@ class QueryVar {
 	 * @param string|null $scheme
 	 * @return string
 	 */
-	public function home_url( string $url, string $path, ?string $scheme ) : string {
+	public static function home_url( string $url, string $path, ?string $scheme ) : string {
 		if ( $scheme === 'rest' ) {
 			return $url;
 		}
@@ -292,13 +302,14 @@ class QueryVar {
 	/**
 	 * Applies the language to the network home url.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
 	 * @param string $path
 	 * @return string
 	 */
-	public function network_home_url( string $url, string $path ) : string {
+	public static function network_home_url( string $url, string $path ) : string {
 		if ( ! is_multisite() ) {
 			return $url;
 		}
@@ -318,7 +329,7 @@ class QueryVar {
 					add_filter( 'ubb_home_url', '__return_true' );
 					$home_url = home_url( $path );
 					remove_filter( 'ubb_home_url', '__return_true' );
-					$new_url = ( new Directory() )->home_url( $home_url, $path );
+					$new_url = Directory::home_url( $home_url, $path, null );
 				} else {
 					$new_url = home_url( $path );
 				}
@@ -332,12 +343,13 @@ class QueryVar {
 	/**
 	 * Adds lang query var to admin url.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
 	 * @return string
 	 */
-	public function admin_url( string $url ) : string {
+	public static function admin_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $url;
