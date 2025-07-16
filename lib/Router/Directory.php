@@ -10,6 +10,7 @@ use WP_Term;
 /**
  * Hooks related to wordpress routing via url directory.
  *
+ * @since Unreleased Change most methods to static methods to allow for easy removal of filters.
  * @since 0.0.1
  */
 class Directory {
@@ -22,6 +23,7 @@ class Directory {
 	 * directory is removed and the lang query argument is added. This procedure needs to be done as
 	 * early as possible in order to avoid problems.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.5.6 Remove previous filters.
 	 * @since 0.5.4 Add filter to remove directory from home_url during parse_request in class-wp.php.
 	 * @since 0.4.5 Remove check for directory, already done inside current_lang_from_uri.
@@ -29,11 +31,11 @@ class Directory {
 	 *
 	 * @return void
 	 */
-	public function init() : void {
+	public static function init() : void {
 
 		// Trailing slash to handle cases like homepage when url/uri does not have / at the end.
-		$request_uri = trailingslashit( $this->clean_path( $_SERVER['REQUEST_URI'] ) );
-		$lang        = $this->current_lang_from_uri( LangInterface::get_default_language(), $request_uri );
+		$request_uri = trailingslashit( self::clean_path( $_SERVER['REQUEST_URI'] ) );
+		$lang        = self::current_lang_from_uri( LangInterface::get_default_language(), $request_uri );
 		if ( $lang === LangInterface::get_default_language() ) {
 			return;
 		}
@@ -47,6 +49,7 @@ class Directory {
 	 * If the $uri does not contain a known directory (language), then the first argument $curr_lang
 	 * is returned.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.4.5 Add check for routes like `{directory}?{key}={value}`.
 	 * @since 0.0.1
 	 *
@@ -54,14 +57,14 @@ class Directory {
 	 * @param string $uri
 	 * @return string Language of the directory in the $uri, if known, otherwise returns $curr_lang.
 	 */
-	public function current_lang_from_uri( string $curr_lang, string $uri ) : string {
+	public static function current_lang_from_uri( string $curr_lang, string $uri ) : string {
 		$languages        = LangInterface::get_languages();
 		$default_language = LangInterface::get_default_language();
 		foreach ( $languages as $lang ) {
 			if ( $lang === $default_language ) {
 				continue;
 			}
-			$directory = $this->get_directory_name( $lang );
+			$directory = self::get_directory_name( $lang );
 			if ( str_starts_with( $uri, "/{$directory}/" ) ) {
 				return $lang;
 			} else if ( str_starts_with( $uri, "/{$directory}?" ) ) {
@@ -74,13 +77,14 @@ class Directory {
 	/**
 	 * Applies language to the page's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.1.1
 	 *
 	 * @param string $page_link
 	 * @param WP_Post|int|mixed $page
 	 * @return string
 	 */
-	public function apply_lang_to_page_url( string $page_link, $page ) : string {
+	public static function apply_lang_to_page_url( string $page_link, $page ) : string {
 		if ( $page instanceof WP_Post ) {
 			$page_id = $page->ID;
 		} else if ( is_int( $page ) ) {
@@ -97,19 +101,20 @@ class Directory {
 			return $page_link;
 		}
 
-		return $this->apply_lang_to_post_url( $page_link, $page );
+		return self::apply_lang_to_post_url( $page_link, $page );
 	}
 
 	/**
 	 * Applies language to the post's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_link
 	 * @param WP_Post|int|mixed $post
 	 * @return string
 	 */
-	public function apply_lang_to_post_url( string $post_link, $post ) : string {
+	public static function apply_lang_to_post_url( string $post_link, $post ) : string {
 
 		// Don't do anything if switched to a site without unbabble.
 		if ( ! LangInterface::is_unbabble_active() ) {
@@ -134,7 +139,7 @@ class Directory {
 		$home_url = home_url();
 		remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
 
-		$url_lang = $this->current_lang_from_uri( '', str_replace( $home_url, '', $post_link ) );
+		$url_lang = self::current_lang_from_uri( '', str_replace( $home_url, '', $post_link ) );
 		if ( $url_lang === $post_lang ) {
 			return $post_link;
 		}
@@ -142,7 +147,7 @@ class Directory {
 		// The source url might be poluted by the home_url language addition.
 		$source_url = $home_url;
 		if ( ! empty( $url_lang ) && $url_lang !== $post_lang ) {
-			$source_url = trailingslashit( $home_url ) . $this->get_directory_name( $url_lang );
+			$source_url = trailingslashit( $home_url ) . self::get_directory_name( $url_lang );
 		}
 
 		// If it's not poluted and the language is the default language don't do anything to it.
@@ -153,7 +158,7 @@ class Directory {
 		// If not default language, set the directory to the post language.
 		$target_url = $home_url;
 		if ( $post_lang !== LangInterface::get_default_language() ) {
-			$directory  = $this->get_directory_name( $post_lang );
+			$directory  = self::get_directory_name( $post_lang );
 			$target_url = trailingslashit( $home_url ) . $directory;
 		}
 
@@ -163,44 +168,47 @@ class Directory {
 	/**
 	 * Applies language to the custom post's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_link
 	 * @param WP_Post $post
 	 * @return string
 	 */
-	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
+	public static function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
 		$post_type = $post->post_type;
 		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
 			return $post_link;
 		}
-		return $this->apply_lang_to_post_url( $post_link, $post );
+		return self::apply_lang_to_post_url( $post_link, $post );
 	}
 
 	/**
 	 * Applies language to the attachment's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $link
 	 * @param int $post_id
 	 * @return string
 	 */
-	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
+	public static function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
 		// When attachments are attached to a post, their url already has the lang from the post permalink.
-		$link_lang = $this->current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
+		$link_lang = self::current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
 		$post_lang = LangInterface::get_post_language( $post_id );
 		if ( ! empty( $lang ) && $link_lang === $post_lang ) {
 			return $link;
 		}
 
 		$post = WP_Post::get_instance( $post_id );
-		return $this->apply_lang_to_post_url( $link, $post );
+		return self::apply_lang_to_post_url( $link, $post );
 	}
 
 	/**
 	 * Applies language to the term's link given it's language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $termlink
@@ -208,7 +216,7 @@ class Directory {
 	 * @param string $taxonomy
 	 * @return string
 	 */
-	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
+	public static function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
 
 		// Don't do anything if switched to a site without unbabble.
 		if ( ! LangInterface::is_unbabble_active() ) {
@@ -229,7 +237,7 @@ class Directory {
 		$home_url = home_url();
 		remove_filter( 'ubb_apply_lang_to_home_url', '__return_false' );
 
-		$url_lang  = $this->current_lang_from_uri( '', str_replace( $home_url, '', $termlink ) );
+		$url_lang  = self::current_lang_from_uri( '', str_replace( $home_url, '', $termlink ) );
 		if ( $url_lang === $term_lang ) {
 			return $termlink;
 		}
@@ -237,7 +245,7 @@ class Directory {
 		// The source url might be poluted by the home_url language addition.
 		$source_url = $home_url;
 		if ( ! empty( $url_lang ) && $url_lang !== $term_lang ) {
-			$source_url = trailingslashit( $home_url ) . $this->get_directory_name( $url_lang );
+			$source_url = trailingslashit( $home_url ) . self::get_directory_name( $url_lang );
 		}
 
 		// If it's not polluted and the language is the default language don't do anything to it.
@@ -248,7 +256,7 @@ class Directory {
 		// If not default language, set the directory to the term language.
 		$target_url = $home_url;
 		if ( $term_lang !== LangInterface::get_default_language() ) {
-			$directory  = $this->get_directory_name( $term_lang );
+			$directory  = self::get_directory_name( $term_lang );
 			$target_url = trailingslashit( $home_url ) . $directory;
 		}
 
@@ -258,12 +266,13 @@ class Directory {
 	/**
 	 * Sets the language for the default homepage.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param WP_Query $query
 	 * @return void
 	 */
-	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
+	public static function homepage_default_lang_redirect( \WP_Query $query ) : void {
 
 		// Don't do anything if switched to a site without unbabble.
 		if ( ! LangInterface::is_unbabble_active() ) {
@@ -302,12 +311,13 @@ class Directory {
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param mixed $pre
 	 * @return null|string|false
 	 */
-	public function pre_redirect_guess_404_permalink( $pre ) {
+	public static function pre_redirect_guess_404_permalink( $pre ) {
 		// TODO: What to do with the $pre.
 		global $wpdb;
 		if ( get_query_var( 'name' ) ) {
@@ -378,6 +388,7 @@ class Directory {
 	/**
 	 * Adds directory to home_url.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.5.4 Allow 'rest' schemes regardless.
 	 * @since 0.5.2 Allow 'rest' schemes if in admin to fix Block Editor.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
@@ -388,7 +399,7 @@ class Directory {
 	 * @param string|null $scheme
 	 * @return string
 	 */
-	public function home_url( string $url, string $path, ?string $scheme ) : string {
+	public static function home_url( string $url, string $path, ?string $scheme ) : string {
 
 		/**
 		 * Filters whether to change the home url or not, given the routing type and the current
@@ -409,7 +420,7 @@ class Directory {
 			return $url;
 		}
 
-		$directory = $this->get_directory_name( $curr_lang );
+		$directory = self::get_directory_name( $curr_lang );
 		$subpath = $path;
 		if ( str_starts_with( $path, '/' ) ) {
 			$subpath = substr( $path, 1 );
@@ -428,6 +439,7 @@ class Directory {
 	/**
 	 * Applies the language to the network home url.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.5.15 Clear Options static cache after every blog switch/restore for correct options access.
 	 * @since 0.0.3
 	 *
@@ -435,7 +447,7 @@ class Directory {
 	 * @param string $path
 	 * @return string
 	 */
-	public function network_home_url( string $url, string $path ) : string {
+	public static function network_home_url( string $url, string $path ) : string {
 		if ( ! is_multisite() ) {
 			return $url;
 		}
@@ -456,7 +468,7 @@ class Directory {
 					add_filter( 'ubb_home_url', '__return_true' );
 					$home_url = home_url( $path );
 					remove_filter( 'ubb_home_url', '__return_true' );
-					$new_url = ( new QueryVar() )->home_url( $home_url, $path );
+					$new_url = QueryVar::home_url( $home_url, $path, null );
 				} else {
 					$new_url = home_url( $path );
 				}
@@ -472,13 +484,14 @@ class Directory {
 	/**
 	 * Adds directory to admin url.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.5.7 Add lang query arg regardless of the current language.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
 	 * @return string
 	 */
-	public function admin_url( string $url ) : string {
+	public static function admin_url( string $url ) : string {
 		$curr_lang = LangInterface::get_current_language();
 		return add_query_arg( 'lang', $curr_lang, $url );
 	}
@@ -486,12 +499,13 @@ class Directory {
 	/**
 	 * Get the directory name for a language.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $lang
 	 * @return string
 	 */
-	private function get_directory_name( string $lang ) : string {
+	private static function get_directory_name( string $lang ) : string {
 		$options = Options::get();
 		if (
 			isset( $options['router_options']['directories'][ $lang ] )
@@ -503,7 +517,7 @@ class Directory {
 		return $lang;
 	}
 
-	private function clean_path( string $path ) : string {
+	private static function clean_path( string $path ) : string {
 		if ( is_multisite() ) {
 			$site_info = get_site();
 			if ( $site_info->path !== '/' ) {
