@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- New integration with Google Site Kit to fix the admin URL in the frontend assets.
+
 ## [0.5.16] - 2025-07-02
 
 ### Added

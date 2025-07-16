@@ -7,6 +7,7 @@ use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastDuplicatePost;
 use TwentySixB\WP\Plugin\Unbabble\Integrations;
 use TwentySixB\WP\Plugin\Unbabble\CLI;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\ElasticPress;
+use TwentySixB\WP\Plugin\Unbabble\Integrations\GoogleSiteKit;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\Relevanssi;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\SearchWP;
 use TwentySixB\WP\Plugin\Unbabble\Integrations\YoastSEO;
@@ -245,7 +246,8 @@ class Plugin {
 			AdvancedCustomFieldsPro::class => 'advanced-custom-fields-pro/acf.php',
 		];
 		$admin_integrations = [
-			YoastDuplicatePost::class      => 'duplicate-post/duplicate-post.php',
+			YoastDuplicatePost::class => 'duplicate-post/duplicate-post.php',
+			GoogleSiteKit::class      => 'google-site-kit/google-site-kit.php',
 		];
 
 		// TODO: shouldn't happen but we should make sure that integration classes are not registed twice.
