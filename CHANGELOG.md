@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- New integration with Google Site Kit to fix the admin URL in the frontend assets.
+
 ### Changed
 
 - Changed most methods in `Router\RoutingResolver`, `Router\Directory` and `Router\QueryVar` to static methods, to allow for easy removal of the filters in exceptional cases.
