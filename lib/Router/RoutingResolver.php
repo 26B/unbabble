@@ -10,6 +10,7 @@ use WP_Term;
 /**
  * Hooks for resolving routing type functionalities.
  *
+ * @since Unreleased Change most methods to static methods to allow for easy removal of filters.
  * @since 0.0.3
  * @todo Refactor all the repetitive methods into a single reusable method.
  */
@@ -23,7 +24,7 @@ class RoutingResolver {
 	 */
 	public function register() {
 		if ( ! is_admin() ) {
-			\add_filter( 'pre_get_posts', [ $this, 'homepage_default_lang_redirect' ], 1 );
+			\add_filter( 'pre_get_posts', [ self::class, 'homepage_default_lang_redirect' ], 1 );
 		}
 
 		// Post Permalinks:
@@ -31,37 +32,37 @@ class RoutingResolver {
 
 		if ( in_array( 'post', $translatable_post_types, true ) ) {
 			// Post permalink.
-			\add_filter( 'post_link', [ $this, 'apply_lang_to_post_url' ], 10, 2 );
+			\add_filter( 'post_link', [ self::class, 'apply_lang_to_post_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'page', $translatable_post_types, true ) ) {
 			// Page permalink.
-			\add_filter( 'page_link', [ $this, 'apply_lang_to_page_url' ], 10, 2 );
+			\add_filter( 'page_link', [ self::class, 'apply_lang_to_page_url' ], 10, 2 );
 		}
 
 		if ( in_array( 'attachment', $translatable_post_types, true ) ) {
 			// Attachment permalink.
-			\add_filter( 'attachment_link', [ $this, 'apply_lang_to_attachment_url' ], 10, 2 );
+			\add_filter( 'attachment_link', [ self::class, 'apply_lang_to_attachment_url' ], 10, 2 );
 		}
 
 		// Custom post types permalinks.
-		\add_filter( 'post_type_link', [ $this, 'apply_lang_to_custom_post_url' ], 10, 2 );
+		\add_filter( 'post_type_link', [ self::class, 'apply_lang_to_custom_post_url' ], 10, 2 );
 
 		// Term archive permalinks.
-		\add_filter( 'term_link', [ $this, 'apply_lang_to_term_link' ], 10, 3 );
+		\add_filter( 'term_link', [ self::class, 'apply_lang_to_term_link' ], 10, 3 );
 
 		// Post archive permalinks.
-		\add_filter( 'post_type_archive_link', [ $this, 'post_type_archive_link' ], 10, 2 );
+		\add_filter( 'post_type_archive_link', [ self::class, 'post_type_archive_link' ], 10, 2 );
 
-		\add_filter( 'pre_redirect_guess_404_permalink', [ $this, 'pre_redirect_guess_404_permalink' ] );
+		\add_filter( 'pre_redirect_guess_404_permalink', [ self::class, 'pre_redirect_guess_404_permalink' ] );
 
-		\add_filter( 'home_url', [ $this, 'home_url' ], 10, 3 );
+		\add_filter( 'home_url', [ self::class, 'home_url' ], 10, 3 );
 
-		\add_filter( 'network_home_url', [ $this, 'network_home_url' ], 10, 3 );
+		\add_filter( 'network_home_url', [ self::class, 'network_home_url' ], 10, 3 );
 
-		\add_filter( 'admin_url', [ $this, 'admin_url' ], 10 );
+		\add_filter( 'admin_url', [ self::class, 'admin_url' ], 10 );
 
-		\add_filter( 'rest_url', [ $this, 'rest_url' ], 10, 4 );
+		\add_filter( 'rest_url', [ self::class, 'rest_url' ], 10, 4 );
 	}
 
 	/**
@@ -71,25 +72,26 @@ class RoutingResolver {
 	 * @return void
 	 */
 	public function init() : void {
-		$router = $this->get_current_router_object();
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'init' ) ) {
-			$router->init();
+			$router::init();
 		}
 	}
 
 	/**
 	 * Apply routing changes to hook `apply_lang_to_post_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $post_link
 	 * @param WP_Post|int|mixed $post
 	 * @return string
 	 */
-	public function apply_lang_to_post_url( string $post_link, $post ) : string {
-		$router = $this->get_current_router_object();
+	public static function apply_lang_to_post_url( string $post_link, $post ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'apply_lang_to_post_url' ) ) {
-			return $router->apply_lang_to_post_url( $post_link, $post );
+			return $router::apply_lang_to_post_url( $post_link, $post );
 		}
 		return $post_link;
 	}
@@ -97,16 +99,17 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_page_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.1.1
 	 *
 	 * @param string $page_link
 	 * @param WP_Post|int|mixed $page
 	 * @return string
 	 */
-	public function apply_lang_to_page_url( string $page_link, $page ) : string {
-		$router = $this->get_current_router_object();
+	public static function apply_lang_to_page_url( string $page_link, $page ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'apply_lang_to_page_url' ) ) {
-			return $router->apply_lang_to_page_url( $page_link, $page );
+			return $router::apply_lang_to_page_url( $page_link, $page );
 		}
 		return $page_link;
 	}
@@ -114,16 +117,17 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_custom_post_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $post_link
 	 * @param WP_Post $post
 	 * @return string
 	 */
-	public function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
-		$router = $this->get_current_router_object();
+	public static function apply_lang_to_custom_post_url( string $post_link, WP_Post $post ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'apply_lang_to_custom_post_url' ) ) {
-			return $router->apply_lang_to_custom_post_url( $post_link, $post );
+			return $router::apply_lang_to_custom_post_url( $post_link, $post );
 		}
 		return $post_link;
 	}
@@ -131,16 +135,17 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_attachment_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $link
 	 * @param int $post_id
 	 * @return string
 	 */
-	public function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
-		$router = $this->get_current_router_object();
+	public static function apply_lang_to_attachment_url( string $link, int $post_id ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'apply_lang_to_attachment_url' ) ) {
-			return $router->apply_lang_to_attachment_url( $link, $post_id );
+			return $router::apply_lang_to_attachment_url( $link, $post_id );
 		}
 		return $link;
 	}
@@ -148,6 +153,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_term_link`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $termlink
@@ -155,10 +161,10 @@ class RoutingResolver {
 	 * @param string $taxonomy
 	 * @return string
 	 */
-	public function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
-		$router = $this->get_current_router_object();
+	public static function apply_lang_to_term_link( string $termlink, WP_Term $term, string $taxonomy ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'apply_lang_to_term_link' ) ) {
-			return $router->apply_lang_to_term_link( $termlink, $term, $taxonomy );
+			return $router::apply_lang_to_term_link( $termlink, $term, $taxonomy );
 		}
 		return $termlink;
 	}
@@ -166,15 +172,16 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `homepage_default_lang_redirect`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param WP_Query $query
 	 * @return void
 	 */
-	public function homepage_default_lang_redirect( \WP_Query $query ) : void {
-		$router = $this->get_current_router_object();
+	public static function homepage_default_lang_redirect( \WP_Query $query ) : void {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'homepage_default_lang_redirect' ) ) {
-			$router->homepage_default_lang_redirect( $query );
+			$router::homepage_default_lang_redirect( $query );
 			return;
 		}
 		return;
@@ -183,16 +190,17 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `post_type_archive_link`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $link
 	 * @param string $post_type
 	 * @return string
 	 */
-	public function post_type_archive_link( string $link, string $post_type ) : string {
-		$router = $this->get_current_router_object();
+	public static function post_type_archive_link( string $link, string $post_type ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'post_type_archive_link' ) ) {
-			return $router->post_type_archive_link( $link, $post_type );
+			return $router::post_type_archive_link( $link, $post_type );
 		}
 		return $link;
 	}
@@ -200,15 +208,16 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `pre_redirect_guess_404_permalink`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param mixed $pre
 	 * @return mixed
 	 */
-	public function pre_redirect_guess_404_permalink( $pre ) {
-		$router = $this->get_current_router_object();
+	public static function pre_redirect_guess_404_permalink( $pre ) {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'pre_redirect_guess_404_permalink' ) ) {
-			return $router->pre_redirect_guess_404_permalink( $pre );
+			return $router::pre_redirect_guess_404_permalink( $pre );
 		}
 		return $pre;
 	}
@@ -216,6 +225,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `home_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.5.0 Added $scheme argument.
 	 * @since 0.0.3
 	 *
@@ -224,16 +234,16 @@ class RoutingResolver {
 	 * @param string|null $scheme
 	 * @return string
 	 */
-	public function home_url( string $url, string $path, ?string $scheme ) : string {
+	public static function home_url( string $url, string $path, ?string $scheme ) : string {
 
 		// TODO: add docs.
 		if ( ! apply_filters( 'ubb_apply_lang_to_home_url', true, $url, $path, $scheme ) ) {
 			return $url;
 		}
 
-		$router = $this->get_current_router_object();
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'home_url' ) ) {
-			return $router->home_url( $url, $path, $scheme );
+			return $router::home_url( $url, $path, $scheme );
 		}
 		return $url;
 	}
@@ -241,6 +251,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `network_home_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
@@ -248,10 +259,10 @@ class RoutingResolver {
 	 * @param $orig_scheme
 	 * @return string
 	 */
-	public function network_home_url( string $url, string $path, $orig_scheme ) : string {
-		$router = $this->get_current_router_object();
+	public static function network_home_url( string $url, string $path, $orig_scheme ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'network_home_url' ) ) {
-			return $router->network_home_url( $url, $path, $orig_scheme );
+			return $router::network_home_url( $url, $path, $orig_scheme );
 		}
 		return $url;
 	}
@@ -259,15 +270,16 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `admin_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $lang
 	 * @return string
 	 */
-	public function admin_url( string $url ) : string {
-		$router = $this->get_current_router_object();
+	public static function admin_url( string $url ) : string {
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'admin_url' ) ) {
-			return $router->admin_url( $url );
+			return $router::admin_url( $url );
 		}
 		return $url;
 	}
@@ -275,6 +287,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `rest_url`.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url     REST URL.
@@ -283,36 +296,37 @@ class RoutingResolver {
 	 * @param string $scheme  Sanitization scheme.
 	 * @return string
 	 */
-	public function rest_url( string $url, string $path, $blog_id, string $scheme ) : string {
+	public static function rest_url( string $url, string $path, $blog_id, string $scheme ) : string {
 
 		// TODO: add docs.
 		if ( ! apply_filters( 'ubb_apply_lang_to_rest_url', true, $url, $path, $blog_id, $scheme ) ) {
 			return $url;
 		}
 
-		$router = $this->get_current_router_object();
+		$router = self::get_current_router_class();
 		if ( $router !== null && method_exists( $router, 'rest_url' ) ) {
-			return $router->rest_url( $url, $path, $blog_id, $scheme );
+			return $router::rest_url( $url, $path, $blog_id, $scheme );
 		}
 		return $url;
 	}
 
 	/**
-	 * Returns the current blog's router object.
+	 * Returns the current blog's router class.
 	 *
+	 * @since Unreleased Changed to static.
 	 * @since 0.0.3
 	 *
-	 * @return ?object
+	 * @return ?string
 	 */
-	private function get_current_router_object() : ?object {
+	private static function get_current_router_class() : ?string {
 		$router_type  = Options::get_router();
 		$router_class = null;
 		switch ( $router_type ) {
 			case 'directory':
-				$router_class = new Directory();
+				$router_class = Directory::class;
 				break;
 			case 'query_var':
-				$router_class = new QueryVar();
+				$router_class = QueryVar::class;
 				break;
 		}
 		return $router_class;
