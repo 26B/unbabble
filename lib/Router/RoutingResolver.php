@@ -10,7 +10,7 @@ use WP_Term;
 /**
  * Hooks for resolving routing type functionalities.
  *
- * @since Unreleased Change most methods to static methods to allow for easy removal of filters.
+ * @since 0.6.0 Change most methods to static methods to allow for easy removal of filters.
  * @since 0.0.3
  * @todo Refactor all the repetitive methods into a single reusable method.
  */
@@ -81,7 +81,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_post_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $post_link
@@ -99,7 +99,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_page_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.1.1
 	 *
 	 * @param string $page_link
@@ -117,7 +117,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_custom_post_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $post_link
@@ -135,7 +135,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_attachment_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $link
@@ -153,7 +153,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `apply_lang_to_term_link`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $termlink
@@ -172,7 +172,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `homepage_default_lang_redirect`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param WP_Query $query
@@ -190,7 +190,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `post_type_archive_link`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $link
@@ -208,7 +208,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `pre_redirect_guess_404_permalink`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param mixed $pre
@@ -225,7 +225,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `home_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.5.0 Added $scheme argument.
 	 * @since 0.0.3
 	 *
@@ -251,7 +251,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `network_home_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
@@ -270,7 +270,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `admin_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $lang
@@ -287,7 +287,7 @@ class RoutingResolver {
 	/**
 	 * Apply routing changes to hook `rest_url`.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url     REST URL.
@@ -313,7 +313,7 @@ class RoutingResolver {
 	/**
 	 * Returns the current blog's router class.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @return ?string

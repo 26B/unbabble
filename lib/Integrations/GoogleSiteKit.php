@@ -7,14 +7,14 @@ use TwentySixB\WP\Plugin\Unbabble\Router\RoutingResolver;
 /**
  * Hooks for integrating with GoogleSiteKit.
  *
- * @since Unreleased
+ * @since 0.6.0
  */
 class GoogleSiteKit {
 
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased
+	 * @since 0.6.0
 	 */
 	public function register() {
 		if ( ! \is_plugin_active( 'google-site-kit/google-site-kit.php' ) ) {
@@ -32,7 +32,7 @@ class GoogleSiteKit {
 	 * slash is also ensured to be there in the frontend before building the rest of the URL.
 	 * This creats a broken URL, so here we remove our language query parameter to fix it.
 	 *
-	 * @since Unreleased
+	 * @since 0.6.0
 	 *
 	 * @param array $inline_data The inline data array.
 	 * @return array The modified inline data array.

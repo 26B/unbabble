@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2025-07-16
+
 ### Fixed
 
 - New integration with Google Site Kit to fix the admin URL in the frontend assets.
@@ -619,7 +621,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.5.16...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.6.0...HEAD
+[0.6.0]: https://github.com/26b/unbabble/compare/0.5.16...0.6.0
 [0.5.16]: https://github.com/26b/unbabble/compare/0.5.15...0.5.16
 [0.5.15]: https://github.com/26b/unbabble/compare/0.5.14...0.5.15
 [0.5.14]: https://github.com/26b/unbabble/compare/0.5.13...0.5.14

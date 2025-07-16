@@ -10,7 +10,7 @@ use WP_Term;
 /**
  * Hooks related to wordpress routing via the query_var lang.
  *
- * @since Unreleased Change most methods to static methods to allow for easy removal of filters.
+ * @since 0.6.0 Change most methods to static methods to allow for easy removal of filters.
  * @since 0.0.1
  */
 class QueryVar {
@@ -18,7 +18,7 @@ class QueryVar {
 	/**
 	 * Applies language to the post's link given it's language.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_link
@@ -49,7 +49,7 @@ class QueryVar {
 	/**
 	 * Applies language to the page's link given it's language.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.1.1
 	 *
 	 * @param string $page_link
@@ -63,7 +63,7 @@ class QueryVar {
 	/**
 	 * Applies language to the custom post's link given it's language.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $post_link
@@ -81,7 +81,7 @@ class QueryVar {
 	/**
 	 * Applies language to the attachment's link given it's language.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $link
@@ -96,7 +96,7 @@ class QueryVar {
 	/**
 	 * Applies language to the term's link given it's language.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param string $termlink
@@ -125,7 +125,7 @@ class QueryVar {
 	/**
 	 * Sets the language for the default homepage.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param WP_Query $query
@@ -155,7 +155,7 @@ class QueryVar {
 	/**
 	 * Applies the language to a post type's archvie link.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $link
@@ -186,7 +186,7 @@ class QueryVar {
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
 	 * @param mixed $pre
@@ -263,7 +263,7 @@ class QueryVar {
 	/**
 	 * Adds directory to home_url.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
 	 *
@@ -302,7 +302,7 @@ class QueryVar {
 	/**
 	 * Applies the language to the network home url.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
@@ -343,7 +343,7 @@ class QueryVar {
 	/**
 	 * Adds lang query var to admin url.
 	 *
-	 * @since Unreleased Changed to static.
+	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.3
 	 *
 	 * @param string $url
