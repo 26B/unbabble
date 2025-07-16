@@ -4,6 +4,7 @@ namespace TwentySixB\WP\Plugin\Unbabble\Router;
 
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use TwentySixB\WP\Plugin\Unbabble\SDK\LanguageContext;
 use WP_Post;
 use WP_Term;
 
@@ -462,7 +463,7 @@ class Directory {
 				$curr_origin_lang !== LangInterface::get_default_language()
 				&& LangInterface::is_language_allowed( $curr_origin_lang )
 			) {
-				add_filter( 'ubb_current_lang', $fn = fn () => $curr_origin_lang );
+				LanguageContext::switch_to_language( $curr_origin_lang );
 				$router_type = Options::get_router();
 				if ( $router_type === 'query_var' ) {
 					add_filter( 'ubb_home_url', '__return_true' );
@@ -472,7 +473,7 @@ class Directory {
 				} else {
 					$new_url = home_url( $path );
 				}
-				remove_filter( 'ubb_current_lang', $fn );
+				LanguageContext::restore_language();
 			}
 		}
 		restore_current_blog();
