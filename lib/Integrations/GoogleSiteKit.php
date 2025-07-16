@@ -2,6 +2,8 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Integrations;
 
+use TwentySixB\WP\Plugin\Unbabble\Router\RoutingResolver;
+
 /**
  * Hooks for integrating with GoogleSiteKit.
  *
@@ -36,40 +38,11 @@ class GoogleSiteKit {
 	 * @return array The modified inline data array.
 	 */
 	public function fix_admin_url_in_assets( array $inline_data ) : array {
-		$admin_url = $inline_data['adminURL'] ?? '';
-		if ( empty( $admin_url ) ) {
-			return $inline_data;
-		}
+		\remove_filter( 'admin_url', [ RoutingResolver::class, 'admin_url' ], 10 );
 
-		if ( str_ends_with( $admin_url, '/' ) ) {
-			$admin_url = substr( $admin_url, 0, -1 );
-		}
+		$inline_data['adminURL'] = esc_url_raw( trailingslashit( admin_url() ) );
 
-		$args = parse_url( $admin_url, PHP_URL_QUERY );
-
-		if ( empty( $args ) ) {
-			return $inline_data;
-		}
-
-		$base_admin_url = str_replace( '?' . $args, '', $admin_url );
-
-		$args_parts = explode( '&', $args );
-		$new_args_parts = [];
-		foreach ( $args_parts as $part ) {
-			if ( str_starts_with( $part, 'lang=' ) ) {
-				continue;
-			}
-
-			$new_args_parts[] = $part;
-		}
-
-		$new_args = implode( '&', $new_args_parts );
-
-		if ( ! empty( $new_args ) ) {
-			$base_admin_url = $base_admin_url . '?' . $new_args;
-		}
-
-		$inline_data['adminURL'] = trailingslashit( $base_admin_url );
+		\add_filter( 'admin_url', [ RoutingResolver::class, 'admin_url' ], 10 );
 
 		return $inline_data;
 	}
