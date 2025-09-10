@@ -2,10 +2,13 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Admin;
 
+use Exception;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
 use TwentySixB\WP\Plugin\Unbabble\Terms;
+use WP_Post_Type;
 use WP_Query;
+use WP_Taxonomy;
 
 /**
  * Hooks for the customize part of Wordpress, menus and homepages.
@@ -56,6 +59,52 @@ class Customize {
 				add_action( 'admin_footer', array( $this, 'nav_menu_lang_metaboxes' ), 10 );
 			}
 		} );
+
+		// Allow lang filter for the post type menu boxes in the nav menu edit screen.
+		add_action( 'adminmenu', [ $this, 'set_menu_edit_meta_box_as_translatable' ], PHP_INT_MAX );
+	}
+
+	/**
+	 * Set the queries for the post_types for the customize menu's meta boxes to be filtered by
+	 * language by removing the 'suppress_filters=true' set by default in
+	 * `wp_nav_menu_item_post_type_meta_box`.
+	 *
+	 * @return void
+	 */
+	public function set_menu_edit_meta_box_as_translatable() : void {
+		global $wp_meta_boxes;
+
+		// Only for the 'nav-menus' screen.
+		$screen = get_current_screen();
+		if ( $screen->id !== 'nav-menus' ) {
+			return;
+		}
+
+		/**
+		 * Edit all the nav-menu meta boxes that call `wp_nav_menu_item_post_type_meta_box` and
+		 * are for translatable post types.
+		 */
+		$meta_boxes = $wp_meta_boxes[ $screen->id ];
+		foreach ( $meta_boxes as $context => $priorities ) {
+			foreach ( $priorities as $priority => $boxes ) {
+				foreach ( $boxes as $box_key => $box ) {
+
+					// Check callback.
+					if ( $box['callback'] !== 'wp_nav_menu_item_post_type_meta_box' ) {
+						continue;
+					}
+
+					// Check post type.
+					$post_type_object = $box['args'];
+					if ( ! $post_type_object instanceof WP_Post_Type || ! LangInterface::is_post_type_translatable( $post_type_object->name ) ) {
+						continue;
+					}
+
+					// Allow our lang filters to run.
+					$wp_meta_boxes[ $screen->id ][ $context ][ $priority ][ $box_key ]['args']->{'_default_query'}['suppress_filters'] = false;
+				}
+			}
+		}
 	}
 
 	/**
