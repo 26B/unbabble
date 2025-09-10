@@ -20,6 +20,7 @@ class Customize {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Add action for lang filter on post type query for nav-menu edit screen.
 	 * @since 0.5.16 Make 'widget_block' option translatable.
 	 * @since 0.4.5 Add check for translatable nav_menu.
 	 * @since 0.0.3
@@ -68,6 +69,8 @@ class Customize {
 	 * Set the queries for the post_types for the customize menu's meta boxes to be filtered by
 	 * language by removing the 'suppress_filters=true' set by default in
 	 * `wp_nav_menu_item_post_type_meta_box`.
+	 *
+	 * @since Unreleased
 	 *
 	 * @return void
 	 */
