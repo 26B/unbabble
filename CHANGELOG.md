@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2025-09-29
+
 ### Fixed
 
 - Allow for lang filter on the queries for the post type meta boxes on the nav menu edit screen.
@@ -625,7 +627,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.6.0...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.6.1...HEAD
+[0.6.1]: https://github.com/26b/unbabble/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/26b/unbabble/compare/0.5.16...0.6.0
 [0.5.16]: https://github.com/26b/unbabble/compare/0.5.15...0.5.16
 [0.5.15]: https://github.com/26b/unbabble/compare/0.5.14...0.5.15
