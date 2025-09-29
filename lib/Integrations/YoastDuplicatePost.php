@@ -9,6 +9,12 @@ use WP_Post;
 use WP_Term;
 
 class YoastDuplicatePost {
+	/**
+	 * Control if meta should include filters.
+	 *
+	 * @var bool
+	 */
+	private $filter_post_meta = false;
 	public function register() {
 
 		// Remove ubb_source from rewrite republish copies.
