@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Allow for lang filter on the queries for the post type meta boxes on the nav menu edit screen.
+
 ## [0.6.0] - 2025-07-16
 
 ### Fixed
