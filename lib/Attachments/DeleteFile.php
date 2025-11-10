@@ -33,6 +33,7 @@ class DeleteFile {
 	 * for file deletion to check if the main file still exist somewhere else. If it does, don't
 	 * delete it yet.
 	 *
+	 * @since Unreleased Add conditions for missing 'file' or 'sizes' in metadata.
 	 * @since 0.0.1
 	 *
 	 * @param int $post_id
@@ -42,7 +43,7 @@ class DeleteFile {
 		$meta = wp_get_attachment_metadata( $post_id );
 
 		// If the attachment has no metadata, ignore it.
-		if ( empty( $meta ) ) {
+		if ( empty( $meta ) || empty( $meta['file'] ) || empty( $meta['sizes'] ) ) {
 			return;
 		}
 
