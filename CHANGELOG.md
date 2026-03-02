@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Added conditions for missing 'file' or 'sizes' in metadata in `Attachments\DeleteFile`.
+- Deprecated warning in 'Admin/Admin:is_block_editor'.
 
 ## [0.6.1] - 2025-09-29
 

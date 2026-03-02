@@ -201,7 +201,7 @@ class Admin {
 		return $query_vars;
 	}
 
-	public static function is_block_editor( WP_Screen $screen = null ) : bool {
+	public static function is_block_editor( ?WP_Screen $screen = null ) : bool {
 		if ( $screen === null && function_exists( 'get_current_screen' ) ) {
 			$screen = get_current_screen();
 		}
