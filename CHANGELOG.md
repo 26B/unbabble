@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-03-02
+
 ### Fixed
 
 - Added conditions for missing 'file' or 'sizes' in metadata in `Attachments\DeleteFile`.
@@ -632,7 +634,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.6.1...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.6.2...HEAD
+[0.6.2]: https://github.com/26b/unbabble/compare/0.6.1...0.6.2
 [0.6.1]: https://github.com/26b/unbabble/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/26b/unbabble/compare/0.5.16...0.6.0
 [0.5.16]: https://github.com/26b/unbabble/compare/0.5.15...0.5.16

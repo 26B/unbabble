@@ -33,7 +33,7 @@ class DeleteFile {
 	 * for file deletion to check if the main file still exist somewhere else. If it does, don't
 	 * delete it yet.
 	 *
-	 * @since Unreleased Add conditions for missing 'file' or 'sizes' in metadata.
+	 * @since 0.6.2 Add conditions for missing 'file' or 'sizes' in metadata.
 	 * @since 0.0.1
 	 *
 	 * @param int $post_id
