@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New proxied option `wp_page_for_privacy_policy` to allow for a different privacy policy page for each language.
+
+### Changed
+
+- Moved WordPress default proxied options filters to `OptionsProxy` class.
+- Only add the `page_on_front` and `page_for_posts` options to the proxied options if the `page` post type is translatable.
+
 ## [0.6.2] - 2026-03-02
 
 ### Fixed

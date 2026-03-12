@@ -14,11 +14,39 @@ class OptionsProxy {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Move WordPress default proxied options filters to here.
 	 * @since 0.2.0
 	 */
 	public function register() {
 		add_filter( 'pre_option', [ $this, 'pre_get_option_proxy' ], 10, 2 );
 		add_filter( 'pre_update_option', [ $this, 'pre_update_option_proxy' ], 10, 3 );
+
+		// Add some WordPress proxied options by default.
+		add_filter( 'ubb_proxy_options', [ $this, 'wordpress_default_options' ] );
+	}
+
+	/**
+	 * Add WordPress default proxied options.
+	 *
+	 * @since Unreleased
+	 */
+	public function wordpress_default_options( array $options ) : array {
+		$theme    = \get_option( 'stylesheet' );
+		$defaults = [
+			// Make widget blocks translatable.
+			'widget_block',
+			'show_on_front',
+			"theme_mods_$theme"
+		];
+
+		// Make page on front and page for posts translatable if page post type is translatable.
+		if ( LangInterface::is_post_type_translatable( 'page' ) ) {
+			$defaults[] = 'page_on_front';
+			$defaults[] = 'page_for_posts';
+			$defaults[] = 'wp_page_for_privacy_policy';
+		}
+
+		return array_merge( $options, $defaults );
 	}
 
 	public function get_proxy_option_name( string $option, string $language ) : string {

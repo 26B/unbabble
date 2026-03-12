@@ -20,6 +20,7 @@ class Customize {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Move proxied options filters to OptionsProxy class.
 	 * @since 0.6.1 Add action for lang filter on post type query for nav-menu edit screen.
 	 * @since 0.5.16 Make 'widget_block' option translatable.
 	 * @since 0.4.5 Add check for translatable nav_menu.
@@ -30,9 +31,6 @@ class Customize {
 		// Fix bad customize action URL that contains bad query args (e.g. `?lang=en_US?theme=...`).
 		add_filter( 'wp_prepare_themes_for_js', [ $this, 'fix_customize_action_url' ] );
 
-		// Make widget blocks translatable.
-		add_filter( 'ubb_proxy_options', fn ( $options ) => array_merge( $options, [ 'widget_block' ] ) );
-
 		// Only register customize hooks if nav_menu is translatable.
 		if ( ! LangInterface::is_taxonomy_translatable( 'nav_menu' ) ) {
 			return;
@@ -42,13 +40,6 @@ class Customize {
 
 		// Filter dropdown pages.
 		add_filter( 'wp_dropdown_pages', [ $this, 'wp_dropdown_pages' ], 10, 2 );
-
-		// Options saving and loading.
-		$theme   = get_option( 'stylesheet' );
-		add_filter( 'ubb_proxy_options', fn ( $options ) => array_merge(
-			$options,
-			[ 'page_on_front','show_on_front','page_for_posts', "theme_mods_$theme" ]
-		) );
 
 		// Set menu language when created.
 		add_action( 'create_nav_menu', [ $this, 'set_menu_lang' ], 10, 2 );
