@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-03-12
+
 ### Added
 
 - New proxied option `wp_page_for_privacy_policy` to allow for a different privacy policy page for each language.
@@ -643,7 +645,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 First Release!
 
-[unreleased]: https://github.com/26b/unbabble/compare/0.6.2...HEAD
+[unreleased]: https://github.com/26b/unbabble/compare/0.6.3...HEAD
+[0.6.3]: https://github.com/26b/unbabble/compare/0.6.2...0.6.3
 [0.6.2]: https://github.com/26b/unbabble/compare/0.6.1...0.6.2
 [0.6.1]: https://github.com/26b/unbabble/compare/0.6.0...0.6.1
 [0.6.0]: https://github.com/26b/unbabble/compare/0.5.16...0.6.0

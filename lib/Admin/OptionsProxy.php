@@ -14,7 +14,7 @@ class OptionsProxy {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Move WordPress default proxied options filters to here.
+	 * @since 0.6.3 Move WordPress default proxied options filters to here.
 	 * @since 0.2.0
 	 */
 	public function register() {
@@ -28,7 +28,7 @@ class OptionsProxy {
 	/**
 	 * Add WordPress default proxied options.
 	 *
-	 * @since Unreleased
+	 * @since 0.6.3
 	 */
 	public function wordpress_default_options( array $options ) : array {
 		$theme    = \get_option( 'stylesheet' );
