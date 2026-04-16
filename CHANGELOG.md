@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-04-16
+
+### Fixed
+
+- Fixed a bug in `0.6.3` where the `ubb_proxy_options` was doing recursive calls.
+
 ## [0.6.3] - 2026-03-12
 
 ### Added

@@ -12,8 +12,25 @@ use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 class OptionsProxy {
 
 	/**
+	 * Theme name.
+	 *
+	 * @since 0.6.4
+	 * @var string
+	 */
+	private string $theme;
+
+	/**
+	 * Whether page post type is translatable.
+	 *
+	 * @since 0.6.4
+	 * @var bool
+	 */
+	private bool $is_page_translatable = false;
+
+	/**
 	 * Register hooks.
 	 *
+	 * @since 0.6.4 Set theme and page post type translatable properties.
 	 * @since 0.6.3 Move WordPress default proxied options filters to here.
 	 * @since 0.2.0
 	 */
@@ -22,25 +39,27 @@ class OptionsProxy {
 		add_filter( 'pre_update_option', [ $this, 'pre_update_option_proxy' ], 10, 3 );
 
 		// Add some WordPress proxied options by default.
+		$this->theme                = \get_option( 'stylesheet' );
+		$this->is_page_translatable = LangInterface::is_post_type_translatable( 'page' );
 		add_filter( 'ubb_proxy_options', [ $this, 'wordpress_default_options' ] );
 	}
 
 	/**
 	 * Add WordPress default proxied options.
 	 *
+	 * @since 0.6.4 Move $theme and $is_page_translatable to class properties to fix recurring calls.
 	 * @since 0.6.3
 	 */
 	public function wordpress_default_options( array $options ) : array {
-		$theme    = \get_option( 'stylesheet' );
 		$defaults = [
 			// Make widget blocks translatable.
 			'widget_block',
 			'show_on_front',
-			"theme_mods_$theme"
+			"theme_mods_{$this->theme}"
 		];
 
 		// Make page on front and page for posts translatable if page post type is translatable.
-		if ( LangInterface::is_post_type_translatable( 'page' ) ) {
+		if ( $this->is_page_translatable ) {
 			$defaults[] = 'page_on_front';
 			$defaults[] = 'page_for_posts';
 			$defaults[] = 'wp_page_for_privacy_policy';
