@@ -647,7 +647,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unnecessary dependencies.
 
-## [0.0.1] - 2023-12-19
+## [0.0.1] - 2022-12-19
 
 First Release!
 
