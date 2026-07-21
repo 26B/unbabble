@@ -26,12 +26,14 @@ class LanguageSwitcher {
 	/**
 	 * Add language switcher to the admin bar.
 	 *
+	 * @since Unreleased Added specific handling for menus.
 	 * @since 0.0.1
 	 *
 	 * @param  WP_Admin_Bar $wp_admin_bar
 	 * @return void
 	 */
 	public function add_switcher_backoffice_admin_bar( \WP_Admin_Bar $wp_admin_bar ) : void {
+		global $pagenow;
 		$current        = LangInterface::get_current_language();
 		$languages_info = Options::get_languages_info();
 		$current_label  = $current;
@@ -51,10 +53,16 @@ class LanguageSwitcher {
 			if (
 				( ! isset( $_REQUEST['post'] ) || ! is_numeric( $_REQUEST['post'] ) )
 				&& ( ! isset( $_REQUEST['tag_ID'] ) || ! is_numeric( $_REQUEST['tag_ID'] ) )
+				&& ( ! isset( $_REQUEST['menu'] ) || ! is_numeric( $_REQUEST['menu'] ) )
 			) {
 				$url = $this->make_switch_url( $allowed_lang );
 			} else if ( isset( $_REQUEST['tag_ID'] ) && is_numeric( $_REQUEST['tag_ID'] ) ) {
 				$url = $this->make_switch_term_url( $_REQUEST['tag_ID'], $allowed_lang );
+			} else if (
+				isset( $_REQUEST['menu'] ) && is_numeric( $_REQUEST['menu'] )
+				&& $pagenow === 'nav-menus.php'
+			) {
+				$url = $this->make_switch_menu_url( $_REQUEST['menu'], $allowed_lang );
 			} else {
 				$url = $this->make_switch_post_url( $_REQUEST['post'], $allowed_lang );
 			}
@@ -187,6 +195,57 @@ class LanguageSwitcher {
 		$params = $_GET;
 		unset( $params['lang'], $params['ubb_switch_lang'] );
 		$params['tag_ID']          = $translation_id;
+		$params['ubb_switch_lang'] = $lang;
+		$query                     = http_build_query( $params );
+		if ( empty( $query ) ) {
+			return strtok( $_SERVER["REQUEST_URI"], '?' );
+		}
+		return strtok( $_SERVER["REQUEST_URI"], '?' ) . '?' . $query;
+	}
+
+	/**
+	 * Returns the url for switching language for a menu.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param int    $menu_id
+	 * @param string $lang
+	 * @return string
+	 */
+	private function make_switch_menu_url( int $menu_id, string $lang ) : string {
+		if ( ! LangInterface::is_taxonomy_translatable( 'nav_menu' ) ) {
+			return get_site_url(
+				null,
+				sprintf(
+					"/wp-admin/nav-menus.php?menu=%s&lang=%s",
+					$menu_id,
+					$lang
+				)
+			);
+		}
+
+		// Return same url if the language is the same.
+		if ( $lang === LangInterface::get_term_language( $menu_id ) ) {
+			return $_SERVER["REQUEST_URI"];
+		}
+
+		// Get the translation of the menu.
+		$translation_id = LangInterface::get_term_translation( $menu_id, $lang );
+		if ( ! $translation_id ) {
+			return get_site_url(
+				null,
+				sprintf(
+					"/wp-admin/nav-menus.php?action=edit&menu=%s&lang=%s",
+					0, // Set menu to 0 so WordPress doesn't default to previously edited menu.
+					$lang
+				)
+			);
+		}
+
+		// Build the URL with the translation ID.
+		$params = $_GET;
+		unset( $params['lang'], $params['ubb_switch_lang'] );
+		$params['menu']            = $translation_id;
 		$params['ubb_switch_lang'] = $lang;
 		$query                     = http_build_query( $params );
 		if ( empty( $query ) ) {

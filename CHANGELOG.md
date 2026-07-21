@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed a bug when switching languages in the admin bar for menus.
+
 ## [0.6.4] - 2026-04-16
 
 ### Fixed
