@@ -220,6 +220,7 @@ class BulkEdit {
 	/**
 	 * Adds a message to the bulk edit update message.
 	 *
+	 * @since Unreleased Fix empty post type on edit.php for posts.
 	 * @since 0.4.0
 	 *
 	 * @param array $bulk_messages Bulk messages.
@@ -227,9 +228,14 @@ class BulkEdit {
 	 * @return array
 	 */
 	public function bulk_edit_messages( array $bulk_messages, array $bulk_counts ) : array {
+		global $pagenow;
 
 		// Get current post type.
 		$current_post_type = $_GET['post_type'] ?? '';
+		if ( empty( $current_post_type ) && $pagenow === 'edit.php' ) {
+			$current_post_type = 'post';
+		}
+
 		if ( empty( $current_post_type ) ) {
 			return $bulk_messages;
 		}
