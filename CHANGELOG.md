@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed a bug in `0.6.3` where the `ubb_proxy_options` was doing recursive calls.
+- Fixed not being able to delete a term without language in the back-office.
 
 ## [0.6.3] - 2026-03-12
 
