@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `wp_set_object_terms` without append bug where terms of a different language or without language were not being cleared.
+
 ## [0.6.4] - 2026-04-16
 
 ### Fixed
