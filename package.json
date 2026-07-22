@@ -42,10 +42,10 @@
 	},
 	"homepage": "https://github.com/26B/unbabble#readme",
 	"devDependencies": {
-		"@wordpress/env": "^10.3.0",
-		"@wordpress/scripts": "^27.0.0"
+		"@wordpress/env": "^11.11.0",
+		"@wordpress/scripts": "^33.0.0"
 	},
 	"dependencies": {
-		"@wordpress/icons": "^10.3.0"
+		"@wordpress/icons": "^15.2.0"
 	}
 }
