@@ -22,7 +22,7 @@ class LangFilter {
 		\add_filter( 'terms_clauses', [ $this, 'filter_terms_by_language' ], 10, 3 );
 
 		// Handle deleting terms without language.
-		\add_filter( 'term_exists_default_query_args', [ $this, 'ajax_delete_term_term_exists' ], PHP_INT_MAX, 4 );
+		\add_filter( 'term_exists_default_query_args', [ $this, 'ajax_delete_term_exists' ], PHP_INT_MAX, 4 );
 	}
 
 	/**
