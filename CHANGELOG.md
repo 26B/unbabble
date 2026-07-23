@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## Unreleased
+
+### Fixed
+
+- Fixed empty post type on edit.php for posts in `Posts\BulkEdit::bulk_edit_messages`.
+
 ## [0.6.4] - 2026-04-16
 
 ### Fixed
