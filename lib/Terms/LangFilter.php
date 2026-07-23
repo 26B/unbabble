@@ -15,10 +15,14 @@ class LangFilter {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Added handling of `set_object_terms` action to clear terms of a different language or without language when object terms are set without append.
 	 * @since 0.0.1
 	 */
 	public function register() {
 		\add_filter( 'terms_clauses', [ $this, 'filter_terms_by_language' ], 10, 3 );
+
+		// When object terms are set without append, clear all attached terms of a different language or without language.
+		\add_action( 'set_object_terms', [ $this, 'clear_object_terms_of_different_language' ], 10, 5 );
 	}
 
 	/**
@@ -81,5 +85,84 @@ class LangFilter {
 		$taxonomies_str = implode( "','", $taxonomies_wo_lang );
 		$pieces['where'] .= " AND ( tt.taxonomy IN ('{$taxonomies_str}') OR t.term_id IN ( SELECT term_id FROM {$term_lang_table} WHERE locale = '$current_lang' ) )";
 		return $pieces;
+	}
+
+	/**
+	 * Clears all terms of a different language or without language when object terms are set without append.
+	 *
+	 * We need this because the fetch of terms in wp_set_object_terms() has the lang filter applied,
+	 * so only the terms of the current language are fetched and deleted when append is false.
+	 *
+	 * @since Unreleased
+	 *
+	 * @param int    $object_id  Object ID.
+	 * @param array  $terms      An array of object term IDs or slugs.
+	 * @param array  $tt_ids     An array of term taxonomy IDs.
+	 * @param string $taxonomy   Taxonomy slug.
+	 * @param bool   $append     Whether to append new terms to the old terms.
+	 */
+	public function clear_object_terms_of_different_language( $object_id, $terms, $tt_ids, $taxonomy, $append ) : void {
+		// Ignore any append operations.
+		if ( $append ) {
+			return;
+		}
+
+		// If the taxonomy is not translatable, we don't need to filter.
+		if ( ! LangInterface::is_taxonomy_translatable( $taxonomy ) ) {
+			return;
+		}
+
+		$post_lang = LangInterface::get_post_language( $object_id );
+
+		// If the post doesn't have a language, we don't need to filter.
+		if ( $post_lang === null ) {
+			return;
+		}
+
+		/**
+		 * We use $terms for the ids instead of $tt_ids because if the wp_set_object_terms was
+		 * called with a term id that is not of the current language, it won't be in the $tt_ids
+		 *  array, but it will be in the $terms array, and we want to keep it.
+		 */
+		$term_ids = array_filter( array_map( fn( $term ) => is_numeric( $term ) ? (int) $term : null, $terms ) );
+
+		/**
+		 * If the number of term IDs don't match the number of terms, we skip it since some
+		 * might be slugs and we want to avoid dealing with those.
+		 */
+		if ( count( $term_ids ) !== count( $terms ) ) {
+			return;
+		}
+
+		global $wpdb;
+
+		$term_lang_table = ( new TermTable() )->get_table_name();
+		$term_ids_str    = implode( ',', array_map( 'intval', $term_ids ) );
+		$where_term_ids  = ! empty( $term_ids ) ? "AND TT.term_id NOT IN ({$term_ids_str})" : '';
+
+		// Delete all old terms of a different language or without language.
+		$deleted = $wpdb->query(
+			$wpdb->prepare(
+				"DELETE TR FROM {$wpdb->term_relationships} AS TR
+					INNER JOIN {$wpdb->term_taxonomy} AS TT ON TR.term_taxonomy_id = TT.term_taxonomy_id
+					WHERE TR.object_id = %d
+					AND TT.taxonomy = %s
+					{$where_term_ids}
+					AND TT.term_id NOT IN (
+						SELECT term_id
+						FROM {$term_lang_table}
+						WHERE locale = %s
+					)",
+				$object_id,
+				$taxonomy,
+				$post_lang
+			)
+		);
+
+		if ( $deleted === false ) {
+			\error_log( "Failed to delete terms of a different language or without language for object ID {$object_id} and taxonomy {$taxonomy} when wp_set_object_terms is applied with :append = false." );
+		}
+
+		return;
 	}
 }
