@@ -30,8 +30,6 @@ class LangFilter {
 	 * In this case, we want to ignore the language filter due to a term_exists call that is
 	 * made during the deletion process.
 	 *
-	 * FIXME: this is too specific for ajax, how do we handle term delete in general?
-	 *
 	 * @since Unreleased
 	 *
 	 * @param array $query_args The query args for term_exists.
@@ -40,7 +38,7 @@ class LangFilter {
 	 * @param int|null $parent The parent term ID, if any.
 	 * @return array The modified query args.
 	 */
-	public function ajax_delete_term_term_exists( $query_args, $term, $taxonomy, $parent ) : array {
+	public function ajax_delete_term_exists( $query_args, $term, $taxonomy, $parent ) : array {
 		// Check if we are in the ajax delete term action.
 		if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || ! isset( $_POST['action'] ) || 'delete-tag' !== $_POST['action'] ) {
 			return $query_args;
