@@ -2,7 +2,6 @@ name: Tests
 
 on:
   push:
-  pull_request:
 
 env:
   PHP_VERSION: '8.3'
@@ -60,4 +59,4 @@ jobs:
         key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
 
     - name: Run test suite with coverage
-      run: composer run-script test:ci
+      run: composer run test:ci
