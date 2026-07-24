@@ -17,6 +17,7 @@ class EditFilters {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Add handling for posts with no language or unknown language. Change `add_no_lang_filter` to `add_no_lang_filters`.
 	 * @since 0.4.5 Add views-edit-{$post_type} filter for all translatable post types.
 	 * @since 0.4.2 Remove filter in $_GET when not in admin. Only add filter hook when $_GET filter is set. Stop post lang filter from being applied.
 	 * @since 0.0.1
@@ -31,11 +32,11 @@ class EditFilters {
 
 		$post_types = LangInterface::get_translatable_post_types();
 		foreach ( $post_types as $post_type ) {
-			\add_filter( "views_edit-{$post_type}", [ $this, 'add_no_lang_filter' ], 10 );
+			\add_filter( "views_edit-{$post_type}", [ $this, 'add_no_lang_filters' ], 10 );
 		}
 
 		// Only add this filter if the post filter is set in $_GET
-		if ( isset( $_GET['ubb_empty_lang_filter'] ) ) {
+		if ( isset( $_GET['ubb_empty_lang_filter'] ) || isset( $_GET['ubb_empty_lang_trashed_filter'] ) ) {
 			\add_filter( 'posts_where', [ $this, 'filter_posts_without_language' ], 10, 2 );
 			\add_filter( 'ubb_use_post_lang_filter', '__return_false' );
 			\add_action( 'wp_list_table_class_name', [ $this, 'override_wp_list_table_class' ], 10, 2 );
@@ -45,6 +46,7 @@ class EditFilters {
 	/**
 	 * Adds a filter to show posts without language.
 	 *
+	 * @since Unreleased Change name to `add_no_lang_filters'. Add trash filter.
 	 * @since 0.4.5 Get post type via $_GET instead of `get_post`.
 	 * @since 0.4.2 Fixed the query not considering posts with unknown language.
 	 * @since 0.4.0
@@ -52,7 +54,7 @@ class EditFilters {
 	 * @param array $views
 	 * @return array
 	 */
-	public function add_no_lang_filter( array $views ) : array {
+	public function add_no_lang_filters( array $views ) : array {
 		global $wpdb;
 		$post_type = $_GET['post_type'] ?? 'post';
 		if (
@@ -69,18 +71,18 @@ class EditFilters {
 			return $views;
 		}
 
-		// TODO: Improve query, we don't need the valid count.
 		$posts_count = $wpdb->get_results(
-			"SELECT IF(UBB.locale IN ('{$allowed_languages}'), 'VALID', 'INVALID') as good_locale, COUNT( * ) as count
+			"SELECT IF(P.post_status = 'trash', 'trash', 'other') as status, COUNT( * ) as count
 				FROM {$wpdb->posts} AS P
 				LEFT JOIN {$post_lang_table} AS UBB ON (P.ID = UBB.post_id)
 				WHERE P.post_type = '{$post_type}'
-				GROUP BY good_locale",
+				AND ( UBB.locale IS NULL OR UBB.locale NOT IN ('{$allowed_languages}') )
+				GROUP BY status",
 			OBJECT_K
 		);
 
-		$valid_count   = $posts_count['VALID']->count ?? 0;
-		$invalid_count = $posts_count['INVALID']->count ?? 0;
+		$trash_count   = $posts_count['trash']->count ?? 0;
+		$other_count = $posts_count['other']->count ?? 0;
 
 		$url = \add_query_arg( 'ubb_empty_lang_filter', '', 'edit.php' );
 		if ( $post_type !== 'post' ) {
@@ -94,8 +96,21 @@ class EditFilters {
 			$selected ? 'class="current"' : '',
 			esc_url( $url ),
 			esc_html__( 'No Language', 'unbabble' ),
-			(int) $invalid_count
+			(int) $other_count
 		);
+
+		if ( ! empty( $trash_count ) ) {
+			$selected                               = isset( $_GET['ubb_empty_lang_trashed_filter'] );
+			$url                                    = str_replace( 'ubb_empty_lang_filter', 'ubb_empty_lang_trashed_filter', $url );
+			$url                                    = \add_query_arg( 'post_status', 'trash', $url );
+			$views['ubb_empty_lang_trashed_filter'] = sprintf(
+				'<a %s href="%s">%s</a>(%s)',
+				$selected ? 'class="current"' : '',
+				esc_url( $url ),
+				esc_html__( 'No Language', 'unbabble' ) . ' (' . esc_html_x( 'Trash', 'noun' ) . ')',
+				(int) $trash_count
+			);
+		}
 
 		return $views;
 	}
