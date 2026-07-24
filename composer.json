@@ -15,7 +15,7 @@
     "wp-cli/wp-cli": "^2.7"
   },
   "require-dev": {
-    "10up/wp_mock": "dev-trunk",
+    "brain/monkey": "2.*",
     "phpunit/phpunit": "^9.5.7"
   },
   "authors": [],
@@ -29,6 +29,9 @@
       "TwentySixB\\WP\\Plugin\\Unbabble\\Tests\\": "tests/"
     }
   },
+	"scripts": {
+		"test": "phpunit"
+	},
   "minimum-stability": "stable",
   "config": {
     "sort-packages": true,

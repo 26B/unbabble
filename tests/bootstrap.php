@@ -1,12 +1,13 @@
 <?php
 
-// First we need to load the composer autoloader so we can use WP Mock
 require_once './vendor/autoload.php';
 
 require_once './tests/MockHelpers.php';
 
-// Now call the bootstrap method of WP Mock
-WP_Mock::activateStrictMode();
-WP_Mock::bootstrap();
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/fixtures/wordpress/' );
+}
 
-\WP_Mock::passthruFunction( '__', [ 'return_arg' => 0 ] );
+if ( ! defined( 'WPINC' ) ) {
+	define( 'WPINC', 'wp-includes' );
+}

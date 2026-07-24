@@ -2,10 +2,13 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Tests;
 
+use Brain\Monkey;
+use Brain\Monkey\Filters;
+use Brain\Monkey\Functions;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
-use WP_Mock;
 
 /**
  * Unit tests for LangInterface.
@@ -13,6 +16,7 @@ use WP_Mock;
  * @since 0.0.12
  */
 class LangInterfaceTest extends TestCase {
+	use MockeryPHPUnitIntegration;
 
 	/**
 	 * TODO: Functions to be tested in Integration and E2E testing.
@@ -42,6 +46,24 @@ class LangInterfaceTest extends TestCase {
 	 */
 
 	/**
+	 * Set up tests.
+	 *
+	 * @since 0.0.12
+	 *
+	 * @return void
+	 */
+	public function setUp() : void {
+		parent::setUp();
+		Monkey\setUp();
+
+		Functions\when( '__' )->returnArg();
+
+		$property = ( new \ReflectionClass( Options::class ) )->getProperty( 'options' );
+		$property->setAccessible( true );
+		$property->setValue( null, null );
+	}
+
+	/**
 	 * Tear down tests.
 	 *
 	 * @since 0.0.12
@@ -49,7 +71,8 @@ class LangInterfaceTest extends TestCase {
 	 * @return void
 	 */
 	public function tearDown() : void {
-		\WP_Mock::tearDown();
+		Monkey\tearDown();
+		parent::tearDown();
 	}
 
 	/**
@@ -81,11 +104,14 @@ class LangInterfaceTest extends TestCase {
 	 * @return void
 	 */
 	public function setUpOptionsHooks( array $options, string $default_locale = 'en_US' ) : void {
-		WP_Mock::expectFilterAdded( 'ubb_stop_switch_locale', '__return_true' );
+		Filters\expectAdded( 'ubb_stop_switch_locale' )
+			->twice()
+			->with( '__return_true' );
 
 		mock_user_function( 'get_locale', [], null, $default_locale );
-		// No expectFilterRemoved exists, so we need to do it manually.
-		mock_user_function( 'remove_filter', [ 'ubb_stop_switch_locale', '__return_true' ], null );
+		Filters\expectRemoved( 'ubb_stop_switch_locale' )
+			->twice()
+			->with( '__return_true' );
 		mock_user_function( 'get_option', [ 'ubb_options' ], null, $options );
 
 		$default_options = Options::defaults();
@@ -109,9 +135,10 @@ class LangInterfaceTest extends TestCase {
 		mock_user_function( 'current_user_can', [ 'manage_options' ], null, false );
 
 		// Test languages unfiltered by hidden languages.
-		WP_Mock::onFilter( 'ubb_do_hidden_languages_filter' )
+		Filters\expectApplied( 'ubb_do_hidden_languages_filter' )
+			->once()
 			->with( true, $options )
-			->reply( false );
+			->andReturn( false );
 
 		$this->assertSame(
 			$options['allowed_languages'],
@@ -119,9 +146,10 @@ class LangInterfaceTest extends TestCase {
 		);
 
 		// Test languages filtered by hidden languages.
-		WP_Mock::onFilter( 'ubb_do_hidden_languages_filter' )
+		Filters\expectApplied( 'ubb_do_hidden_languages_filter' )
+			->once()
 			->with( true, $options )
-			->reply( true );
+			->andReturn( true );
 
 		$this->assertSame(
 			array_diff( $options['allowed_languages'], $options['hidden_languages'] ),
