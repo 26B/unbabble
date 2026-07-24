@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed a bug when switching languages in the admin bar for menus.
 - Fixed `wp_set_object_terms` without append bug where terms of a different language or without language were not being cleared.
 - Fixed empty post type on edit.php for posts in `Posts\BulkEdit::bulk_edit_messages`.
+- Fixed missing variable (typo) `$lang` comparison in `Directory::apply_lang_to_attachment_url` method.
+
+### Added
+
+- Add test coverage for main classes and methods.
+- Replaced WP_Mock with Brain\Monkey for better testing of WordPress functions and hooks.
+- Handle non-null `$pre` in `Directory::pre_redirect_guess_404_permalink` and `QueryVar::pre_redirect_guess_404_permalink` as already short-circuited.
 
 ## [0.6.4] - 2026-04-16
 

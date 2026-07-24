@@ -157,20 +157,23 @@ class DirectoryTest extends TestCase {
 	 *
 	 * @since Unreleased
 	 *
-	 * @testdox home_url - returns REST scheme URLs unchanged
+	 * @testdox home_url - applies directory routing to REST scheme URLs
 	 *
 	 * @return void
 	 */
-	public function testHomeUrlReturnsRestSchemeUrlsUnchanged() : void {
+	public function testHomeUrlAppliesDirectoryRoutingToRestSchemeUrls() : void {
+		$this->setUpOptionsHooks();
+
 		Filters\expectApplied( 'ubb_home_url' )
 			->once()
 			->with( false, 'https://example.test/wp-json/', '/wp-json/', 'rest' )
 			->andReturn( false );
-		Functions\expect( 'get_option' )->never();
-		Functions\expect( 'get_query_var' )->never();
+		mock_user_function( 'is_admin', null, null, true );
+		mock_user_function( 'sanitize_text_field', [ 'pt_PT' ], 1, 'pt_PT' );
+		$_GET['lang'] = 'pt_PT';
 
 		$this->assertSame(
-			'https://example.test/wp-json/',
+			'https://example.test/pt/wp-json/',
 			Directory::home_url( 'https://example.test/wp-json/', '/wp-json/', 'rest' )
 		);
 	}

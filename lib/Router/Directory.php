@@ -186,7 +186,7 @@ class Directory {
 	/**
 	 * Applies language to the attachment's link given it's language.
 	 *
-	 * @since
+	 * @since Unreleased Correct typo in variable name comparison.
 	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
@@ -312,6 +312,7 @@ class Directory {
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
 	 *
+	 * @since Unreleased Assume that when `$pre` is null the logic has already been short-circuited.
 	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
@@ -393,7 +394,7 @@ class Directory {
 	 * Adds directory to home_url.
 	 *
 	 * @since 0.6.0 Changed to static.
-	 * @since 0.5.4 Allow 'rest' schemes regardless.
+	 * @since 0.5.6 Allow 'rest' schemes regardless.
 	 * @since 0.5.2 Allow 'rest' schemes if in admin to fix Block Editor.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
@@ -416,10 +417,6 @@ class Directory {
 		 * @param string $scheme          Url scheme.
 		 */
 		if ( apply_filters( 'ubb_home_url', false, $url, $path, $scheme ) ) {
-			return $url;
-		}
-
-		if ( $scheme === 'rest' ) {
 			return $url;
 		}
 
