@@ -75,6 +75,7 @@ class Options {
 	/**
 	 * Submit options.
 	 *
+	 * @since Unreleased Return bad request responses for validation errors.
 	 * @since 0.5.0 Improve response with new options and canUpdate.
 	 * @since 0.2.0
 	 *

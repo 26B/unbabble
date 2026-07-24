@@ -186,6 +186,7 @@ class Directory {
 	/**
 	 * Applies language to the attachment's link given it's language.
 	 *
+	 * @since
 	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
@@ -197,7 +198,7 @@ class Directory {
 		// When attachments are attached to a post, their url already has the lang from the post permalink.
 		$link_lang = self::current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
 		$post_lang = LangInterface::get_post_language( $post_id );
-		if ( ! empty( $lang ) && $link_lang === $post_lang ) {
+		if ( ! empty( $link_lang ) && $link_lang === $post_lang ) {
 			return $link;
 		}
 
@@ -318,7 +319,10 @@ class Directory {
 	 * @return null|string|false
 	 */
 	public static function pre_redirect_guess_404_permalink( $pre ) {
-		// TODO: What to do with the $pre.
+		if ( $pre !== null ) {
+			return $pre;
+		}
+
 		global $wpdb;
 		if ( get_query_var( 'name' ) ) {
 			/**
@@ -415,6 +419,10 @@ class Directory {
 			return $url;
 		}
 
+		if ( $scheme === 'rest' ) {
+			return $url;
+		}
+
 		$curr_lang = LangInterface::get_current_language();
 		if ( $curr_lang === LangInterface::get_default_language() ) {
 			return $url;
@@ -445,9 +453,10 @@ class Directory {
 	 *
 	 * @param string $url
 	 * @param string $path
+	 * @param mixed  $orig_scheme
 	 * @return string
 	 */
-	public static function network_home_url( string $url, string $path ) : string {
+	public static function network_home_url( string $url, string $path, $orig_scheme ) : string {
 		if ( ! is_multisite() ) {
 			return $url;
 		}

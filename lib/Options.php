@@ -180,6 +180,7 @@ class Options {
 	/**
 	 * Updates the Unbabble options via the API.
 	 *
+	 * @since Unreleased Validate API payload before building options.
 	 * @since 0.5.0 Add update for manual changes option.
 	 * @since 0.2.0
 	 *
@@ -521,7 +522,7 @@ class Options {
 	/**
 	 * Validates the API options payload before building the internal options array.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @param array $options
 	 * @return array

@@ -14,7 +14,7 @@ use TwentySixB\WP\Plugin\Unbabble\Options;
 /**
  * Unit tests for LangInterface.
  *
- * @since 0.0.12
+ * @since Unreleased Migrate LangInterface tests to Brain Monkey.
  */
 class LangInterfaceTest extends TestCase {
 	use MockeryPHPUnitIntegration;
@@ -49,7 +49,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Set up tests.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @return void
 	 */
@@ -72,7 +72,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Tear down tests.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Tear down Brain Monkey after tests.
 	 *
 	 * @return void
 	 */
@@ -84,7 +84,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Options used in the tests.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Use shared options for expanded language tests.
 	 *
 	 * @return array
 	 */
@@ -103,7 +103,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Set up hooks for loading options.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Set up Brain Monkey hooks for options loading.
 	 *
 	 * @param array  $options
 	 * @param string $default_locale
@@ -127,7 +127,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_languages.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate hidden language filter assertions to Brain Monkey.
 	 *
 	 * @testdox get_languages - return expected filtered and unfiltered languages
 	 *
@@ -166,7 +166,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_language_allowed.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate allowed language assertions to Brain Monkey.
 	 *
 	 * @testdox is_language_allowed - returns as expected
 	 *
@@ -191,7 +191,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_default_language.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate default language assertions to Brain Monkey.
 	 *
 	 * @testdox get_default_language - returns as expected
 	 *
@@ -210,7 +210,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_current_language with a query var.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_current_language - reads a valid query var before other sources
 	 *
@@ -237,7 +237,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_current_language with GET data.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_current_language - falls back to a valid lang request value
 	 *
@@ -262,7 +262,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_current_language with admin cookie.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_current_language - falls back to a valid admin language cookie
 	 *
@@ -287,7 +287,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_current_language with an invalid value.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_current_language - falls back to default language when value is invalid
 	 *
@@ -314,7 +314,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_current_language.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate current language mutation assertions to Brain Monkey.
 	 *
 	 * @testdox set_current_language - functions as expected
 	 *
@@ -340,7 +340,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_post_language from database.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_post_language - returns database value and caches it when cache misses
 	 *
@@ -380,7 +380,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_post_language rejects unknown language.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox set_post_language - rejects unknown language without writing the database
 	 *
@@ -401,7 +401,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_post_language inserts a new language.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox set_post_language - writes a new language, clears cache, and fires action
 	 *
@@ -464,7 +464,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_post_source from transient.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_post_source - returns non-empty transient value without reading meta
 	 *
@@ -480,7 +480,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_post_source normalizes empty meta.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_post_source - normalizes empty meta values to null and caches null
 	 *
@@ -497,7 +497,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_post_source adds a new source.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox set_post_source - adds a new source, updates transients, and fires action
 	 *
@@ -520,7 +520,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_post_source force with same source.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox set_post_source - forced same source returns true without writing meta
 	 *
@@ -538,7 +538,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test delete_post_source preserves integer ID.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox delete_post_source - deletes transients and meta using integer post ID
 	 *
@@ -562,7 +562,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_translatable_post_types.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate translatable post type assertions to Brain Monkey.
 	 *
 	 * @testdox get_translatable_post_types - returns as expected
 	 *
@@ -581,7 +581,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_post_type_translatable.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate post type translatability assertions to Brain Monkey.
 	 *
 	 * @testdox is_post_type_translatable - returns as expected
 	 *
@@ -606,7 +606,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_translatable_taxonomies.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate translatable taxonomy assertions to Brain Monkey.
 	 *
 	 * @testdox get_translatable_taxonomies - returns as expected
 	 *
@@ -625,7 +625,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_term_source from transient.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_term_source - returns non-empty transient value without reading meta
 	 *
@@ -641,7 +641,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_term_source normalizes empty meta.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox get_term_source - normalizes empty meta values to null and caches null
 	 *
@@ -658,7 +658,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_term_source adds a new source.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox set_term_source - adds a new source, updates transients, and fires action
 	 *
@@ -681,7 +681,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test set_term_source force with same source.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox set_term_source - forced same source returns true without writing meta
 	 *
@@ -699,7 +699,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test delete_term_source preserves integer ID.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox delete_term_source - deletes transients and meta using integer term ID
 	 *
@@ -723,7 +723,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_taxonomy_translatable.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate taxonomy translatability assertions to Brain Monkey.
 	 *
 	 * @testdox is_taxonomy_translatable - returns as expected
 	 *

@@ -11,7 +11,7 @@ use TwentySixB\WP\Plugin\Unbabble\Validation\Validator;
 /**
  * Unit tests for Validator.
  *
- * @since 0.0.12
+ * @since Unreleased
  */
 class ValidatorTest extends TestCase {
 	use MockeryPHPUnitIntegration;
@@ -19,7 +19,7 @@ class ValidatorTest extends TestCase {
 	/**
 	 * Set up tests.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @return void
 	 */
@@ -33,7 +33,7 @@ class ValidatorTest extends TestCase {
 	/**
 	 * Tear down tests.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @return void
 	 */
@@ -45,7 +45,7 @@ class ValidatorTest extends TestCase {
 	/**
 	 * Test valid values.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox validate - accepts values that satisfy all configured rules
 	 *
@@ -77,7 +77,7 @@ class ValidatorTest extends TestCase {
 	/**
 	 * Test missing values.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox validate - reports configured keys that are missing
 	 *
@@ -98,7 +98,7 @@ class ValidatorTest extends TestCase {
 	/**
 	 * Test invalid values.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox validate - reports type, emptiness, and allow-list errors
 	 *
@@ -138,7 +138,7 @@ class ValidatorTest extends TestCase {
 	/**
 	 * Test invalid string array values.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased
 	 *
 	 * @testdox validate - reports non-string entries in string arrays
 	 *
