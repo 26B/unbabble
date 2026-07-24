@@ -536,6 +536,30 @@ class LangInterfaceTest extends TestCase {
 	}
 
 	/**
+	 * Test delete_post_source preserves integer ID.
+	 *
+	 * @since 0.0.12
+	 *
+	 * @testdox delete_post_source - deletes transients and meta using integer post ID
+	 *
+	 * @return void
+	 */
+	public function testDeletePostSourceUsesIntegerPostId() : void {
+		mock_user_function( 'get_transient', [ 'ubb_123_post_source' ], 1, 'source-1' );
+		mock_user_function( 'delete_transient', [ 'ubb_source-1_source_posts' ], 1, true );
+		mock_user_function( 'delete_transient', [ 'ubb_123_post_source' ], 1, true );
+		Actions\expectDone( 'ubb_post_source_delete' )
+			->once()
+			->with( \Mockery::on( fn ( $post_id ) => $post_id === 123 ), 'source-1' );
+		Functions\expect( 'delete_post_meta' )
+			->once()
+			->with( \Mockery::on( fn ( $post_id ) => $post_id === 123 ), 'ubb_source' )
+			->andReturn( true );
+
+		$this->assertTrue( LangInterface::delete_post_source( 123 ) );
+	}
+
+	/**
 	 * Test get_translatable_post_types.
 	 *
 	 * @since 0.0.12
@@ -670,6 +694,30 @@ class LangInterfaceTest extends TestCase {
 		Functions\expect( 'delete_transient' )->never();
 
 		$this->assertTrue( LangInterface::set_term_source( 321, 'source-2', true ) );
+	}
+
+	/**
+	 * Test delete_term_source preserves integer ID.
+	 *
+	 * @since 0.0.12
+	 *
+	 * @testdox delete_term_source - deletes transients and meta using integer term ID
+	 *
+	 * @return void
+	 */
+	public function testDeleteTermSourceUsesIntegerTermId() : void {
+		mock_user_function( 'get_transient', [ 'ubb_321_term_source' ], 1, 'source-2' );
+		mock_user_function( 'delete_transient', [ 'ubb_source-2_source_terms' ], 1, true );
+		mock_user_function( 'delete_transient', [ 'ubb_321_term_source' ], 1, true );
+		Actions\expectDone( 'ubb_term_source_delete' )
+			->once()
+			->with( \Mockery::on( fn ( $term_id ) => $term_id === 321 ), 'source-2' );
+		Functions\expect( 'delete_term_meta' )
+			->once()
+			->with( \Mockery::on( fn ( $term_id ) => $term_id === 321 ), 'ubb_source' )
+			->andReturn( true );
+
+		$this->assertTrue( LangInterface::delete_term_source( 321 ) );
 	}
 
 	/**

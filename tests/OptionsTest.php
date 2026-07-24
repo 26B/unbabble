@@ -15,12 +15,32 @@ namespace {
 		class WP_REST_Request {
 			private string $body;
 
-			public function __construct( array $body ) {
-				$this->body = json_encode( $body );
+			public function __construct( $body ) {
+				$this->body = is_string( $body ) ? $body : json_encode( $body );
 			}
 
 			public function get_body() : string {
 				return $this->body;
+			}
+		}
+	}
+
+	if ( ! class_exists( 'WP_REST_Response' ) ) {
+		class WP_REST_Response {
+			private $data;
+			private int $status;
+
+			public function __construct( $data, int $status = 200 ) {
+				$this->data   = $data;
+				$this->status = $status;
+			}
+
+			public function get_data() {
+				return $this->data;
+			}
+
+			public function get_status() : int {
+				return $this->status;
 			}
 		}
 	}
@@ -33,7 +53,9 @@ use Brain\Monkey\Filters;
 use Brain\Monkey\Functions;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
+use TwentySixB\WP\Plugin\Unbabble\API\Options as APIOptions;
 use TwentySixB\WP\Plugin\Unbabble\Options;
+use TwentySixB\WP\Plugin\Unbabble\Plugin;
 
 /**
  * Unit tests for Options.
@@ -369,6 +391,99 @@ class OptionsTest extends TestCase {
 		);
 
 		$this->assertTrue( Options::update_via_api( $request ) );
+	}
+
+	/**
+	 * Test update_via_api with invalid JSON.
+	 *
+	 * @since 0.0.12
+	 *
+	 * @testdox update_via_api - returns per-field errors for invalid JSON bodies
+	 *
+	 * @return void
+	 */
+	public function testUpdateViaApiReturnsErrorsForInvalidJsonBody() : void {
+		Functions\expect( 'update_option' )->never();
+
+		$this->assertSame(
+			[
+				'languages'       => [ 'Missing option.' ],
+				'defaultLanguage' => [ 'Missing option.' ],
+				'routing'         => [ 'Missing option.' ],
+				'postTypes'       => [ 'Missing option.' ],
+				'taxonomies'      => [ 'Missing option.' ],
+			],
+			Options::update_via_api( new \WP_REST_Request( '{invalid json' ) )
+		);
+	}
+
+	/**
+	 * Test update_via_api rejects malformed nested payload values.
+	 *
+	 * @since 0.0.12
+	 *
+	 * @testdox update_via_api - rejects malformed language, router, and type entries
+	 *
+	 * @return void
+	 */
+	public function testUpdateViaApiRejectsMalformedNestedPayloadValues() : void {
+		Functions\expect( 'update_option' )->never();
+
+		$request = new \WP_REST_Request(
+			[
+				'languages'       => [
+					[ 'language' => 'en_US' ],
+					[ 'hidden' => true ],
+				],
+				'defaultLanguage' => 'en_US',
+				'routing'         => [
+					'router'         => 'directory',
+					'router_options' => [],
+				],
+				'postTypes'       => [ 'post', 26 ],
+				'taxonomies'      => [ 'category', false ],
+			]
+		);
+
+		$this->assertSame(
+			[
+				'languages'  => [ 'At least one language entry is invalid.' ],
+				'routing'    => [ 'Missing directories option.' ],
+				'postTypes'  => [ 'At least one of it\'s array values is not a string.' ],
+				'taxonomies' => [ 'At least one of it\'s array values is not a string.' ],
+			],
+			Options::update_via_api( $request )
+		);
+	}
+
+	/**
+	 * Test submit_options validation status.
+	 *
+	 * @since 0.0.12
+	 *
+	 * @testdox submit_options - returns 400 when submitted options fail validation
+	 *
+	 * @return void
+	 */
+	public function testSubmitOptionsReturnsBadRequestForValidationErrors() : void {
+		Functions\expect( 'update_option' )->never();
+
+		$api      = new APIOptions( new Plugin( 'unbabble', 'test' ), 'unbabble/v1' );
+		$response = $api->submit_options( new \WP_REST_Request( '{invalid json' ) );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame(
+			[
+				'errors' => [
+					'languages'       => [ 'Missing option.' ],
+					'defaultLanguage' => [ 'Missing option.' ],
+					'routing'         => [ 'Missing option.' ],
+					'postTypes'       => [ 'Missing option.' ],
+					'taxonomies'      => [ 'Missing option.' ],
+				],
+			],
+			$response->get_data()
+		);
 	}
 }
 }

@@ -617,14 +617,14 @@ class LangInterface {
 	 * @since 0.4.6 Added `ubb_post_source_delete` action.
 	 * @since 0.0.1
 	 *
-	 * @param string $post_id ID of the post to delete source.
+	 * @param int $post_id ID of the post to delete source.
 	 * @return bool True on success, false on failure.
 	 */
-	public static function delete_post_source( string $post_id ) : bool {
+	public static function delete_post_source( int $post_id ) : bool {
 
 		// Delete transient for translations.
 		$post_source   = self::get_post_source( $post_id );
-		if ( ! $post_source ) {
+		if ( ! empty( $post_source ) ) {
 			\delete_transient( sprintf( 'ubb_%s_source_posts', $post_source ) );
 		}
 
@@ -1041,14 +1041,14 @@ class LangInterface {
 	 * @since 0.4.6 Added `ubb_term_source_delete` action.
 	 * @since 0.0.1
 	 *
-	 * @param string $term_id ID of the term to delete source.
+	 * @param int $term_id ID of the term to delete source.
 	 * @return bool True on success, false on failure.
 	 */
-	public static function delete_term_source( string $term_id ) : bool {
+	public static function delete_term_source( int $term_id ) : bool {
 
 		// Delete transient for translations.
 		$term_source = self::get_term_source( $term_id );
-		if ( ! $term_source ) {
+		if ( ! empty( $term_source ) ) {
 			\delete_transient( sprintf( 'ubb_%s_source_terms', $term_source ) );
 		}
 

@@ -189,6 +189,15 @@ class Options {
 	 */
 	public static function update_via_api( \WP_REST_Request $request ) {
 		$body = json_decode( $request->get_body(), true );
+		if ( ! is_array( $body ) ) {
+			$body = [];
+		}
+
+		$payload_errors = self::validate_api_payload( $body );
+		if ( $payload_errors ) {
+			return $payload_errors;
+		}
+
 		$new_options = self::build_options_from_api( $body );
 
 		$errors = self::validate( $new_options );
@@ -507,6 +516,78 @@ class Options {
 		$new_options = self::standardize( $new_options );
 
 		return $new_options;
+	}
+
+	/**
+	 * Validates the API options payload before building the internal options array.
+	 *
+	 * @since 0.0.12
+	 *
+	 * @param array $options
+	 * @return array
+	 */
+	private static function validate_api_payload( array $options ) : array {
+		$errors = [];
+
+		if ( ! isset( $options['languages'] ) ) {
+			$errors['languages'][] = \__( 'Missing option.', 'unbabble' );
+		} else if ( ! is_array( $options['languages'] ) ) {
+			$errors['languages'][] = \__( 'Value is not an array.', 'unbabble' );
+		} else {
+			foreach ( $options['languages'] as $language ) {
+				if ( ! is_array( $language ) || ! is_string( $language['language'] ?? null ) ) {
+					$errors['languages'][] = \__( 'At least one language entry is invalid.', 'unbabble' );
+					break;
+				}
+			}
+		}
+
+		if ( ! isset( $options['defaultLanguage'] ) ) {
+			$errors['defaultLanguage'][] = \__( 'Missing option.', 'unbabble' );
+		} else if ( ! is_string( $options['defaultLanguage'] ) ) {
+			$errors['defaultLanguage'][] = \__( 'Value is not a string.', 'unbabble' );
+		}
+
+		if ( ! isset( $options['routing'] ) ) {
+			$errors['routing'][] = \__( 'Missing option.', 'unbabble' );
+		} else if ( ! is_array( $options['routing'] ) ) {
+			$errors['routing'][] = \__( 'Value is not an array.', 'unbabble' );
+		} else {
+			if ( ! isset( $options['routing']['router'] ) ) {
+				$errors['routing'][] = \__( 'Missing router option.', 'unbabble' );
+			} else if ( ! is_string( $options['routing']['router'] ) ) {
+				$errors['routing'][] = \__( 'Router is not a string.', 'unbabble' );
+			}
+
+			if ( ! isset( $options['routing']['router_options'] ) ) {
+				$errors['routing'][] = \__( 'Missing router options.', 'unbabble' );
+			} else if ( ! is_array( $options['routing']['router_options'] ) ) {
+				$errors['routing'][] = \__( 'Router options are not an array.', 'unbabble' );
+			} else if (
+				( $options['routing']['router'] ?? null ) === 'directory'
+				&& ! is_array( $options['routing']['router_options']['directories'] ?? null )
+			) {
+				$errors['routing'][] = \__( 'Missing directories option.', 'unbabble' );
+			}
+		}
+
+		if ( ! isset( $options['postTypes'] ) ) {
+			$errors['postTypes'][] = \__( 'Missing option.', 'unbabble' );
+		} else if ( ! is_array( $options['postTypes'] ) ) {
+			$errors['postTypes'][] = \__( 'Value is not an array.', 'unbabble' );
+		} else if ( array_filter( $options['postTypes'], fn ( $post_type ) => ! is_string( $post_type ) ) ) {
+			$errors['postTypes'][] = \__( 'At least one of it\'s array values is not a string.', 'unbabble' );
+		}
+
+		if ( ! isset( $options['taxonomies'] ) ) {
+			$errors['taxonomies'][] = \__( 'Missing option.', 'unbabble' );
+		} else if ( ! is_array( $options['taxonomies'] ) ) {
+			$errors['taxonomies'][] = \__( 'Value is not an array.', 'unbabble' );
+		} else if ( array_filter( $options['taxonomies'], fn ( $taxonomy ) => ! is_string( $taxonomy ) ) ) {
+			$errors['taxonomies'][] = \__( 'At least one of it\'s array values is not a string.', 'unbabble' );
+		}
+
+		return $errors;
 	}
 
 	/**
