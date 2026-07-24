@@ -17,12 +17,15 @@ class AdminNotices {
 	/**
 	 * Register hooks.
 	 *
+	 * @since Unreleased Add filters for trashed posts without none/unknown language.
 	 * @since 0.0.1
 	 */
 	public function register() {
 		\add_action( 'admin_notices', [ $this, 'duplicate_language' ], PHP_INT_MAX );
 		\add_action( 'admin_notices', [ $this, 'posts_missing_language' ], PHP_INT_MAX );
+		\add_action( 'admin_notices', [ $this, 'trashed_posts_missing_language' ], PHP_INT_MAX );
 		\add_filter( 'admin_notices', [ $this, 'post_missing_language_filter_explanation' ], PHP_INT_MAX );
+		\add_filter( 'admin_notices', [ $this, 'trashed_post_missing_language_filter_explanation' ], PHP_INT_MAX );
 	}
 
 	/**
@@ -58,6 +61,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice for when there's posts with missing languages or with an unknown language.
 	 *
+	 * @since Unreleased Add query condition to not count trashed posts.
 	 * @since 0.4.2 Remove TODO and duplicate $post_type.
 	 * @since 0.0.1
 	 *
@@ -96,7 +100,7 @@ class AdminNotices {
 					SELECT post_id
 					FROM {$translations_table} as PT
 					WHERE PT.locale IN ('{$allowed_languages}')
-				) AND post_type = %s AND post_status != 'auto-draft'",
+				) AND post_type = %s AND post_status != 'auto-draft' AND post_status != 'trash'",
 				esc_sql( $post_type )
 			)
 		);
@@ -113,6 +117,78 @@ class AdminNotices {
 		);
 
 		$url = add_query_arg( 'ubb_empty_lang_filter', '', parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
+		if ( $post_type !== 'post' ) {
+			$url = add_query_arg( 'post_type', $post_type, $url );
+		}
+
+		printf(
+			'<div class="notice notice-warning"><p><b>Unbabble: </b>%s</p></div>',
+			sprintf(
+				$message,
+				count( $bad_posts ),
+				$url
+			)
+		);
+	}
+
+	/**
+	 * Adds an admin notice for when there's trashed posts with missing languages or with an unknown language.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
+	public function trashed_posts_missing_language() : void {
+		global $wpdb;
+		$screen = get_current_screen();
+		if (
+			! is_admin()
+			|| $screen->parent_base !== 'edit'
+			|| $screen->base !== 'edit'
+			|| ! current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		$post_type = $_GET['post_type'] ?? 'post';
+
+		// Don't show when the user is already on the no language filter.
+		if ( isset( $_GET['ubb_empty_lang_trashed_filter'] ) ) {
+			return;
+		}
+
+		if ( ! LangInterface::is_post_type_translatable( $post_type ) ) {
+			return;
+		}
+
+		$allowed_languages  = implode( "','", LangInterface::get_languages() );
+		$translations_table = ( new PostTable() )->get_table_name();
+		$bad_posts          = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID
+				FROM {$wpdb->posts} as P
+				WHERE ID NOT IN (
+					SELECT post_id
+					FROM {$translations_table} as PT
+					WHERE PT.locale IN ('{$allowed_languages}')
+				) AND post_type = %s AND post_status = 'trash'",
+				esc_sql( $post_type )
+			)
+		);
+
+		if ( count( $bad_posts ) === 0 ) {
+			return;
+		}
+
+		$message = _n(
+			'There is %1$s trashed post without language or with an unknown language. <a href="%2$s">See post</a>',
+			'There are %1$s trashed posts without language or with an unknown language. <a href="%2$s">See posts</a>',
+			count( $bad_posts ),
+			'unbabble'
+		);
+
+		$url = add_query_arg( 'ubb_empty_lang_trashed_filter', '', parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
+		// $url = add_query_arg( 'post_status', 'trash', $url );
 		if ( $post_type !== 'post' ) {
 			$url = add_query_arg( 'post_type', $post_type, $url );
 		}
@@ -151,6 +227,33 @@ class AdminNotices {
 		printf(
 			'<div class="notice notice-info"><p><b>Unbabble:</b> %s</p></div>',
 			__( 'The posts presented here have no language or an unknown language. Use the Bulk Edit or the Post Edit Page to assign languages.', 'unbabble' )
+		);
+	}
+
+	/**
+	 * Adds an admin notice explaining the trashed post filter for unknown or missing languages.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
+	public function trashed_post_missing_language_filter_explanation() : void {
+		$screen = get_current_screen();
+		if (
+			! is_admin()
+			|| $screen->parent_base !== 'edit'
+			|| $screen->base !== 'edit'
+		) {
+			return;
+		}
+
+		if ( ! isset( $_GET['ubb_empty_lang_trashed_filter'] ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-info"><p><b>Unbabble:</b> %s</p></div>',
+			__( 'The posts presented here are trashed and have no language or an unknown language.', 'unbabble' )
 		);
 	}
 }
