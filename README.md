@@ -58,11 +58,11 @@ Options have a specific table, but there is no interface to connect them and cre
 
 ### Translations Links
 
-To know which entities are translations of any other entity, we add a meta to all entities that contains the original ID `ubb_source`. The original is the first post that was created, and can be in any langue. Although the site might have a given default language that is not required to be the language of all original posts/terms.
+To know which entities are translations of any other entity, we add a meta to all entities that contains the original ID `ubb_source`. The original is the first post that was created, and can be in any language. Although the site might have a given default language that does not make it the language of all original posts/terms.
 
 ### Enforced restrictions
 
-- Only one translation for a given `ubb_source` with the same locale (avoids multiple options for the same entity). This does not break the site, but is shown as an issue. By default, when many posts share the same language, it first is selected.
+- Only one translation for a given `ubb_source` with the same locale (avoids multiple options for the same entity). This does not break the site, but is shown as an issue. By default, when many posts share the same language, the first is selected as the content's language.
 
 ## Develop
 
@@ -70,8 +70,8 @@ We use a standard WordPress plugin approach with OOP style and composer to manag
 
 Development requires:
 
-- NodeJS v18
-- PHP >=8.0
+- NodeJS v20
+- PHP >=8.3
 - Composer v2
 - WordPress >=6.5
 - Docker (optional)
