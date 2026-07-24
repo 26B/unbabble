@@ -188,7 +188,6 @@ class AdminNotices {
 		);
 
 		$url = add_query_arg( 'ubb_empty_lang_trashed_filter', '', parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
-		// $url = add_query_arg( 'post_status', 'trash', $url );
 		if ( $post_type !== 'post' ) {
 			$url = add_query_arg( 'post_type', $post_type, $url );
 		}
