@@ -1,0 +1,63 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+env:
+  PHP_VERSION: '8.3'
+  NODE_VERSION: '20.x'
+  BACKEND_CACHE_PATH: |
+    vendor
+
+jobs:
+  install-backend:
+    name: Install backend dependencies
+    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Switch PHP Version
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Validate composer.json and composer.lock files
+        run: composer validate --no-interaction
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.BACKEND_CACHE_PATH }}
+          key: ${{ runner.os }}-composer-dev-${{ hashFiles('composer.lock') }}
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader --no-scripts
+
+  backend-test:
+    name: Backend Unit Testing
+    needs: install-backend
+    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v6.0.2
+
+    - name: Switch PHP Version
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+
+    - name: Composer Modules Cache - Checkout
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.BACKEND_CACHE_PATH }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+
+    - name: Run test suite with coverage
+      run: composer run-script test:ci
