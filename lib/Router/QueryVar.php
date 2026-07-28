@@ -186,6 +186,7 @@ class QueryVar {
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
 	 *
+	 * @since Unreleased Assume that when `$pre` is null the logic has already been short-circuited.
 	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
@@ -193,7 +194,10 @@ class QueryVar {
 	 * @return null|string|false
 	 */
 	public static function pre_redirect_guess_404_permalink( $pre ) {
-		// TODO: What to do with the $pre.
+		if ( $pre !== null ) {
+			return $pre;
+		}
+
 		global $wpdb;
 		if ( get_query_var( 'name' ) ) {
 			/**
@@ -307,9 +311,10 @@ class QueryVar {
 	 *
 	 * @param string $url
 	 * @param string $path
+	 * @param mixed  $orig_scheme
 	 * @return string
 	 */
-	public static function network_home_url( string $url, string $path ) : string {
+	public static function network_home_url( string $url, string $path, $orig_scheme ) : string {
 		if ( ! is_multisite() ) {
 			return $url;
 		}

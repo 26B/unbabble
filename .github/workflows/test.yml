@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+
+env:
+  PHP_VERSION: '8.3'
+  NODE_VERSION: '20.x'
+  BACKEND_CACHE_PATH: |
+    vendor
+
+jobs:
+  backend:
+    name: Install dependencies and run tests
+    timeout-minutes: 5
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Switch PHP Version
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Validate composer.json and composer.lock files
+        run: composer validate --no-interaction
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.BACKEND_CACHE_PATH }}
+          key: ${{ runner.os }}-composer-dev-${{ hashFiles('composer.lock') }}
+
+      - name: Install dependencies
+        if: steps.composer-cache.outputs.cache-hit != 'true'
+        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader --no-scripts
+      - name: Run test suite with coverage
+        run: composer run test:ci

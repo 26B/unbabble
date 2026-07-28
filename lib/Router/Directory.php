@@ -186,6 +186,7 @@ class Directory {
 	/**
 	 * Applies language to the attachment's link given it's language.
 	 *
+	 * @since Unreleased Correct typo in variable name comparison.
 	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
@@ -197,7 +198,7 @@ class Directory {
 		// When attachments are attached to a post, their url already has the lang from the post permalink.
 		$link_lang = self::current_lang_from_uri( '', parse_url( $link, PHP_URL_PATH ) );
 		$post_lang = LangInterface::get_post_language( $post_id );
-		if ( ! empty( $lang ) && $link_lang === $post_lang ) {
+		if ( ! empty( $link_lang ) && $link_lang === $post_lang ) {
 			return $link;
 		}
 
@@ -311,6 +312,7 @@ class Directory {
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
 	 *
+	 * @since Unreleased Assume that when `$pre` is null the logic has already been short-circuited.
 	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *
@@ -318,7 +320,10 @@ class Directory {
 	 * @return null|string|false
 	 */
 	public static function pre_redirect_guess_404_permalink( $pre ) {
-		// TODO: What to do with the $pre.
+		if ( $pre !== null ) {
+			return $pre;
+		}
+
 		global $wpdb;
 		if ( get_query_var( 'name' ) ) {
 			/**
@@ -389,7 +394,7 @@ class Directory {
 	 * Adds directory to home_url.
 	 *
 	 * @since 0.6.0 Changed to static.
-	 * @since 0.5.4 Allow 'rest' schemes regardless.
+	 * @since 0.5.6 Allow 'rest' schemes regardless.
 	 * @since 0.5.2 Allow 'rest' schemes if in admin to fix Block Editor.
 	 * @since 0.5.0 Added $scheme argument. Stop if $scheme is 'rest'.
 	 * @since 0.0.1
@@ -445,9 +450,10 @@ class Directory {
 	 *
 	 * @param string $url
 	 * @param string $path
+	 * @param mixed  $orig_scheme
 	 * @return string
 	 */
-	public static function network_home_url( string $url, string $path ) : string {
+	public static function network_home_url( string $url, string $path, $orig_scheme ) : string {
 		if ( ! is_multisite() ) {
 			return $url;
 		}

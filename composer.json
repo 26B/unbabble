@@ -1,39 +1,45 @@
 {
-  "name": "26b/unbabble",
-  "description": "A new and simple i18n system for WordPress",
-  "type": "wordpress-plugin",
-  "keywords": [
-    "wordpress",
-    "plugin"
-  ],
-  "homepage": "https://github.com/26B/unbabble",
-  "license": "GPL-2.0-or-later",
-  "require": {
-    "php": ">=8.0",
-    "26b/diqa-formatter": "^1.2",
-    "ramsey/uuid": "^4.6",
-    "wp-cli/wp-cli": "^2.7"
-  },
-  "require-dev": {
-    "10up/wp_mock": "dev-trunk",
-    "phpunit/phpunit": "^9.5.7"
-  },
-  "authors": [],
-  "autoload": {
-    "psr-4": {
-      "TwentySixB\\WP\\Plugin\\Unbabble\\": "lib/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "TwentySixB\\WP\\Plugin\\Unbabble\\Tests\\": "tests/"
-    }
-  },
-  "minimum-stability": "stable",
-  "config": {
-    "sort-packages": true,
-    "allow-plugins": {
-      "composer/installers": false
-    }
-  }
+	"name": "26b/unbabble",
+	"description": "A new and simple i18n system for WordPress",
+	"type": "wordpress-plugin",
+	"keywords": [
+		"wordpress",
+		"plugin"
+	],
+	"homepage": "https://github.com/26B/unbabble",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=8.0",
+		"26b/diqa-formatter": "^1.2",
+		"ramsey/uuid": "^4.6",
+		"wp-cli/wp-cli": "^2.7"
+	},
+	"require-dev": {
+		"brain/monkey": "2.*",
+		"phpunit/phpunit": "^9.5.7"
+	},
+	"authors": [],
+	"autoload": {
+		"psr-4": {
+			"TwentySixB\\WP\\Plugin\\Unbabble\\": "lib/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"TwentySixB\\WP\\Plugin\\Unbabble\\Tests\\": "tests/"
+		}
+	},
+	"scripts": {
+		"test": "phpunit --testdox --colors=always",
+		"test:ci": [
+			"@test --stop-on-failure"
+		]
+	},
+	"minimum-stability": "stable",
+	"config": {
+		"sort-packages": true,
+		"allow-plugins": {
+			"composer/installers": false
+		}
+	}
 }

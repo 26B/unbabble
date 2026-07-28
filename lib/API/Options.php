@@ -75,6 +75,7 @@ class Options {
 	/**
 	 * Submit options.
 	 *
+	 * @since Unreleased Return bad request responses for validation errors.
 	 * @since 0.5.0 Improve response with new options and canUpdate.
 	 * @since 0.2.0
 	 *
@@ -84,7 +85,7 @@ class Options {
 	public function submit_options( \WP_REST_Request $request ) {
 		$updated = UnbabbleOptions::update_via_api( $request );
 		if ( is_array( $updated ) ) {
-			return new \WP_REST_Response( [ 'errors' => $updated ], 500 );
+			return new \WP_REST_Response( [ 'errors' => $updated ], 400 );
 		}
 
 		// Need to fetch new option values.

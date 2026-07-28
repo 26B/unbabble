@@ -2,17 +2,22 @@
 
 namespace TwentySixB\WP\Plugin\Unbabble\Tests;
 
+use Brain\Monkey;
+use Brain\Monkey\Actions;
+use Brain\Monkey\Filters;
+use Brain\Monkey\Functions;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use PHPUnit\Framework\TestCase;
 use TwentySixB\WP\Plugin\Unbabble\LangInterface;
 use TwentySixB\WP\Plugin\Unbabble\Options;
-use WP_Mock;
 
 /**
  * Unit tests for LangInterface.
  *
- * @since 0.0.12
+ * @since Unreleased Migrate LangInterface tests to Brain Monkey.
  */
 class LangInterfaceTest extends TestCase {
+	use MockeryPHPUnitIntegration;
 
 	/**
 	 * TODO: Functions to be tested in Integration and E2E testing.
@@ -42,20 +47,44 @@ class LangInterfaceTest extends TestCase {
 	 */
 
 	/**
+	 * Set up tests.
+	 *
+	 * @since Unreleased
+	 *
+	 * @return void
+	 */
+	public function setUp() : void {
+		parent::setUp();
+		Monkey\setUp();
+
+		Functions\when( '__' )->returnArg();
+		$_GET    = [];
+		$_COOKIE = [];
+
+		global $wp_query;
+		$wp_query = null;
+
+		$property = ( new \ReflectionClass( Options::class ) )->getProperty( 'options' );
+		$property->setAccessible( true );
+		$property->setValue( null, null );
+	}
+
+	/**
 	 * Tear down tests.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Tear down Brain Monkey after tests.
 	 *
 	 * @return void
 	 */
 	public function tearDown() : void {
-		\WP_Mock::tearDown();
+		Monkey\tearDown();
+		parent::tearDown();
 	}
 
 	/**
 	 * Options used in the tests.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Use shared options for expanded language tests.
 	 *
 	 * @return array
 	 */
@@ -74,18 +103,21 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Set up hooks for loading options.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Set up Brain Monkey hooks for options loading.
 	 *
 	 * @param array  $options
 	 * @param string $default_locale
 	 * @return void
 	 */
 	public function setUpOptionsHooks( array $options, string $default_locale = 'en_US' ) : void {
-		WP_Mock::expectFilterAdded( 'ubb_stop_switch_locale', '__return_true' );
+		Filters\expectAdded( 'ubb_stop_switch_locale' )
+			->twice()
+			->with( '__return_true' );
 
 		mock_user_function( 'get_locale', [], null, $default_locale );
-		// No expectFilterRemoved exists, so we need to do it manually.
-		mock_user_function( 'remove_filter', [ 'ubb_stop_switch_locale', '__return_true' ], null );
+		Filters\expectRemoved( 'ubb_stop_switch_locale' )
+			->twice()
+			->with( '__return_true' );
 		mock_user_function( 'get_option', [ 'ubb_options' ], null, $options );
 
 		$default_options = Options::defaults();
@@ -95,7 +127,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_languages.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate hidden language filter assertions to Brain Monkey.
 	 *
 	 * @testdox get_languages - return expected filtered and unfiltered languages
 	 *
@@ -109,9 +141,10 @@ class LangInterfaceTest extends TestCase {
 		mock_user_function( 'current_user_can', [ 'manage_options' ], null, false );
 
 		// Test languages unfiltered by hidden languages.
-		WP_Mock::onFilter( 'ubb_do_hidden_languages_filter' )
+		Filters\expectApplied( 'ubb_do_hidden_languages_filter' )
+			->once()
 			->with( true, $options )
-			->reply( false );
+			->andReturn( false );
 
 		$this->assertSame(
 			$options['allowed_languages'],
@@ -119,9 +152,10 @@ class LangInterfaceTest extends TestCase {
 		);
 
 		// Test languages filtered by hidden languages.
-		WP_Mock::onFilter( 'ubb_do_hidden_languages_filter' )
+		Filters\expectApplied( 'ubb_do_hidden_languages_filter' )
+			->once()
 			->with( true, $options )
-			->reply( true );
+			->andReturn( true );
 
 		$this->assertSame(
 			array_diff( $options['allowed_languages'], $options['hidden_languages'] ),
@@ -132,7 +166,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_language_allowed.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate allowed language assertions to Brain Monkey.
 	 *
 	 * @testdox is_language_allowed - returns as expected
 	 *
@@ -157,7 +191,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_default_language.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate default language assertions to Brain Monkey.
 	 *
 	 * @testdox get_default_language - returns as expected
 	 *
@@ -174,9 +208,113 @@ class LangInterfaceTest extends TestCase {
 	}
 
 	/**
+	 * Test get_current_language with a query var.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_current_language - reads a valid query var before other sources
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentLanguageReadsQueryVar() : void {
+		global $wp_query;
+		$wp_query = new \stdClass();
+
+		$options = $this->options();
+		$this->setUpOptionsHooks( $options );
+
+		mock_user_function( 'get_query_var', [ 'lang', null ], 1, 'en_US' );
+		mock_user_function( 'is_admin', null, null, true );
+		mock_user_function( 'sanitize_text_field', [ 'en_US' ], 1, 'en_US' );
+		Filters\expectApplied( 'ubb_current_lang' )
+			->once()
+			->with( 'en_US' )
+			->andReturn( 'en_US' );
+
+		$this->assertSame( 'en_US', LangInterface::get_current_language() );
+	}
+
+	/**
+	 * Test get_current_language with GET data.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_current_language - falls back to a valid lang request value
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentLanguageReadsGetValue() : void {
+		$options = $this->options();
+		$this->setUpOptionsHooks( $options );
+
+		$_GET['lang'] = 'pt_PT';
+
+		mock_user_function( 'is_admin', null, null, true );
+		mock_user_function( 'sanitize_text_field', [ 'pt_PT' ], 1, 'pt_PT' );
+		Filters\expectApplied( 'ubb_current_lang' )
+			->once()
+			->with( 'pt_PT' )
+			->andReturn( 'pt_PT' );
+
+		$this->assertSame( 'pt_PT', LangInterface::get_current_language() );
+	}
+
+	/**
+	 * Test get_current_language with admin cookie.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_current_language - falls back to a valid admin language cookie
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentLanguageReadsAdminCookie() : void {
+		$options = $this->options();
+		$this->setUpOptionsHooks( $options );
+
+		$_COOKIE['ubb_lang'] = 'pt_PT';
+
+		mock_user_function( 'is_admin', null, null, true );
+		mock_user_function( 'sanitize_text_field', [ 'pt_PT' ], 1, 'pt_PT' );
+		Filters\expectApplied( 'ubb_current_lang' )
+			->once()
+			->with( 'pt_PT' )
+			->andReturn( 'pt_PT' );
+
+		$this->assertSame( 'pt_PT', LangInterface::get_current_language() );
+	}
+
+	/**
+	 * Test get_current_language with an invalid value.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_current_language - falls back to default language when value is invalid
+	 *
+	 * @return void
+	 */
+	public function testGetCurrentLanguageFallsBackToDefaultWhenInvalid() : void {
+		global $wp_query;
+		$wp_query = new \stdClass();
+
+		$options = $this->options();
+		$this->setUpOptionsHooks( $options );
+
+		mock_user_function( 'get_query_var', [ 'lang', null ], 1, 'unknown_language' );
+		mock_user_function( 'is_admin', null, null, true );
+		mock_user_function( 'sanitize_text_field', [ $options['default_language'] ], 1, $options['default_language'] );
+		Filters\expectApplied( 'ubb_current_lang' )
+			->once()
+			->with( $options['default_language'] )
+			->andReturn( $options['default_language'] );
+
+		$this->assertSame( $options['default_language'], LangInterface::get_current_language() );
+	}
+
+	/**
 	 * Test set_current_language.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate current language mutation assertions to Brain Monkey.
 	 *
 	 * @testdox set_current_language - functions as expected
 	 *
@@ -200,9 +338,231 @@ class LangInterfaceTest extends TestCase {
 	}
 
 	/**
+	 * Test get_post_language from database.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_post_language - returns database value and caches it when cache misses
+	 *
+	 * @return void
+	 */
+	public function testGetPostLanguageReturnsDatabaseValueOnCacheMiss() : void {
+		global $wpdb;
+		$wpdb = new class() {
+			public string $prefix = 'wp_';
+			public string $last_prepare_query = '';
+			public array $last_prepare_args = [];
+
+			public function prepare( string $query, ...$args ) : string {
+				$this->last_prepare_query = $query;
+				$this->last_prepare_args  = $args;
+				return 'prepared post language query';
+			}
+
+			public function get_var( string $query ) : string {
+				return 'pt_PT';
+			}
+		};
+
+		$options = $this->options();
+		$this->setUpOptionsHooks( $options );
+
+		mock_user_function( 'get_post_type', [ 123 ], 1, 'post' );
+		mock_user_function( 'is_admin', null, null, true );
+		mock_user_function( 'get_current_blog_id', [], 1, 1 );
+		mock_user_function( 'wp_cache_get', [ 'ubb_1_123_post_language', 'ubb', false, false ], 1, false );
+		mock_user_function( 'wp_cache_set', [ 'ubb_1_123_post_language', 'pt_PT', 'ubb', 30 ], 1, true );
+
+		$this->assertSame( 'pt_PT', LangInterface::get_post_language( 123 ) );
+		$this->assertSame( [ 123 ], $wpdb->last_prepare_args );
+	}
+
+	/**
+	 * Test set_post_language rejects unknown language.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox set_post_language - rejects unknown language without writing the database
+	 *
+	 * @return void
+	 */
+	public function testSetPostLanguageRejectsUnknownLanguage() : void {
+		global $wpdb;
+		$wpdb = (object) [ 'prefix' => 'wp_' ];
+
+		$options = $this->options();
+		$this->setUpOptionsHooks( $options );
+
+		mock_user_function( 'is_admin', null, null, true );
+
+		$this->assertFalse( LangInterface::set_post_language( 123, 'unknown_language' ) );
+	}
+
+	/**
+	 * Test set_post_language inserts a new language.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox set_post_language - writes a new language, clears cache, and fires action
+	 *
+	 * @return void
+	 */
+	public function testSetPostLanguageWritesNewLanguage() : void {
+		global $wpdb;
+		$wpdb = new class() {
+			public string $prefix = 'wp_';
+			public array $replace_args = [];
+
+			public function prepare( string $query, ...$args ) : string {
+				return 'prepared post language query';
+			}
+
+			public function get_var( string $query ) : string {
+				return '';
+			}
+
+			public function replace( string $table, array $data ) : int {
+				$this->replace_args = [ $table, $data ];
+				return 1;
+			}
+		};
+
+		$options = $this->options();
+		$this->setUpOptionsHooks( $options );
+
+		mock_user_function( 'is_admin', null, null, true );
+		mock_user_function( 'get_post_type', [ 123 ], 1, 'post' );
+		mock_user_function( 'get_current_blog_id', [], null, 1 );
+		Functions\expect( 'wp_cache_get' )
+			->once()
+			->withAnyArgs()
+			->andReturnUsing(
+				function ( string $key, string $group, bool $force, bool &$found ) : string {
+					$found = true;
+					return '';
+				}
+			);
+		mock_user_function( 'wp_cache_set', [ 'ubb_1_123_post_language', '', 'ubb', 30 ], 1, true );
+		mock_user_function( 'wp_cache_delete', [ 'ubb_1_123_post_language', 'ubb' ], 1, true );
+		Actions\expectDone( 'ubb_post_language_set' )
+			->once()
+			->with( 123, 'pt_PT', false, null );
+
+		$this->assertTrue( LangInterface::set_post_language( 123, 'pt_PT' ) );
+		$this->assertSame(
+			[
+				'wp_ubb_post_translations',
+				[
+					'post_id' => 123,
+					'locale'  => 'pt_PT',
+				],
+			],
+			$wpdb->replace_args
+		);
+	}
+
+	/**
+	 * Test get_post_source from transient.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_post_source - returns non-empty transient value without reading meta
+	 *
+	 * @return void
+	 */
+	public function testGetPostSourceReturnsTransientValue() : void {
+		mock_user_function( 'get_transient', [ 'ubb_123_post_source' ], 1, 'source-1' );
+		Functions\expect( 'get_post_meta' )->never();
+
+		$this->assertSame( 'source-1', LangInterface::get_post_source( 123 ) );
+	}
+
+	/**
+	 * Test get_post_source normalizes empty meta.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_post_source - normalizes empty meta values to null and caches null
+	 *
+	 * @return void
+	 */
+	public function testGetPostSourceNormalizesEmptyMetaValue() : void {
+		mock_user_function( 'get_transient', [ 'ubb_123_post_source' ], 1, false );
+		mock_user_function( 'get_post_meta', [ 123, 'ubb_source', true ], 1, '' );
+		mock_user_function( 'set_transient', [ 'ubb_123_post_source', null, 30 ], 1, true );
+
+		$this->assertNull( LangInterface::get_post_source( 123 ) );
+	}
+
+	/**
+	 * Test set_post_source adds a new source.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox set_post_source - adds a new source, updates transients, and fires action
+	 *
+	 * @return void
+	 */
+	public function testSetPostSourceAddsNewSource() : void {
+		mock_user_function( 'get_transient', [ 'ubb_123_post_source' ], 1, false );
+		mock_user_function( 'get_post_meta', [ 123, 'ubb_source', true ], 1, '' );
+		mock_user_function( 'set_transient', [ 'ubb_123_post_source', null, 30 ], 1, true );
+		mock_user_function( 'add_post_meta', [ 123, 'ubb_source', 'source-1', true ], 1, 456 );
+		mock_user_function( 'delete_transient', [ 'ubb_source-1_source_posts' ], 1, true );
+		mock_user_function( 'set_transient', [ 'ubb_123_post_source', 'source-1', 30 ], 1, true );
+		Actions\expectDone( 'ubb_post_source_set' )
+			->once()
+			->with( 123, 'source-1', null, false );
+
+		$this->assertTrue( LangInterface::set_post_source( 123, 'source-1' ) );
+	}
+
+	/**
+	 * Test set_post_source force with same source.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox set_post_source - forced same source returns true without writing meta
+	 *
+	 * @return void
+	 */
+	public function testSetPostSourceForceSameSourceSkipsMetaWrite() : void {
+		mock_user_function( 'get_transient', [ 'ubb_123_post_source' ], 1, 'source-1' );
+		Functions\expect( 'update_post_meta' )->never();
+		Functions\expect( 'add_post_meta' )->never();
+		Functions\expect( 'delete_transient' )->never();
+
+		$this->assertTrue( LangInterface::set_post_source( 123, 'source-1', true ) );
+	}
+
+	/**
+	 * Test delete_post_source preserves integer ID.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox delete_post_source - deletes transients and meta using integer post ID
+	 *
+	 * @return void
+	 */
+	public function testDeletePostSourceUsesIntegerPostId() : void {
+		mock_user_function( 'get_transient', [ 'ubb_123_post_source' ], 1, 'source-1' );
+		mock_user_function( 'delete_transient', [ 'ubb_source-1_source_posts' ], 1, true );
+		mock_user_function( 'delete_transient', [ 'ubb_123_post_source' ], 1, true );
+		Actions\expectDone( 'ubb_post_source_delete' )
+			->once()
+			->with( \Mockery::on( fn ( $post_id ) => $post_id === 123 ), 'source-1' );
+		Functions\expect( 'delete_post_meta' )
+			->once()
+			->with( \Mockery::on( fn ( $post_id ) => $post_id === 123 ), 'ubb_source' )
+			->andReturn( true );
+
+		$this->assertTrue( LangInterface::delete_post_source( 123 ) );
+	}
+
+	/**
 	 * Test get_translatable_post_types.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate translatable post type assertions to Brain Monkey.
 	 *
 	 * @testdox get_translatable_post_types - returns as expected
 	 *
@@ -221,7 +581,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test is_post_type_translatable.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate post type translatability assertions to Brain Monkey.
 	 *
 	 * @testdox is_post_type_translatable - returns as expected
 	 *
@@ -246,7 +606,7 @@ class LangInterfaceTest extends TestCase {
 	/**
 	 * Test get_translatable_taxonomies.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate translatable taxonomy assertions to Brain Monkey.
 	 *
 	 * @testdox get_translatable_taxonomies - returns as expected
 	 *
@@ -263,9 +623,107 @@ class LangInterfaceTest extends TestCase {
 	}
 
 	/**
+	 * Test get_term_source from transient.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_term_source - returns non-empty transient value without reading meta
+	 *
+	 * @return void
+	 */
+	public function testGetTermSourceReturnsTransientValue() : void {
+		mock_user_function( 'get_transient', [ 'ubb_321_term_source' ], 1, 'source-2' );
+		Functions\expect( 'get_term_meta' )->never();
+
+		$this->assertSame( 'source-2', LangInterface::get_term_source( 321 ) );
+	}
+
+	/**
+	 * Test get_term_source normalizes empty meta.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox get_term_source - normalizes empty meta values to null and caches null
+	 *
+	 * @return void
+	 */
+	public function testGetTermSourceNormalizesEmptyMetaValue() : void {
+		mock_user_function( 'get_transient', [ 'ubb_321_term_source' ], 1, false );
+		mock_user_function( 'get_term_meta', [ 321, 'ubb_source', true ], 1, '' );
+		mock_user_function( 'set_transient', [ 'ubb_321_term_source', null, 30 ], 1, true );
+
+		$this->assertNull( LangInterface::get_term_source( 321 ) );
+	}
+
+	/**
+	 * Test set_term_source adds a new source.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox set_term_source - adds a new source, updates transients, and fires action
+	 *
+	 * @return void
+	 */
+	public function testSetTermSourceAddsNewSource() : void {
+		mock_user_function( 'get_transient', [ 'ubb_321_term_source' ], 1, false );
+		mock_user_function( 'get_term_meta', [ 321, 'ubb_source', true ], 1, '' );
+		mock_user_function( 'set_transient', [ 'ubb_321_term_source', null, 30 ], 1, true );
+		mock_user_function( 'add_term_meta', [ 321, 'ubb_source', 'source-2', true ], 1, 654 );
+		mock_user_function( 'delete_transient', [ 'ubb_source-2_source_terms' ], 1, true );
+		mock_user_function( 'set_transient', [ 'ubb_321_term_source', 'source-2', 30 ], 1, true );
+		Actions\expectDone( 'ubb_term_source_set' )
+			->once()
+			->with( 321, 'source-2', null, false );
+
+		$this->assertTrue( LangInterface::set_term_source( 321, 'source-2' ) );
+	}
+
+	/**
+	 * Test set_term_source force with same source.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox set_term_source - forced same source returns true without writing meta
+	 *
+	 * @return void
+	 */
+	public function testSetTermSourceForceSameSourceSkipsMetaWrite() : void {
+		mock_user_function( 'get_transient', [ 'ubb_321_term_source' ], 1, 'source-2' );
+		Functions\expect( 'update_term_meta' )->never();
+		Functions\expect( 'add_term_meta' )->never();
+		Functions\expect( 'delete_transient' )->never();
+
+		$this->assertTrue( LangInterface::set_term_source( 321, 'source-2', true ) );
+	}
+
+	/**
+	 * Test delete_term_source preserves integer ID.
+	 *
+	 * @since Unreleased
+	 *
+	 * @testdox delete_term_source - deletes transients and meta using integer term ID
+	 *
+	 * @return void
+	 */
+	public function testDeleteTermSourceUsesIntegerTermId() : void {
+		mock_user_function( 'get_transient', [ 'ubb_321_term_source' ], 1, 'source-2' );
+		mock_user_function( 'delete_transient', [ 'ubb_source-2_source_terms' ], 1, true );
+		mock_user_function( 'delete_transient', [ 'ubb_321_term_source' ], 1, true );
+		Actions\expectDone( 'ubb_term_source_delete' )
+			->once()
+			->with( \Mockery::on( fn ( $term_id ) => $term_id === 321 ), 'source-2' );
+		Functions\expect( 'delete_term_meta' )
+			->once()
+			->with( \Mockery::on( fn ( $term_id ) => $term_id === 321 ), 'ubb_source' )
+			->andReturn( true );
+
+		$this->assertTrue( LangInterface::delete_term_source( 321 ) );
+	}
+
+	/**
 	 * Test is_taxonomy_translatable.
 	 *
-	 * @since 0.0.12
+	 * @since Unreleased Migrate taxonomy translatability assertions to Brain Monkey.
 	 *
 	 * @testdox is_taxonomy_translatable - returns as expected
 	 *
