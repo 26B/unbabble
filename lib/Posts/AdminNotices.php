@@ -17,7 +17,7 @@ class AdminNotices {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Add filters for trashed posts without none/unknown language.
+	 * @since 0.7.0 Add filters for trashed posts without none/unknown language.
 	 * @since 0.0.1
 	 */
 	public function register() {
@@ -61,7 +61,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice for when there's posts with missing languages or with an unknown language.
 	 *
-	 * @since Unreleased Add query condition to not count trashed posts.
+	 * @since 0.7.0 Add query condition to not count trashed posts.
 	 * @since 0.4.2 Remove TODO and duplicate $post_type.
 	 * @since 0.0.1
 	 *
@@ -134,7 +134,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice for when there's trashed posts with missing languages or with an unknown language.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -232,7 +232,7 @@ class AdminNotices {
 	/**
 	 * Adds an admin notice explaining the trashed post filter for unknown or missing languages.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */

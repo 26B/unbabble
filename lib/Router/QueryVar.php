@@ -186,7 +186,7 @@ class QueryVar {
 	 * was no way of filtering the post found after the fact, but we wanted to have the same
 	 * behaviour of guessing that WP has.
 	 *
-	 * @since Unreleased Assume that when `$pre` is null the logic has already been short-circuited.
+	 * @since 0.7.0 Assume that when `$pre` is null the logic has already been short-circuited.
 	 * @since 0.6.0 Changed to static.
 	 * @since 0.0.1
 	 *

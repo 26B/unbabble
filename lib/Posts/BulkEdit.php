@@ -220,7 +220,7 @@ class BulkEdit {
 	/**
 	 * Adds a message to the bulk edit update message.
 	 *
-	 * @since Unreleased Fix empty post type on edit.php for posts.
+	 * @since 0.7.0 Fix empty post type on edit.php for posts.
 	 * @since 0.4.0
 	 *
 	 * @param array $bulk_messages Bulk messages.

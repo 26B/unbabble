@@ -26,7 +26,7 @@ class LanguageSwitcher {
 	/**
 	 * Add language switcher to the admin bar.
 	 *
-	 * @since Unreleased Added specific handling for menus.
+	 * @since 0.7.0 Added specific handling for menus.
 	 * @since 0.0.1
 	 *
 	 * @param  WP_Admin_Bar $wp_admin_bar
@@ -206,7 +206,7 @@ class LanguageSwitcher {
 	/**
 	 * Returns the url for switching language for a menu.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @param int    $menu_id
 	 * @param string $lang

@@ -60,7 +60,7 @@ use TwentySixB\WP\Plugin\Unbabble\Plugin;
 /**
  * Unit tests for Options.
  *
- * @since Unreleased
+ * @since 0.7.0
  */
 class OptionsTest extends TestCase {
 	use MockeryPHPUnitIntegration;
@@ -68,7 +68,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Set up tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -88,7 +88,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Tear down tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -101,7 +101,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Options used in the tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return array
 	 */
@@ -120,7 +120,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test validate accepts valid options.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox validate - accepts complete valid options
 	 *
@@ -133,7 +133,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test validate reports schema errors.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox validate - reports missing, type, and router errors
 	 *
@@ -166,7 +166,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test validate reports language rule errors.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox validate - reports default and hidden language conflicts
 	 *
@@ -200,7 +200,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test standardize.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox standardize - reindexes post type and taxonomy arrays
 	 *
@@ -220,7 +220,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test get_filter_options with no filter value.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox get_filter_options - returns false when filter does not provide options
 	 *
@@ -238,7 +238,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test get_filter_options with invalid options.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox get_filter_options - returns WP_Error for invalid filtered options
 	 *
@@ -268,7 +268,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test get_filter_options pairs menu translation options.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox get_filter_options - pairs nav menu post types and taxonomies
 	 *
@@ -305,7 +305,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test update_via_api with query var router.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox update_via_api - builds normalized options and preserves router options for query var router
 	 *
@@ -352,7 +352,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test update_via_api with directory router.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox update_via_api - normalizes directory router options
 	 *
@@ -396,7 +396,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test update_via_api with invalid JSON.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox update_via_api - returns per-field errors for invalid JSON bodies
 	 *
@@ -420,7 +420,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test update_via_api rejects malformed nested payload values.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox update_via_api - rejects malformed language, router, and type entries
 	 *
@@ -459,7 +459,7 @@ class OptionsTest extends TestCase {
 	/**
 	 * Test submit_options validation status.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox submit_options - returns 400 when submitted options fail validation
 	 *

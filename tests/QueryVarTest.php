@@ -11,7 +11,7 @@ use TwentySixB\WP\Plugin\Unbabble\Router\QueryVar;
 /**
  * Unit tests for query var routing.
  *
- * @since Unreleased
+ * @since 0.7.0
  */
 class QueryVarTest extends TestCase {
 	use MockeryPHPUnitIntegration;
@@ -19,7 +19,7 @@ class QueryVarTest extends TestCase {
 	/**
 	 * Set up tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -31,7 +31,7 @@ class QueryVarTest extends TestCase {
 	/**
 	 * Tear down tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -43,7 +43,7 @@ class QueryVarTest extends TestCase {
 	/**
 	 * Test redirect guess pre-filter values.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox pre_redirect_guess_404_permalink - returns non-null pre-filter values unchanged
 	 *
@@ -61,7 +61,7 @@ class QueryVarTest extends TestCase {
 	/**
 	 * Test network_home_url signature.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox network_home_url - accepts resolver arguments
 	 *

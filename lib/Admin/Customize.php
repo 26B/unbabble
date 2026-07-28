@@ -20,7 +20,7 @@ class Customize {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Move proxied options filters to OptionsProxy class.
+	 * @since 0.7.0 Move proxied options filters to OptionsProxy class.
 	 * @since 0.6.1 Add action for lang filter on post type query for nav-menu edit screen.
 	 * @since 0.5.16 Make 'widget_block' option translatable.
 	 * @since 0.4.5 Add check for translatable nav_menu.

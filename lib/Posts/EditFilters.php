@@ -17,7 +17,7 @@ class EditFilters {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased Add handling for posts with no language or unknown language. Change `add_no_lang_filter` to `add_no_lang_filters`.
+	 * @since 0.7.0 Add handling for posts with no language or unknown language. Change `add_no_lang_filter` to `add_no_lang_filters`.
 	 * @since 0.4.5 Add views-edit-{$post_type} filter for all translatable post types.
 	 * @since 0.4.2 Remove filter in $_GET when not in admin. Only add filter hook when $_GET filter is set. Stop post lang filter from being applied.
 	 * @since 0.0.1
@@ -46,7 +46,7 @@ class EditFilters {
 	/**
 	 * Adds a filter to show posts without language.
 	 *
-	 * @since Unreleased Change name to `add_no_lang_filters'. Add trash filter.
+	 * @since 0.7.0 Change name to `add_no_lang_filters'. Add trash filter.
 	 * @since 0.4.5 Get post type via $_GET instead of `get_post`.
 	 * @since 0.4.2 Fixed the query not considering posts with unknown language.
 	 * @since 0.4.0

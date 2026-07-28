@@ -31,7 +31,7 @@ use TwentySixB\WP\Plugin\Unbabble\Router\Directory;
 /**
  * Unit tests for directory routing.
  *
- * @since Unreleased
+ * @since 0.7.0
  */
 class DirectoryTest extends TestCase {
 	use MockeryPHPUnitIntegration;
@@ -39,7 +39,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Set up tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -60,7 +60,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Tear down tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -73,7 +73,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Options used in tests.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return array
 	 */
@@ -96,7 +96,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Set up option loading.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -119,7 +119,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Test attachment links that already include the attachment language.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox apply_lang_to_attachment_url - returns same-language attachment URLs unchanged
 	 *
@@ -155,7 +155,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Test REST home URLs.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox home_url - applies directory routing to REST scheme URLs
 	 *
@@ -181,7 +181,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Test redirect guess pre-filter values.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox pre_redirect_guess_404_permalink - returns non-null pre-filter values unchanged
 	 *
@@ -199,7 +199,7 @@ class DirectoryTest extends TestCase {
 	/**
 	 * Test network_home_url signature.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @testdox network_home_url - accepts resolver arguments
 	 *

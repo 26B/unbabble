@@ -614,7 +614,7 @@ class LangInterface {
 	 *
 	 * Unlinks post from its translations.
 	 *
-	 * @since Unreleased Use integer IDs and delete translation cache when source exists.
+	 * @since 0.7.0 Use integer IDs and delete translation cache when source exists.
 	 * @since 0.4.6 Added `ubb_post_source_delete` action.
 	 * @since 0.0.1
 	 *
@@ -1039,7 +1039,7 @@ class LangInterface {
 	 *
 	 * Unlinks term from its translations.
 	 *
-	 * @since Unreleased Use integer IDs and delete translation cache when source exists.
+	 * @since 0.7.0 Use integer IDs and delete translation cache when source exists.
 	 * @since 0.4.6 Added `ubb_term_source_delete` action.
 	 * @since 0.0.1
 	 *

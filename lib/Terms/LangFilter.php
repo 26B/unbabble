@@ -15,8 +15,8 @@ class LangFilter {
 	/**
 	 * Register hooks.
 	 *
-	 * @since Unreleased - Fix term delete bug via ajax when term has no language.
-	 * @since Unreleased - Added handling of `set_object_terms` action to clear terms of a different language or without language when object terms are set without append.
+	 * @since 0.7.0 - Fix term delete bug via ajax when term has no language.
+	 * @since 0.7.0 - Added handling of `set_object_terms` action to clear terms of a different language or without language when object terms are set without append.
 	 * @since 0.0.1
 	 */
 	public function register() {
@@ -34,7 +34,7 @@ class LangFilter {
 	 * In this case, we want to ignore the language filter due to a term_exists call that is
 	 * made during the deletion process.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @param array $query_args The query args for term_exists.
 	 * @param mixed $term The term being checked.
@@ -161,7 +161,7 @@ class LangFilter {
 	 * We need this because the fetch of terms in wp_set_object_terms() has the lang filter applied,
 	 * so only the terms of the current language are fetched and deleted when append is false.
 	 *
-	 * @since Unreleased
+	 * @since 0.7.0
 	 *
 	 * @param int    $object_id  Object ID.
 	 * @param array  $terms      An array of object term IDs or slugs.
