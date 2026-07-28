@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add test coverage for main classes and methods.
 - Replaced WP_Mock with Brain\Monkey for better testing of WordPress functions and hooks.
 - Handle non-null `$pre` in `Directory::pre_redirect_guess_404_permalink` and `QueryVar::pre_redirect_guess_404_permalink` as already short-circuited.
-- Added valition for payload structure in `Options::update_via_api` method.
+- Added validation for payload structure in `Options::update_via_api` method.
 
 ## [0.6.4] - 2026-04-16
 
