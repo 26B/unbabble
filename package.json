@@ -43,7 +43,7 @@
 	"homepage": "https://github.com/26B/unbabble#readme",
 	"devDependencies": {
 		"@wordpress/env": "^11.11.0",
-		"@wordpress/scripts": "^33.0.0"
+		"@wordpress/scripts": "^37.0.0"
 	},
 	"dependencies": {
 		"@wordpress/icons": "^15.2.0"
